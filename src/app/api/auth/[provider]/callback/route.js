@@ -20,12 +20,19 @@ export async function GET(request, { params }) {
   const savedState = request.cookies.get('oauth_state')?.value;
   const next = request.cookies.get('oauth_next')?.value || '/';
 
+  console.log(`[auth/${provider}/callback] 진입 — origin:`, origin,
+    '/ code:', code ? code.slice(0, 10) + '…' : '없음',
+    '/ state(query):', state?.slice(0, 8) || '없음',
+    '/ state(cookie):', savedState?.slice(0, 8) || '없음');
+
   if (!code) return fail('로그인이 취소되었습니다.');
   if (!state || state !== savedState) return fail('로그인 요청이 만료되었습니다. 다시 시도해 주세요.');
 
   let profile;
   try {
-    const accessToken = await exchangeToken(p, { code, state, uri: redirectUri(provider, request) });
+    const uri = redirectUri(provider, request);
+    console.log(`[auth/${provider}/callback] 토큰 교환 redirect_uri:`, uri);
+    const accessToken = await exchangeToken(p, { code, state, uri });
     profile = await fetchProfile(p, accessToken);
   } catch (e) {
     console.error(`[auth/${provider}/callback] 토큰·프로필 실패:`, e.message);
