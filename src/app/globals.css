@@ -1,0 +1,169 @@
+/* ─────────────────────────────────────────────────────────────
+   디자인 토큰 — "낮의 이야기 투어" 화이트 테마
+   실제 디자인(Figma·갑 에셋) 확정 시 이 변수만 교체하면 전체 반영됨.
+   컨셉: 한지 흰 바탕 / 청사초롱 등불 호박빛 / 부적 붉은색
+   ───────────────────────────────────────────────────────────── */
+:root {
+  --bg:         #ffffff;   /* 배경: 한지 흰빛 */
+  --surface:    #ffffff;   /* 카드 */
+  --surface-2:  #f5f6f8;   /* 눌린 면(입력창·게이지 트랙·관리자 사이드바) */
+  --text:       #1b1f2a;   /* 본문 잉크 */
+  --text-dim:   #6b7280;   /* 보조 텍스트 */
+  --lantern:    #b8760f;   /* 강조: 등불 호박빛 */
+  --lantern-dim:#8f5b09;
+  --talisman:   #c1392b;   /* 보조 강조: 부적 붉은색 (아껴서) */
+  --line:       #e4e7ec;
+  --radius:     14px;
+  --shadow:     0 8px 24px rgba(20,26,46,.07);
+  --maxw:       420px;     /* 모바일 기준(360px)+여유 */
+}
+
+* { box-sizing: border-box; }
+html, body, #root { height: 100%; margin: 0; }
+body {
+  background: radial-gradient(1200px 600px at 50% -10%, #fdf6e9 0%, var(--bg) 55%, #f4f5f7 100%);
+  color: var(--text);
+  font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, 'Apple SD Gothic Neo',
+               'Malgun Gothic', system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  line-height: 1.55;
+}
+a { color: var(--lantern); text-decoration: none; }
+
+/* 모바일 컨테이너 (사용자 화면) */
+.screen {
+  min-height: 100dvh;
+  max-width: var(--maxw);
+  margin: 0 auto;
+  padding: 24px 20px calc(24px + env(safe-area-inset-bottom));
+  display: flex; flex-direction: column;
+}
+.grow { flex: 1; }
+
+/* 버튼 */
+.btn {
+  appearance: none; border: 0; cursor: pointer;
+  display: block; text-align: center;          /* <a>·<button> 모두 같은 모양으로 */
+  width: 100%; padding: 15px 18px; border-radius: var(--radius);
+  font-size: 16px; font-weight: 700; letter-spacing: -.01em;
+  background: var(--lantern); color: #fff;
+  box-shadow: 0 6px 18px rgba(184,118,15,.22);
+  transition: transform .06s ease, filter .15s ease;
+}
+.btn:active { transform: translateY(1px); }
+.btn:disabled { filter: grayscale(.5) opacity(.6); cursor: default; }
+.btn.ghost { background: transparent; color: var(--text); box-shadow: none; border: 1px solid var(--line); }
+.btn.danger { background: var(--talisman); color: #fff; box-shadow: none; }
+
+/* 소셜 로그인 — 각 사의 브랜드 가이드 색 */
+.btn--kakao { background: #fee500; color: #191600; box-shadow: 0 6px 18px rgba(254,229,0,.35); }
+.btn--naver { background: #03c75a; color: #fff;    box-shadow: 0 6px 18px rgba(3,199,90,.28); }
+
+/* 카드/패널 */
+.card {
+  background: linear-gradient(180deg, var(--surface), #fafbfc);
+  border: 1px solid var(--line); border-radius: var(--radius);
+  padding: 18px; box-shadow: var(--shadow);
+}
+
+/* 폼 */
+.field { margin-bottom: 14px; }
+.field label { display: block; font-size: 13px; color: var(--text-dim); margin-bottom: 6px; }
+.input, textarea, select {
+  width: 100%; padding: 12px 14px; border-radius: 10px;
+  background: var(--surface-2); color: var(--text);
+  border: 1px solid var(--line); font-size: 15px; font-family: inherit;
+}
+textarea { min-height: 90px; resize: vertical; }
+.input:focus, textarea:focus, select:focus { outline: 2px solid var(--lantern); border-color: transparent; }
+
+/* 진행 게이지 */
+.gauge { height: 12px; background: var(--surface-2); border-radius: 999px; overflow: hidden; border: 1px solid var(--line); }
+.gauge > i { display: block; height: 100%; background: linear-gradient(90deg, var(--lantern-dim), var(--lantern)); transition: width .5s ease; }
+
+/* 등불 시그니처 */
+.lantern {
+  width: 64px; height: 64px; border-radius: 50%;
+  background: radial-gradient(circle at 50% 40%, #ffd98a, #e8a13a 55%, var(--lantern));
+  box-shadow: 0 0 32px 6px rgba(232,161,58,.30);
+  margin: 0 auto 8px;
+  animation: sway 3.2s ease-in-out infinite;
+}
+@keyframes sway { 0%,100% { transform: translateY(0) } 50% { transform: translateY(-6px) } }
+
+.eyebrow { font-size: 12px; letter-spacing: .22em; text-transform: uppercase; color: var(--lantern); }
+h1 { font-size: 26px; margin: 6px 0 4px; letter-spacing: -.02em; }
+.muted { color: var(--text-dim); font-size: 14px; }
+.center { text-align: center; }
+.stack > * + * { margin-top: 12px; }
+.spread { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.badge { font-size: 12px; padding: 3px 9px; border-radius: 999px; border: 1px solid var(--line); color: var(--text-dim); }
+.badge.done { color: var(--lantern); border-color: var(--lantern); }
+
+@media (prefers-reduced-motion: reduce) { .lantern { animation: none; } }
+
+/* ─────────────────────────────────────────────────────────────
+   반응형 앱 셸 — 모바일 360px 우선 / 데스크톱 420px 중앙 프레임
+   ───────────────────────────────────────────────────────────── */
+.frame {
+  position: relative;
+  width: 100%;
+  max-width: var(--maxw);
+  margin: 0 auto;
+  min-height: 100dvh;
+  background: var(--bg);
+  display: flex; flex-direction: column;
+}
+/* 데스크톱: 중앙 프레임 + 좌우 배경 여백 */
+@media (min-width: 480px) {
+  body { padding: 0; }
+  .frame {
+    min-height: 100dvh;
+    box-shadow: 0 0 60px rgba(20,26,46,.10);
+    border-left: 1px solid var(--line);
+    border-right: 1px solid var(--line);
+  }
+}
+.frame__body { flex: 1; display: flex; flex-direction: column; }
+
+/* 하단 탭바 */
+.tabbar {
+  position: sticky; bottom: 0;
+  display: grid; grid-template-columns: repeat(3, 1fr);
+  background: rgba(255,255,255,.92);
+  backdrop-filter: blur(8px);
+  border-top: 1px solid var(--line);
+  padding-bottom: env(safe-area-inset-bottom);
+}
+.tab {
+  display: flex; flex-direction: column; align-items: center; gap: 3px;
+  padding: 10px 0 8px; color: var(--text-dim); font-size: 11px;
+  min-height: 56px; justify-content: center;   /* 터치 타깃 */
+}
+.tab__icon { font-size: 20px; filter: grayscale(1) opacity(.7); transition: filter .15s; }
+.tab--on { color: var(--lantern); }
+.tab--on .tab__icon { filter: none; }
+
+/* 셸을 쓰는 화면은 .screen 상단여백 유지, 하단은 탭바가 처리 */
+.frame .screen { min-height: auto; flex: 1; }
+/* 관리자(PC) 전용 레이아웃 — 사용자 모바일과 분리 */
+.admin { min-height: 100dvh; display: grid; grid-template-columns: 220px 1fr; }
+.admin__nav {
+  background: var(--surface-2); border-right: 1px solid var(--line);
+  padding: 20px 14px; display: flex; flex-direction: column; gap: 6px;
+}
+.admin__brand { font-weight: 800; color: var(--lantern); margin-bottom: 16px; letter-spacing: -.02em; }
+.admin__nav a { color: var(--text-dim); padding: 10px 12px; border-radius: 8px; font-size: 14px; }
+.admin__nav a.active, .admin__nav a:hover { background: #e9ebef; color: var(--text); }
+.admin__main { padding: 28px 32px; max-width: 1100px; }
+.admin__login { display: grid; place-items: center; min-height: 100dvh; }
+.admin__login .card { width: 340px; }
+
+.table { width: 100%; border-collapse: collapse; font-size: 14px; }
+.table th, .table td { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--line); }
+.table th { color: var(--text-dim); font-weight: 600; }
+.row-actions { display: flex; gap: 8px; }
+.btn.sm { width: auto; padding: 8px 12px; font-size: 13px; }
+.grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.qr-card { display: inline-flex; flex-direction: column; align-items: center; gap: 8px; padding: 14px; }
+.qr-card img { width: 160px; height: 160px; background: #fff; border-radius: 8px; padding: 8px; }

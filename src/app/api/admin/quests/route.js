@@ -1,0 +1,20 @@
+import { customAlphabet } from 'nanoid';
+import { q } from '@/lib/db';
+import { verifyFrom, ok, unauthorized } from '@/lib/auth';
+
+const shortCode = customAlphabet('ABCDEFGHJKLMNPQRSTUVWXYZ23456789', 6);
+
+export async function GET(request) {
+  if (!verifyFrom(request, 'admin')) return unauthorized();
+  return ok({ quests: await q('SELECT * FROM quests ORDER BY order_no ASC') });
+}
+
+export async function POST(request) {
+  if (!verifyFrom(request, 'admin')) return unauthorized();
+  const b = await request.json().catch(() => ({}));
+  const code = b.code || shortCode();
+  const r = await q(
+    'INSERT INTO quests (code, title, order_no, cover_image_url, reward_points, is_active) VALUES (?,?,?,?,?,?)',
+    [code, b.title || '제목없음', b.order_no || 0, b.cover_image_url || null, b.reward_points ?? 100, b.is_active ?? 1]);
+  return ok({ id: r.insertId, code });
+}
