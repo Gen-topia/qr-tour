@@ -28,8 +28,11 @@ export async function GET(request, { params }) {
     const accessToken = await exchangeToken(p, { code, state, uri: redirectUri(provider, request) });
     profile = await fetchProfile(p, accessToken);
   } catch (e) {
+    console.error(`[auth/${provider}/callback] 토큰·프로필 실패:`, e.message);
     return fail(`${p.label} 로그인에 실패했습니다: ${e.message}`);
   }
+  console.log(`[auth/${provider}/callback] 프로필 조회 성공 — providerId:`, profile.providerId,
+    '/ nickname:', profile.nickname);
 
   // 이미 가입한 계정이면 기존 id를 그대로 반환(ON DUPLICATE KEY UPDATE + LAST_INSERT_ID)
   const r = await q(
@@ -37,6 +40,8 @@ export async function GET(request, { params }) {
      ON DUPLICATE KEY UPDATE id = LAST_INSERT_ID(id)`,
     [randomUUID(), provider, profile.providerId, profile.nickname]
   );
+  console.log(`[auth/${provider}/callback] users 저장 완료 — userId:`, r.insertId,
+    '/ affectedRows:', r.affectedRows);
   const token = signToken({ id: r.insertId, role: 'user' });
 
   const res = NextResponse.redirect(`${origin}/auth/complete?next=${encodeURIComponent(next)}`);

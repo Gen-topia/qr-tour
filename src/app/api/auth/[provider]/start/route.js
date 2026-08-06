@@ -8,6 +8,9 @@ export async function GET(request, { params }) {
   const { provider } = await params;
   const p = PROVIDERS[provider];
   if (!p) return bad('지원하지 않는 로그인 방식', 404);
+  console.log(`[auth/${provider}/start] clientId:`, p.clientId() ? '설정됨' : '없음',
+    '/ APP_BASE_URL:', process.env.APP_BASE_URL || '(미설정 → 요청 origin 사용)',
+    '/ redirect_uri:', redirectUri(provider, request));
   if (!p.clientId()) return bad(`${p.label} 앱 키가 설정되지 않았습니다.`, 500);
 
   // CSRF 방지용 state — 쿠키에 심고 콜백에서 대조
