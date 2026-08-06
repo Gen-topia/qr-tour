@@ -5,7 +5,8 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "start": "next start"
+    "start": "next start",
+    "push": "git add . && git commit -m \"$npm_config_m\" && git push"
   },
   "dependencies": {
     "next": "^15.1.0",
