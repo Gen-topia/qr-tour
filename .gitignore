@@ -3,3 +3,8 @@ node_modules/
 .env
 .env.local
 npm-debug.log*
+
+# 저장소에 올리지 않는 작업용 폴더
+/docs/
+/db/
+/reference/

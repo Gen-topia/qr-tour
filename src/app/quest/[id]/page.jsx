@@ -1,5 +1,5 @@
 'use client';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Protected from '@/components/Protected';
 import { api } from '@/lib/apiClient';
@@ -7,6 +7,13 @@ import AudioPlayer from '@/components/AudioPlayer';
 import HintModal from '@/components/HintModal';
 import PhotoShare from '@/components/PhotoShare';
 import Loading from '@/components/Loading';
+import QuizStep from '@/components/steps/QuizStep';
+import PuzzleStep from '@/components/steps/PuzzleStep';
+import ScratchStep from '@/components/steps/ScratchStep';
+import GaugeStep from '@/components/steps/GaugeStep';
+import DialStep from '@/components/steps/DialStep';
+
+const PLAY_COMPONENTS = { quiz: QuizStep, puzzle: PuzzleStep, scratch: ScratchStep, gauge: GaugeStep, dial: DialStep };
 
 function Quest() {
   const { id } = useParams();
@@ -21,13 +28,28 @@ function Quest() {
     api.questSteps(id).then(r => setSteps(r.steps)).catch(e => setErr(e.message));
   }, [id]);
 
+  const stepId = steps?.[idx]?.id;
+  const isLastStep = steps ? idx >= steps.length - 1 : false;
+
+  // 모든 유형이 공유하는 제출 — 통과했으면 true를 돌려준다.
+  const submit = useCallback(async (payload) => {
+    try {
+      const r = await api.submitAnswer(id, stepId, payload);
+      if (!r.correct) return false;
+      if (r.isFinal) setResult({ awarded: r.awarded, alreadyCleared: r.alreadyCleared });
+      else setIdx(i => i + 1);
+      return true;
+    } catch (e) { setErr(e.message); return false; }
+  }, [id, stepId]);
+
   if (err) return <div className="screen center"><p className="muted">{err}</p></div>;
   if (!steps) return <Loading label="미션을 여는 중…" />;
   if (result) return <ResultView result={result} onHome={() => router.replace('/')} />;
 
   const step = steps[idx];
-  const isLast = idx >= steps.length - 1;
+  const isLast = isLastStep;
   const next = () => { if (!isLast) setIdx(i => i + 1); };
+  const Play = PLAY_COMPONENTS[step.type];
 
   return (
     <div className="screen stack fade-in">
@@ -43,33 +65,7 @@ function Quest() {
 
       {step.type === 'story' && (<><div className="grow" /><button className="btn" onClick={next} disabled={isLast}>{isLast ? '마지막 장' : '다음'}</button></>)}
       {step.type === 'photo' && (<><PhotoShare /><div className="grow" /><button className="btn" onClick={next}>다음</button></>)}
-      {step.type === 'quiz' && (
-        <QuizStep questId={id} step={step} setErr={setErr}
-          onCorrect={(r) => r.isFinal ? setResult({ awarded: r.awarded, alreadyCleared: r.alreadyCleared }) : next()} />
-      )}
-    </div>
-  );
-}
-
-function QuizStep({ questId, step, onCorrect, setErr }) {
-  const [answer, setAnswer] = useState('');
-  const [wrong, setWrong] = useState(false);
-  const [busy, setBusy] = useState(false);
-  const options = Array.isArray(step.options) ? step.options : null;
-  async function submit(val) {
-    setBusy(true); setWrong(false);
-    try { const r = await api.submitAnswer(questId, step.id, val ?? answer); r.correct ? onCorrect(r) : setWrong(true); }
-    catch (e) { setErr(e.message); } finally { setBusy(false); }
-  }
-  return (
-    <div className="card stack">
-      <div className="eyebrow">미션 · 퀴즈</div>
-      <p style={{ margin: 0 }}>{step.question}</p>
-      {options
-        ? options.map((op, i) => <button key={i} className="btn ghost" disabled={busy} onClick={() => submit(op)}>{op}</button>)
-        : (<><input className="input" value={answer} onChange={e => setAnswer(e.target.value)} placeholder="정답 입력" />
-            <button className="btn" disabled={busy || !answer.trim()} onClick={() => submit()}>제출</button></>)}
-      {wrong && <p style={{ color: 'var(--talisman)', margin: 0 }}>정답이 아니에요. 다시 시도해 보세요.</p>}
+      {Play && <Play key={step.id} step={step} submit={submit} />}
     </div>
   );
 }

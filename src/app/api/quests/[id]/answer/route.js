@@ -1,5 +1,26 @@
 import { pool, q } from '@/lib/db';
 import { verifyFrom, ok, bad, unauthorized } from '@/lib/auth';
+import { isPlayable, SERVER_VERIFIED } from '@/lib/stepTypes';
+
+// 유형별 완료 판정.
+// quiz·dial은 서버가 값을 검증하고, 나머지 인터랙션 유형은 클라이언트의 완료 신호를 받는다.
+function judge(step, answer) {
+  if (step.type === 'quiz') {
+    return String(answer ?? '').trim() === String(step.answer ?? '').trim();
+  }
+  if (step.type === 'dial') {
+    const cfg = step.config || {};
+    const target = Number(cfg.target_angle ?? 0);
+    const tol = Number(cfg.tolerance ?? 12);
+    const angle = Number(answer?.angle);
+    if (!Number.isFinite(angle)) return false;
+    // 두 각도의 최소 차이를 0~180으로 정규화해 비교(359°와 1°의 차이는 2°)
+    const diff = Math.abs(((angle - target + 540) % 360) - 180);
+    return diff <= tol;
+  }
+  // puzzle · scratch · gauge — 클라이언트가 완료를 판정한다
+  return answer?.done === true;
+}
 
 export async function POST(request, { params }) {
   const user = verifyFrom(request, 'user');
@@ -8,10 +29,10 @@ export async function POST(request, { params }) {
   const { stepId, answer } = await request.json().catch(() => ({}));
 
   const [step] = await q('SELECT * FROM quest_steps WHERE id=? AND quest_id=?', [stepId, id]);
-  if (!step || step.type !== 'quiz') return bad('퀴즈 단계가 아닙니다.');
+  if (!step || !isPlayable(step.type)) return bad('완료 처리할 수 있는 단계가 아닙니다.');
 
-  const correct = String(answer ?? '').trim() === String(step.answer ?? '').trim();
-  if (!correct) return ok({ correct: false });
+  const correct = judge(step, answer);
+  if (!correct) return ok({ correct: false, verified: SERVER_VERIFIED.includes(step.type) });
 
   const [last] = await q('SELECT MAX(step_no) AS mx FROM quest_steps WHERE quest_id=?', [id]);
   const isFinal = step.step_no >= Number(last.mx);

@@ -2,19 +2,17 @@
 import { useEffect, useState } from 'react';
 import AdminShell from '@/components/AdminShell';
 import { api } from '@/lib/apiClient';
+import { STEP_TYPES } from '@/lib/stepTypes';
 
 const EMPTY = { title: '', order_no: 1, cover_image_url: '', reward_points: 100, is_active: 1 };
-const SAMPLE = `[
-  { "type": "story", "title": "1장", "body_text": "이야기 도입..." },
-  { "type": "quiz", "title": "미션", "question": "정답이 뭘까요?",
-    "options": ["보기1","보기2","정답"], "answer": "정답" }
-]`;
+const SAMPLE = JSON.stringify([STEP_TYPES.story.sample, STEP_TYPES.quiz.sample], null, 2);
 
 function Quests() {
   const [quests, setQuests] = useState([]);
   const [editing, setEditing] = useState(null);
   const [stepsText, setStepsText] = useState('');
   const [stepsErr, setStepsErr] = useState('');
+  const [newType, setNewType] = useState('quiz');
 
   async function load() { setQuests((await api.adminQuests()).quests); }
   useEffect(() => { load(); }, []);
@@ -23,11 +21,45 @@ function Quests() {
     setEditing(qst); setStepsErr('');
     if (qst.id) {
       const { steps } = await api.adminGetSteps(qst.id);
-      setStepsText(JSON.stringify(steps.map(s => ({
-        type: s.type, title: s.title, body_text: s.body_text, image_url: s.image_url,
-        audio_url: s.audio_url, hint_text: s.hint_text, question: s.question, options: s.options, answer: s.answer,
-      })), null, 2));
+      // 값이 없는 필드는 빼서 JSON을 읽기 쉽게 유지한다
+      setStepsText(JSON.stringify(steps.map(s => {
+        const out = { type: s.type };
+        for (const k of ['title', 'body_text', 'image_url', 'audio_url', 'hint_text', 'question', 'answer', 'config']) {
+          if (s[k] !== null && s[k] !== undefined && s[k] !== '') out[k] = s[k];
+        }
+        return out;
+      }), null, 2));
     } else setStepsText(SAMPLE);
+  }
+
+  // 선택한 유형의 기본값 스텝을 JSON 배열 끝에 추가한다
+  function addStep() {
+    let steps;
+    try { steps = JSON.parse(stepsText); if (!Array.isArray(steps)) throw 0; }
+    catch { setStepsErr('현재 JSON이 올바르지 않아 추가할 수 없습니다.'); return; }
+    steps.push(STEP_TYPES[newType].sample);
+    setStepsText(JSON.stringify(steps, null, 2));
+    setStepsErr('');
+  }
+
+  // 마지막 스텝의 유형을 바꾸고 그 유형의 기본값으로 교체한다
+  function changeLastType(type) {
+    setNewType(type);
+    let steps;
+    try { steps = JSON.parse(stepsText); if (!Array.isArray(steps) || !steps.length) return; }
+    catch { return; }
+    const last = steps[steps.length - 1];
+    // 공통 필드는 남기고 유형별 필드는 기본값으로 갈아끼운다
+    steps[steps.length - 1] = {
+      ...STEP_TYPES[type].sample,
+      ...(last.title ? { title: last.title } : {}),
+      ...(last.body_text ? { body_text: last.body_text } : {}),
+      ...(last.image_url ? { image_url: last.image_url } : {}),
+      ...(last.hint_text ? { hint_text: last.hint_text } : {}),
+      type,
+    };
+    setStepsText(JSON.stringify(steps, null, 2));
+    setStepsErr('');
   }
   async function save() {
     let steps;
@@ -47,15 +79,25 @@ function Quests() {
         <button className="btn sm" onClick={() => openEdit({ ...EMPTY, order_no: quests.length + 1 })}>+ 새 미션</button>
       </div>
       <table className="table">
-        <thead><tr><th>순서</th><th>제목</th><th>코드(QR)</th><th>포인트</th><th>활성</th><th></th></tr></thead>
+        <thead><tr><th>순서</th><th>제목</th><th>유형</th><th>코드(QR)</th><th>포인트</th><th>활성</th><th></th></tr></thead>
         <tbody>
           {quests.map(q => (
-            <tr key={q.id}><td>{q.order_no}</td><td>{q.title}</td><td><code>{q.code}</code></td>
+            <tr key={q.id}><td>{q.order_no}</td><td>{q.title}</td>
+              <td>
+                {q.step_types?.length
+                  ? <span className="type-tags">
+                      {q.step_types.map(t => (
+                        <span key={t} className="badge">{STEP_TYPES[t]?.label || t}</span>
+                      ))}
+                    </span>
+                  : <span className="muted">—</span>}
+              </td>
+              <td><code>{q.code}</code></td>
               <td>{q.reward_points}</td><td>{q.is_active ? 'Y' : 'N'}</td>
               <td className="row-actions"><button className="btn sm ghost" onClick={() => openEdit(q)}>수정</button>
                 <button className="btn sm danger" onClick={() => remove(q.id)}>삭제</button></td></tr>
           ))}
-          {quests.length === 0 && <tr><td colSpan="6" className="muted">등록된 미션이 없습니다.</td></tr>}
+          {quests.length === 0 && <tr><td colSpan="7" className="muted">등록된 미션이 없습니다.</td></tr>}
         </tbody>
       </table>
 
@@ -71,7 +113,16 @@ function Quests() {
               <div className="field"><label>커버 이미지 URL</label><input className="input" value={editing.cover_image_url || ''} onChange={e => setEditing({ ...editing, cover_image_url: e.target.value })} /></div>
               <div className="field"><label>보상 포인트</label><input className="input" type="number" value={editing.reward_points} onChange={e => setEditing({ ...editing, reward_points: +e.target.value })} /></div>
             </div>
-            <div className="field"><label>서브페이지 (JSON) — type: story / quiz / photo</label>
+            <div className="field">
+              <label>서브페이지 (JSON)</label>
+              <div className="spread" style={{ marginBottom: 8 }}>
+                <select className="input" style={{ flex: 1 }} value={newType}
+                  onChange={e => changeLastType(e.target.value)}>
+                  {Object.entries(STEP_TYPES).map(([k, v]) => <option key={k} value={k}>{v.label}</option>)}
+                </select>
+                <button type="button" className="btn sm ghost" onClick={addStep}>+ 스텝 추가</button>
+              </div>
+              <p className="muted" style={{ fontSize: 12, margin: '0 0 8px' }}>{STEP_TYPES[newType].hint}</p>
               <textarea style={{ minHeight: 220, fontFamily: 'monospace', fontSize: 13 }} value={stepsText} onChange={e => setStepsText(e.target.value)} />
               {stepsErr && <p style={{ color: 'var(--talisman)', fontSize: 13 }}>{stepsErr}</p>}
             </div>

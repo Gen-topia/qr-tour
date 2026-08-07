@@ -6,8 +6,9 @@ export async function GET(request, { params }) {
   if (!user) return unauthorized();
   const { id } = await params;
   const steps = await q(
-    'SELECT id, step_no, type, title, body_text, image_url, audio_url, hint_text, question, options FROM quest_steps WHERE quest_id=? ORDER BY step_no ASC',
+    'SELECT id, step_no, type, title, body_text, image_url, audio_url, hint_text, question, options, config FROM quest_steps WHERE quest_id=? ORDER BY step_no ASC',
     [id]
   );
-  return ok({ steps }); // answer 컬럼 미포함
+  // answer 컬럼은 미포함. dial의 목표 각도는 config에 있지만, 어차피 그만큼 돌려야 하므로 노출해도 무방하다.
+  return ok({ steps });
 }
