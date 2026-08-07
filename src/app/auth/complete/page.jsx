@@ -2,6 +2,7 @@
 import { Suspense, useEffect, useRef, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuth } from '@/lib/authClient';
+import Loading from '@/components/Loading';
 
 function CompleteInner() {
   const { completeSocialLogin } = useAuth();
@@ -27,9 +28,9 @@ function CompleteInner() {
       <button className="btn" onClick={() => router.replace('/')}>처음으로</button>
     </div>
   );
-  return <div className="screen center"><div className="grow" /><div className="lantern" /><p className="muted">로그인 중…</p><div className="grow" /></div>;
+  return <Loading label="로그인 중…" />;
 }
 
 export default function AuthCompletePage() {
-  return <Suspense fallback={<div className="screen center"><div className="lantern" /></div>}><CompleteInner /></Suspense>;
+  return <Suspense fallback={<Loading label="로그인 중…" />}><CompleteInner /></Suspense>;
 }

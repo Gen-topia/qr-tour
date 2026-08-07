@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Protected from '@/components/Protected';
 import { api } from '@/lib/apiClient';
+import Loading from '@/components/Loading';
 
 function QrEntry() {
   const { code } = useParams();
@@ -23,10 +24,11 @@ function QrEntry() {
     return () => { alive = false; };
   }, [code, router]);
 
+  if (!failed) return <Loading label={msg} />;
   return (
     <div className="screen center">
       <div className="grow" /><div className="lantern" /><p className="muted">{msg}</p><div className="grow" />
-      {failed && <button className="btn" onClick={() => router.replace('/')}>메인으로</button>}
+      <button className="btn" onClick={() => router.replace('/')}>메인으로</button>
     </div>
   );
 }

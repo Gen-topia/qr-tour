@@ -3,6 +3,7 @@ import { Suspense, useState } from 'react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuth } from '@/lib/authClient';
+import Loading from '@/components/Loading';
 
 function MainInner() {
   const { isAuthed, ready, user, loginAsTest, reset } = useAuth();
@@ -12,7 +13,7 @@ function MainInner() {
   const next = params.get('next') || '/';
   const err = params.get('error');
 
-  if (!ready) return <div className="screen center"><div className="lantern" /></div>;
+  if (!ready) return <Loading />;
 
   if (!isAuthed) {
     const startUrl = (provider) => `/api/auth/${provider}/start?next=${encodeURIComponent(next)}`;
@@ -22,7 +23,7 @@ function MainInner() {
       catch (e) { alert(e.message); setTesting(false); }
     };
     return (
-      <div className="screen">
+      <div className="screen fade-in">
         <div className="grow" /><div className="lantern" />
         <div className="eyebrow center">제주 미션 투어</div>
         <h1 className="center">측간신의 부탁</h1>
@@ -44,7 +45,7 @@ function MainInner() {
   const onLogout = () => { reset(); router.replace('/'); };
 
   return (
-    <div className="screen">
+    <div className="screen fade-in">
       <div className="topbar">
         <button type="button" onClick={onLogout}>로그아웃</button>
       </div>
@@ -62,5 +63,5 @@ function MainInner() {
 }
 
 export default function MainPage() {
-  return <Suspense fallback={<div className="screen center"><div className="lantern" /></div>}><MainInner /></Suspense>;
+  return <Suspense fallback={<Loading />}><MainInner /></Suspense>;
 }

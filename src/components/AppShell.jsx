@@ -4,9 +4,9 @@ import { usePathname } from 'next/navigation';
 import { useAuth } from '@/lib/authClient';
 
 const TABS = [
-  { to: '/',         label: '홈',      icon: '🏮' },
-  { to: '/scan',     label: '스캔',    icon: '📷', auth: true },
-  { to: '/missions', label: '나의미션', icon: '📜', auth: true },
+  { to: '/',         label: '홈',     icon: '🏮' },
+  { to: '/scan',     label: 'QR',    icon: '📷', auth: true },
+  { to: '/missions', label: '미션',   icon: '📜', auth: true },
 ];
 const IMMERSIVE = [/^\/quest\//, /^\/scan/];
 

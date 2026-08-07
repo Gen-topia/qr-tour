@@ -1,30 +1,46 @@
 /* ─────────────────────────────────────────────────────────────
-   디자인 토큰 — "낮의 이야기 투어" 화이트 테마
-   실제 디자인(Figma·갑 에셋) 확정 시 이 변수만 교체하면 전체 반영됨.
-   컨셉: 한지 흰 바탕 / 청사초롱 등불 호박빛 / 부적 붉은색
+   디자인 토큰 — "Soft Iridescent" 라이트 테마
+   출처: reference/screens · reference/components (soft neumorphism + glassmorphism)
+   컨셉: 옅은 라벤더 화이트 바탕 / 홀로그램 광원 / 보라 주색
    ───────────────────────────────────────────────────────────── */
 :root {
-  --bg:         #ffffff;   /* 배경: 한지 흰빛 */
-  --surface:    #ffffff;   /* 카드 */
-  --surface-2:  #f5f6f8;   /* 눌린 면(입력창·게이지 트랙·관리자 사이드바) */
-  --text:       #1b1f2a;   /* 본문 잉크 */
-  --text-dim:   #6b7280;   /* 보조 텍스트 */
-  --lantern:    #b8760f;   /* 강조: 등불 호박빛 */
-  --lantern-dim:#8f5b09;
-  --talisman:   #c1392b;   /* 보조 강조: 부적 붉은색 (아껴서) */
-  --line:       #e4e7ec;
-  --radius:     14px;
-  --shadow:     0 8px 24px rgba(20,26,46,.07);
+  --bg:         #f4f5fb;   /* 배경: 옅은 라벤더 화이트 */
+  --surface:    #ffffff;   /* 카드: 순백 */
+  --surface-2:  #eceef8;   /* 눌린 면(입력창·게이지 트랙·관리자 사이드바) */
+  --text:       #1a1d2b;   /* 본문: 짙은 남색 */
+  --text-dim:   #767c93;   /* 보조 텍스트 */
+  --lantern:    #7b6ef6;   /* 주 강조색: 라벤더 바이올렛 */
+  --lantern-dim:#6355e0;
+  --talisman:   #e2415f;   /* 보조 강조: 경고·삭제 (아껴서) */
+  --line:       #e6e8f4;
+  --radius:     20px;      /* 시안의 큰 둥글기 */
+  --radius-pill:999px;     /* 버튼은 알약 모양 */
+  --shadow:     0 12px 32px rgba(90,84,160,.10);
+  --shadow-sm:  0 6px 16px rgba(90,84,160,.08);
   --maxw:       420px;     /* 모바일 기준(360px)+여유 */
+
+  /* 홀로그램 광원 — 배경·시그니처 구체·게이지에 사용 */
+  --iris-1:     #b9a7f7;   /* 라벤더 */
+  --iris-2:     #7fd8d0;   /* 민트 */
+  --iris-3:     #f5a9d3;   /* 핑크 */
+  --iris-4:     #ffd9a8;   /* 피치 */
+
+  --font-sans:  var(--font-inter), var(--font-noto-kr), -apple-system, BlinkMacSystemFont,
+                'Apple SD Gothic Neo', system-ui, sans-serif;
 }
 
 * { box-sizing: border-box; }
 html, body, #root { height: 100%; margin: 0; }
 body {
-  background: radial-gradient(1200px 600px at 50% -10%, #fdf6e9 0%, var(--bg) 55%, #f4f5f7 100%);
+  /* 시안의 은은한 홀로그램 광원 — 옅게 겹쳐 배경에 색기운만 남긴다 */
+  background:
+    radial-gradient(760px 460px at 12% -6%,  rgba(185,167,247,.34), transparent 62%),
+    radial-gradient(700px 420px at 88%  4%,  rgba(127,216,208,.26), transparent 64%),
+    radial-gradient(620px 400px at 50% 104%, rgba(245,169,211,.22), transparent 62%),
+    var(--bg);
+  background-attachment: fixed;
   color: var(--text);
-  font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, 'Apple SD Gothic Neo',
-               'Malgun Gothic', system-ui, sans-serif;
+  font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
   line-height: 1.55;
 }
@@ -40,29 +56,34 @@ a { color: var(--lantern); text-decoration: none; }
 }
 .grow { flex: 1; }
 
-/* 버튼 */
+/* 버튼 — 시안의 알약 모양 + 부드럽고 넓은 그림자 */
 .btn {
   appearance: none; border: 0; cursor: pointer;
   display: block; text-align: center;          /* <a>·<button> 모두 같은 모양으로 */
-  width: 100%; padding: 15px 18px; border-radius: var(--radius);
+  width: 100%; padding: 16px 18px; border-radius: var(--radius-pill);
   font-size: 16px; font-weight: 700; letter-spacing: -.01em;
-  background: var(--lantern); color: #fff;
-  box-shadow: 0 6px 18px rgba(184,118,15,.22);
-  transition: transform .06s ease, filter .15s ease;
+  background: linear-gradient(135deg, #8f81f8, #6f5ef0);
+  color: #fff;
+  box-shadow: 0 10px 24px rgba(110,94,240,.30);
+  transition: transform .06s ease, box-shadow .18s ease, filter .15s ease;
 }
-.btn:active { transform: translateY(1px); }
+.btn:active { transform: translateY(1px); box-shadow: 0 6px 16px rgba(110,94,240,.26); }
 .btn:disabled { filter: grayscale(.5) opacity(.6); cursor: default; }
-.btn.ghost { background: transparent; color: var(--text); box-shadow: none; border: 1px solid var(--line); }
-.btn.danger { background: var(--talisman); color: #fff; box-shadow: none; }
+/* 시안의 흰색 알약 버튼(Remind me) */
+.btn.ghost {
+  background: var(--surface); color: var(--text);
+  border: 1px solid var(--line); box-shadow: var(--shadow-sm);
+}
+.btn.danger { background: var(--talisman); color: #fff; box-shadow: 0 10px 24px rgba(226,65,95,.24); }
 
 /* 소셜 로그인 — 각 사의 브랜드 가이드 색 */
-.btn--kakao { background: #fee500; color: #191600; box-shadow: 0 6px 18px rgba(254,229,0,.35); }
-.btn--naver { background: #03c75a; color: #fff;    box-shadow: 0 6px 18px rgba(3,199,90,.28); }
+.btn--kakao { background: #fee500; color: #191600; box-shadow: 0 10px 24px rgba(254,229,0,.34); }
+.btn--naver { background: #03c75a; color: #fff;    box-shadow: 0 10px 24px rgba(3,199,90,.26); }
 
-/* 카드/패널 */
+/* 카드/패널 — 시안의 흰 표면 + 넓고 옅은 그림자 */
 .card {
-  background: linear-gradient(180deg, var(--surface), #fafbfc);
-  border: 1px solid var(--line); border-radius: var(--radius);
+  background: var(--surface);
+  border: 1px solid rgba(255,255,255,.9); border-radius: var(--radius);
   padding: 18px; box-shadow: var(--shadow);
 }
 
@@ -78,35 +99,67 @@ textarea { min-height: 90px; resize: vertical; }
 .input:focus, textarea:focus, select:focus { outline: 2px solid var(--lantern); border-color: transparent; }
 
 /* 진행 게이지 */
-.gauge { height: 12px; background: var(--surface-2); border-radius: 999px; overflow: hidden; border: 1px solid var(--line); }
-.gauge > i { display: block; height: 100%; background: linear-gradient(90deg, var(--lantern-dim), var(--lantern)); transition: width .5s ease; }
+.gauge { height: 12px; background: var(--surface-2); border-radius: var(--radius-pill); overflow: hidden; border: 1px solid var(--line); }
+/* 시안의 홀로그램 슬라이더 톤 */
+.gauge > i { display: block; height: 100%; background: linear-gradient(90deg, var(--iris-1), var(--iris-2)); transition: width .5s ease; }
 
-/* 등불 시그니처 */
+/* 시그니처 구체 — 시안 중앙의 홀로그램 오브 (클래스명은 유지) */
 .lantern {
-  width: 64px; height: 64px; border-radius: 50%;
-  background: radial-gradient(circle at 50% 40%, #ffd98a, #e8a13a 55%, var(--lantern));
-  box-shadow: 0 0 32px 6px rgba(232,161,58,.30);
-  margin: 0 auto 8px;
-  animation: sway 3.2s ease-in-out infinite;
+  width: 96px; height: 96px; border-radius: 50%;
+  background:
+    radial-gradient(circle at 32% 26%, rgba(255,255,255,.95) 0%, rgba(255,255,255,0) 46%),
+    conic-gradient(from 210deg,
+      var(--iris-1), var(--iris-2), var(--iris-4), var(--iris-3), var(--iris-1));
+  box-shadow:
+    0 20px 44px rgba(140,120,230,.28),          /* 아래로 퍼지는 그림자 */
+    0 0 46px 10px rgba(185,167,247,.34),        /* 주변 발광 */
+    inset 0 0 30px rgba(255,255,255,.55);       /* 안쪽 부드러운 하이라이트 */
+  margin: 0 auto 12px;
+  animation: sway 4.5s ease-in-out infinite;
 }
-@keyframes sway { 0%,100% { transform: translateY(0) } 50% { transform: translateY(-6px) } }
+@keyframes sway { 0%,100% { transform: translateY(0) } 50% { transform: translateY(-8px) } }
 
-.eyebrow { font-size: 12px; letter-spacing: .22em; text-transform: uppercase; color: var(--lantern); }
-h1 { font-size: 26px; margin: 6px 0 4px; letter-spacing: -.02em; }
+.eyebrow { font-size: 12px; letter-spacing: .22em; text-transform: uppercase; color: var(--lantern); font-weight: 500; }
+h1 { font-size: 28px; font-weight: 800; margin: 8px 0 6px; letter-spacing: -.03em; }
 .muted { color: var(--text-dim); font-size: 14px; }
 .center { text-align: center; }
 .stack > * + * { margin-top: 12px; }
 .spread { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
 /* 화면 우상단 보조 액션(로그아웃) */
-.topbar { display: flex; justify-content: flex-end; }
+/* .screen 좌우 여백(20px)을 일부 상쇄해 화면 오른쪽 끝에 더 붙인다 */
+.topbar { display: flex; justify-content: flex-end; margin-right: -12px; }
 .topbar button {
   appearance: none; background: none; border: 0; cursor: pointer; font-family: inherit;
-  font-size: 13px; color: var(--text-dim); padding: 4px 2px;
+  font-size: 13px; color: var(--text-dim); padding: 4px 6px;
 }
 .badge { font-size: 12px; padding: 3px 9px; border-radius: 999px; border: 1px solid var(--line); color: var(--text-dim); }
 .badge.done { color: var(--lantern); border-color: var(--lantern); }
 
-@media (prefers-reduced-motion: reduce) { .lantern { animation: none; } }
+/* 로딩 → 콘텐츠 전환을 부드럽게 (깜빡임 완화) */
+.fade-in { animation: fadeIn .18s ease-out both; }
+@keyframes fadeIn { from { opacity: 0 } to { opacity: 1 } }
+
+/* 스캐너 자리 — 카메라가 열리기 전에도 높이를 확보해 레이아웃이 밀리지 않게 */
+.scan-box {
+  position: relative; width: 100%; aspect-ratio: 1 / 1; margin-top: 12px;
+  border-radius: 12px; overflow: hidden; background: var(--surface-2);
+  display: grid; place-items: center;
+}
+.scan-box__msg {
+  position: absolute; margin: 0; padding: 0; max-width: 80%; text-align: center;
+  appearance: none; background: none; border: 0; font: inherit; font-size: 14px;
+}
+/* 권한 거부 안내 — 누르면 다시 요청한다 */
+.scan-box__msg--err { color: var(--talisman); cursor: pointer; font-weight: 700; line-height: 1.5; }
+.scan-box__hint {
+  display: block; margin-top: 8px; font-weight: 400; font-size: 12px;
+  color: var(--text-dim); line-height: 1.5;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .lantern { animation: none; }
+  .fade-in { animation: none; }
+}
 
 /* ─────────────────────────────────────────────────────────────
    반응형 앱 셸 — 모바일 360px 우선 / 데스크톱 420px 중앙 프레임
@@ -117,7 +170,7 @@ h1 { font-size: 26px; margin: 6px 0 4px; letter-spacing: -.02em; }
   max-width: var(--maxw);
   margin: 0 auto;
   min-height: 100dvh;
-  background: var(--bg);
+  background: transparent;   /* body의 홀로그램 광원이 비치도록 */
   display: flex; flex-direction: column;
 }
 /* 데스크톱: 중앙 프레임 + 좌우 배경 여백 */
@@ -125,9 +178,11 @@ h1 { font-size: 26px; margin: 6px 0 4px; letter-spacing: -.02em; }
   body { padding: 0; }
   .frame {
     min-height: 100dvh;
-    box-shadow: 0 0 60px rgba(20,26,46,.10);
-    border-left: 1px solid var(--line);
-    border-right: 1px solid var(--line);
+    background: rgba(255,255,255,.34);
+    backdrop-filter: blur(2px);
+    box-shadow: 0 0 80px rgba(90,84,160,.12);
+    border-left: 1px solid rgba(255,255,255,.7);
+    border-right: 1px solid rgba(255,255,255,.7);
   }
 }
 .frame__body { flex: 1; display: flex; flex-direction: column; }
@@ -136,9 +191,11 @@ h1 { font-size: 26px; margin: 6px 0 4px; letter-spacing: -.02em; }
 .tabbar {
   position: sticky; bottom: 0;
   display: grid; grid-template-columns: repeat(3, 1fr);
-  background: rgba(255,255,255,.92);
-  backdrop-filter: blur(8px);
-  border-top: 1px solid var(--line);
+  background: rgba(255,255,255,.72);                 /* 시안의 유리 표면 */
+  backdrop-filter: blur(18px) saturate(150%);
+  -webkit-backdrop-filter: blur(18px) saturate(150%);
+  border-top: 1px solid rgba(255,255,255,.75);
+  box-shadow: 0 -8px 26px rgba(90,84,160,.07);
   padding-bottom: env(safe-area-inset-bottom);
 }
 .tab {
@@ -147,8 +204,8 @@ h1 { font-size: 26px; margin: 6px 0 4px; letter-spacing: -.02em; }
   min-height: 56px; justify-content: center;   /* 터치 타깃 */
   background: none; border: 0; font-family: inherit;  /* button으로도 쓰임(로그인 잠금 탭) */
 }
-.tab__icon { font-size: 20px; filter: grayscale(1) opacity(.7); transition: filter .15s; }
-.tab--on { color: var(--lantern); }
+.tab__icon { font-size: 20px; filter: grayscale(1) opacity(.55); transition: filter .15s; }
+.tab--on { color: var(--lantern); font-weight: 700; }
 .tab--on .tab__icon { filter: none; }
 
 /* 셸을 쓰는 화면은 .screen 상단여백 유지, 하단은 탭바가 처리 */

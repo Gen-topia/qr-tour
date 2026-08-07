@@ -6,6 +6,7 @@ import { api } from '@/lib/apiClient';
 import AudioPlayer from '@/components/AudioPlayer';
 import HintModal from '@/components/HintModal';
 import PhotoShare from '@/components/PhotoShare';
+import Loading from '@/components/Loading';
 
 function Quest() {
   const { id } = useParams();
@@ -21,7 +22,7 @@ function Quest() {
   }, [id]);
 
   if (err) return <div className="screen center"><p className="muted">{err}</p></div>;
-  if (!steps) return <div className="screen center"><div className="lantern" /></div>;
+  if (!steps) return <Loading label="미션을 여는 중…" />;
   if (result) return <ResultView result={result} onHome={() => router.replace('/')} />;
 
   const step = steps[idx];
@@ -29,7 +30,7 @@ function Quest() {
   const next = () => { if (!isLast) setIdx(i => i + 1); };
 
   return (
-    <div className="screen stack">
+    <div className="screen stack fade-in">
       <div className="spread">
         <div className="eyebrow">{quest?.title || '미션'}</div>
         <span className="badge">{idx + 1} / {steps.length}</span>
