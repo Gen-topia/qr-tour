@@ -29,7 +29,8 @@ function Scan() {
       if (!alive) return;
       scanner = new Html5Qrcode('qr-reader');
       try {
-        await scanner.start({ facingMode: 'environment' }, { fps: 10, qrbox: { width: 240, height: 240 } },
+        // qrbox를 주면 흰 테두리 사각형이 그려진다. 화면 전체로 인식하도록 생략.
+        await scanner.start({ facingMode: 'environment' }, { fps: 10 },
           (decoded) => {
             if (done) return; done = true;
             stopScanner(scanner);
@@ -57,7 +58,7 @@ function Scan() {
       <h1>지점의 QR을 비춰주세요</h1>
       {/* 카메라가 열리기 전에도 같은 크기의 자리를 잡아둬 화면이 밀리지 않게 한다 */}
       <div className="scan-box">
-        <div id="qr-reader" style={{ width: '100%' }} />
+        <div id="qr-reader" />
         {!camReady && (
           err
             ? <button type="button" className="scan-box__msg scan-box__msg--err"

@@ -3,8 +3,9 @@ import { useEffect, useState } from 'react';
 import AdminShell from '@/components/AdminShell';
 import { api } from '@/lib/apiClient';
 import { STEP_TYPES } from '@/lib/stepTypes';
+import { SPOT_OPTIONS } from '@/lib/spots';
 
-const EMPTY = { title: '', order_no: 1, cover_image_url: '', reward_points: 100, is_active: 1 };
+const EMPTY = { title: '', order_no: 1, place: '', cover_image_url: '', reward_points: 100, is_active: 1 };
 const SAMPLE = JSON.stringify([STEP_TYPES.story.sample, STEP_TYPES.quiz.sample], null, 2);
 
 function Quests() {
@@ -110,9 +111,16 @@ function Quests() {
               <div className="field"><label>순서</label><input className="input" type="number" value={editing.order_no} onChange={e => setEditing({ ...editing, order_no: +e.target.value })} /></div>
             </div>
             <div className="grid2">
-              <div className="field"><label>커버 이미지 URL</label><input className="input" value={editing.cover_image_url || ''} onChange={e => setEditing({ ...editing, cover_image_url: e.target.value })} /></div>
+              <div className="field">
+                <label>장소 (코드 지도)</label>
+                <select className="input" value={editing.place || ''} onChange={e => setEditing({ ...editing, place: e.target.value })}>
+                  <option value="">— 지정 안 함 —</option>
+                  {SPOT_OPTIONS.map(s => <option key={s.code} value={s.code}>{s.name}</option>)}
+                </select>
+              </div>
               <div className="field"><label>보상 포인트</label><input className="input" type="number" value={editing.reward_points} onChange={e => setEditing({ ...editing, reward_points: +e.target.value })} /></div>
             </div>
+            <div className="field"><label>커버 이미지 URL</label><input className="input" value={editing.cover_image_url || ''} onChange={e => setEditing({ ...editing, cover_image_url: e.target.value })} /></div>
             <div className="field">
               <label>서브페이지 (JSON)</label>
               <div className="spread" style={{ marginBottom: 8 }}>

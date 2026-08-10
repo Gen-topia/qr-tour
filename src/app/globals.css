@@ -75,6 +75,16 @@ a { color: var(--lantern); text-decoration: none; }
   border: 1px solid var(--line); box-shadow: var(--shadow-sm);
 }
 .btn.danger { background: var(--talisman); color: #fff; box-shadow: 0 10px 24px rgba(226,65,95,.24); }
+/* 유리(글래스) 버튼 — 어두운 이미지 배경 위에 얹는다 */
+.btn.glass {
+  background: rgba(255,255,255,.12);
+  border: 1px solid rgba(255,255,255,.3);
+  color: #fff;
+  backdrop-filter: blur(14px) saturate(140%);
+  -webkit-backdrop-filter: blur(14px) saturate(140%);
+  box-shadow: 0 10px 28px rgba(0,0,0,.28), inset 0 1px 0 rgba(255,255,255,.35);
+}
+.btn.glass:active { background: rgba(255,255,255,.2); box-shadow: 0 6px 16px rgba(0,0,0,.24); }
 
 /* 소셜 로그인 — 각 사의 브랜드 가이드 색 */
 .btn--kakao { background: #fee500; color: #191600; box-shadow: 0 10px 24px rgba(254,229,0,.34); }
@@ -177,26 +187,38 @@ h1 { font-size: 28px; font-weight: 800; margin: 8px 0 6px; letter-spacing: -.03e
 @keyframes nudge { 0%,100% { transform: translateY(0); opacity: .5 } 50% { transform: translateY(-6px); opacity: 1 } }
 
 /* 다이얼: 동심원 중 활성 링만 회전 */
-.dial { position: relative; width: 100%; aspect-ratio: 1 / 1; touch-action: none; user-select: none; }
+.dial {
+  position: relative; width: 100%; aspect-ratio: 1 / 1;
+  touch-action: none; user-select: none; -webkit-user-select: none;
+}
 .dial__ring {
   position: absolute; left: 50%; top: 50%; border-radius: 50%;
-  border: 2px solid var(--line); background: var(--surface);
+  border: 2px solid var(--line); background: transparent;
+  pointer-events: none;              /* 터치 판정은 .dial이 좌표로 처리한다 */
 }
 .dial__ring--active {
-  border-color: var(--lantern); cursor: grab;
+  border-color: var(--lantern); border-width: 3px;
   box-shadow: 0 6px 18px rgba(110,94,240,.20);
 }
 .dial__ring--near { border-color: var(--iris-2); box-shadow: 0 0 0 6px rgba(127,216,208,.28); }
-/* 활성 링의 방향 표시 — 링 위쪽 가장자리에 붙는다 */
+/* 잡고 돌리는 손잡이 — 링 12시 방향에 붙어 함께 회전한다 */
 .dial__handle {
-  position: absolute; left: 50%; top: 6px; width: 14px; height: 14px;
-  margin-left: -7px; border-radius: 50%; background: var(--lantern);
+  position: absolute; left: 50%; top: -13px; width: 26px; height: 26px;
+  margin-left: -13px; border-radius: 50%;
+  background: var(--lantern); border: 3px solid var(--surface);
+  box-shadow: 0 4px 12px rgba(110,94,240,.45);
 }
-/* 목표 각도 눈금 */
-.dial__target {
-  position: absolute; left: 50%; top: 50%; width: 3px; height: 50%;
-  background: linear-gradient(180deg, var(--iris-3), transparent 55%);
-  transform-origin: 50% 0;
+/* 목표 위치 — 활성 링과 같은 크기·좌표계라 손잡이와 겹치면 정답 */
+.dial__goal { position: absolute; left: 50%; top: 50%; pointer-events: none; }
+.dial__goal-mark {
+  position: absolute; left: 50%; top: -11px; width: 22px; height: 22px;
+  margin-left: -11px; border-radius: 50%;
+  border: 3px dashed var(--iris-3); background: rgba(255,255,255,.6);
+  transition: border-color .15s, box-shadow .15s;
+}
+.dial__goal-mark--near {
+  border-style: solid; border-color: var(--iris-2);
+  box-shadow: 0 0 0 6px rgba(127,216,208,.30);
 }
 
 /* 로딩 → 콘텐츠 전환을 부드럽게 (깜빡임 완화) */
@@ -206,9 +228,18 @@ h1 { font-size: 28px; font-weight: 800; margin: 8px 0 6px; letter-spacing: -.03e
 /* 스캐너 자리 — 카메라가 열리기 전에도 높이를 확보해 레이아웃이 밀리지 않게 */
 .scan-box {
   position: relative; width: 100%; aspect-ratio: 1 / 1; margin-top: 12px;
-  border-radius: 12px; overflow: hidden; background: var(--surface-2);
+  border-radius: var(--radius); overflow: hidden; background: var(--surface-2);
   display: grid; place-items: center;
 }
+/* 카메라 영상을 스캔 영역에 꽉 채워 정중앙에 맞춘다 */
+#qr-reader { position: absolute; inset: 0; width: 100%; height: 100%; border: 0 !important; }
+#qr-reader video {
+  width: 100% !important; height: 100% !important;
+  object-fit: cover; display: block;
+}
+/* html5-qrcode가 넣는 스캔 영역 테두리·안내 UI는 감춘다 */
+#qr-reader__scan_region { width: 100%; height: 100%; }
+#qr-reader__scan_region img, #qr-reader__dashboard, #qr-shaded-region { display: none !important; }
 .scan-box__msg {
   position: absolute; margin: 0; padding: 0; max-width: 80%; text-align: center;
   appearance: none; background: none; border: 0; font: inherit; font-size: 14px;
@@ -254,7 +285,7 @@ h1 { font-size: 28px; font-weight: 800; margin: 8px 0 6px; letter-spacing: -.03e
 /* 하단 탭바 */
 .tabbar {
   position: sticky; bottom: 0;
-  display: grid; grid-template-columns: repeat(3, 1fr);
+  display: grid; grid-template-columns: 1fr;
   background: rgba(255,255,255,.72);                 /* 시안의 유리 표면 */
   backdrop-filter: blur(18px) saturate(150%);
   -webkit-backdrop-filter: blur(18px) saturate(150%);
@@ -268,9 +299,7 @@ h1 { font-size: 28px; font-weight: 800; margin: 8px 0 6px; letter-spacing: -.03e
   min-height: 56px; justify-content: center;   /* 터치 타깃 */
   background: none; border: 0; font-family: inherit;  /* button으로도 쓰임(로그인 잠금 탭) */
 }
-.tab__icon { font-size: 20px; filter: grayscale(1) opacity(.55); transition: filter .15s; }
-.tab--on { color: var(--lantern); font-weight: 700; }
-.tab--on .tab__icon { filter: none; }
+.tab__icon { font-size: 20px; }
 
 /* 셸을 쓰는 화면은 .screen 상단여백 유지, 하단은 탭바가 처리 */
 .frame .screen { min-height: auto; flex: 1; }
@@ -307,3 +336,160 @@ h1 { font-size: 28px; font-weight: 800; margin: 8px 0 6px; letter-spacing: -.03e
 .qr-card__url { font-size: 11px; text-align: center; word-break: break-all; }
 /* 미션 목록의 유형 배지 */
 .type-tags { display: flex; flex-wrap: wrap; gap: 4px; }
+
+/* ─────────────────────────────────────────────────────────────
+   로그인 · 프롤로그 · 지침서 — 탭바까지 덮는 전체화면 레이어
+   ───────────────────────────────────────────────────────────── */
+.login, .prologue, .onboard { position: fixed; inset: 0; z-index: 50; overflow: auto; }
+
+/* 수호자 서약(로그인)·메인 — intro.png(9:16)가 잘리지 않도록 같은 비율의 무대를 화면 정중앙에 둔다.
+   기기 화면과의 비율 차이는 무대 바깥의 어두운 여백으로 남는다 */
+.login, .home {
+  display: flex; align-items: center; justify-content: center;
+  overflow: hidden; background: #0b0820;
+}
+.stage {
+  position: relative; display: flex;
+  width: 100%;
+  max-width: calc(100vh * 9 / 16);    /* dvh 미지원 브라우저용 대체값 */
+  max-width: calc(100dvh * 9 / 16);
+  aspect-ratio: 9 / 16;
+}
+.login .screen, .home .screen { flex: 1; min-height: 0; overflow: auto; }
+
+.login__bg { position: absolute; inset: 0; background: url('/intro.png') center / contain no-repeat; }
+.login__dim { position: absolute; inset: 0; background: linear-gradient(rgba(20,16,50,.25), rgba(20,16,50,.62)); }
+.login .screen { position: relative; }
+.login .eyebrow { color: #fff; opacity: .85; }
+.login h1 { color: #fff; text-shadow: 0 2px 18px rgba(0,0,0,.35); }
+.login__sub { color: rgba(255,255,255,.82); font-size: 14px; }
+
+/* 프롤로그: 세로형 전체 영상 + 나레이션 */
+.prologue { background: #000; }
+.prologue__video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+/* 자동재생이 막혔을 때 — 화면 전체가 재생 버튼 */
+.prologue__tap {
+  position: absolute; inset: 0; display: grid; place-content: center; gap: 14px; justify-items: center;
+  appearance: none; border: 0; cursor: pointer; font: inherit; font-size: 14px;
+  background: rgba(0,0,0,.45); color: #fff;
+}
+.prologue__play {
+  width: 68px; height: 68px; border-radius: 50%;
+  border: 2px solid rgba(255,255,255,.85); background: rgba(255,255,255,.12);
+  display: grid; place-items: center;
+}
+.prologue__play::after {
+  content: ''; width: 0; height: 0; margin-left: 5px;
+  border-left: 20px solid #fff; border-top: 12px solid transparent; border-bottom: 12px solid transparent;
+}
+/* 프롤로그 컨트롤바 — 재생 중에도 항상 보이게 직접 만든다 */
+.prologue__bar {
+  position: absolute; left: 0; right: 0; bottom: 0; z-index: 2;
+  display: flex; align-items: center; gap: 10px;
+  padding: 14px 14px calc(14px + env(safe-area-inset-bottom));
+  background: linear-gradient(rgba(0,0,0,0), rgba(0,0,0,.68));
+  color: #fff;
+}
+.prologue__toggle, .prologue__mute {
+  flex: none; width: 38px; height: 38px; border-radius: 50%;
+  appearance: none; cursor: pointer; display: grid; place-items: center;
+  border: 1px solid rgba(255,255,255,.3); background: rgba(255,255,255,.14); color: #fff;
+  backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+}
+.prologue__seek { flex: 1; min-width: 0; height: 22px; accent-color: var(--lantern); cursor: pointer; }
+.prologue__time { flex: none; font-size: 12px; font-variant-numeric: tabular-nums; opacity: .85; }
+
+.prologue__fallback {
+  position: absolute; left: 0; right: 0; bottom: 0;
+  padding: 24px 20px calc(24px + env(safe-area-inset-bottom));
+  max-width: var(--maxw); margin: 0 auto;
+}
+.prologue__fallback .muted { color: rgba(255,255,255,.7); }
+
+/* 수호자 지침서 */
+.onboard { background: radial-gradient(600px 400px at 50% -10%, rgba(185,167,247,.30), transparent 62%), var(--bg); }
+.onboard .screen { min-height: 100dvh; }
+/* 3대 과업 — 번호 배지를 단 카드 */
+.guide { margin: 0; padding: 0; list-style: none; counter-reset: g; }
+.guide li {
+  counter-increment: g; position: relative; padding: 16px 18px 16px 54px;
+}
+.guide li + li { margin-top: 12px; }
+.guide li::before {
+  content: counter(g); position: absolute; left: 18px; top: 16px;
+  width: 26px; height: 26px; border-radius: 50%;
+  background: var(--lantern); color: #fff;
+  font-size: 13px; font-weight: 700; display: grid; place-items: center;
+}
+.guide b { display: block; font-size: 15px; font-weight: 800; letter-spacing: -.01em; }
+.guide span { display: block; margin-top: 6px; font-size: 14px; line-height: 1.7; color: var(--text-dim); }
+
+/* 프롤로그 닫기 — 다시 볼 때 중간에 나갈 수 있게 */
+.prologue__close {
+  position: absolute; top: calc(12px + env(safe-area-inset-top)); right: 12px;
+  width: 40px; height: 40px; border-radius: 50%;
+  appearance: none; border: 0; cursor: pointer; font: inherit; font-size: 16px;
+  background: rgba(0,0,0,.45); color: #fff;
+}
+
+/* 메인 홈 — 인트로 이미지를 배경으로 깔고 검정 반투명으로 덮는다 */
+.home { position: fixed; inset: 0; z-index: 1; }
+.home__bg { position: absolute; inset: 0; background: url('/intro.png') center / contain no-repeat; }
+.home__dim { position: absolute; inset: 0; background: rgba(10,8,26,.62); }
+.home .screen { position: relative; }
+.home .eyebrow { color: #fff; opacity: .85; }
+.home h1 { color: #fff; text-shadow: 0 2px 18px rgba(0,0,0,.45); }
+.home .muted { color: rgba(255,255,255,.78); }
+.home .topbar button { color: rgba(255,255,255,.75); }
+
+/* 메인 메뉴 — 화면 중앙에 세로로 쌓이는 버튼 */
+.menu { display: flex; flex-direction: column; align-items: center; gap: 10px; margin-top: 28px; }
+.menu__item { width: 50%; font-size: 14px; padding: 8px 18px; }
+
+/* 수호자 지침서 본문 */
+.guide__lead { white-space: pre-line; font-size: 15px; line-height: 1.75; margin: 0 0 26px; }
+
+/* 섹션 — 작은 대문자형 머리글 + 카드 묶음 */
+.guide__sec + .guide__sec { margin-top: 26px; }
+.guide__head {
+  display: flex; align-items: center; gap: 8px;
+  font-size: 13px; font-weight: 800; letter-spacing: .04em;
+  color: var(--lantern); margin: 0 0 10px;
+}
+.guide__head::before { content: ''; width: 14px; height: 2px; border-radius: 2px; background: var(--lantern); }
+
+/* 라벨 : 값 목록 (기본 정보 · 운영 안내) */
+.guide__info { margin: 0; display: grid; grid-template-columns: max-content 1fr; column-gap: 14px; row-gap: 8px; font-size: 14px; }
+.guide__info > div { display: contents; }
+.guide__info dt { color: var(--text-dim); }
+.guide__info dd { margin: 0; font-weight: 600; }
+
+/* 카드 안 보조 설명 — 구분선 아래로 내린다 */
+.guide__note, .guide__notes {
+  margin: 14px 0 0; padding-top: 14px; border-top: 1px solid var(--line);
+  font-size: 13px; line-height: 1.7; color: var(--text-dim);
+}
+.guide__notes { padding-left: 18px; }
+.guide__notes li + li { margin-top: 6px; }
+
+.guide__rule + .guide__rule { margin-top: 12px; }
+.guide__rule b { display: block; font-size: 15px; font-weight: 800; }
+.guide__rule .guide__notes { margin-top: 12px; padding-top: 12px; }
+
+/* 코드 지도 — 장소 리스트 */
+.spots { margin-top: 22px; }
+.spots__group {
+  font-size: 12px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase;
+  color: var(--lantern); margin: 0 0 10px;
+}
+.spot + .spot { margin-top: 10px; }
+.spot__name { font-weight: 700; font-size: 16px; letter-spacing: -.02em; }
+.spot__sub { font-size: 12px; color: var(--text-dim); margin-top: 2px; }
+.spot__info {
+  margin: 12px 0 0; display: grid; grid-template-columns: 40px 1fr;
+  row-gap: 5px; font-size: 13px; line-height: 1.6;
+}
+.spot__info dt { color: var(--text-dim); }
+.spot__info dd { margin: 0; }
+.spot__note { font-size: 12px; color: var(--text-dim); line-height: 1.6; margin: 10px 0 0; }
+.spot .btn.sm { margin-top: 12px; }
