@@ -422,24 +422,6 @@ h1 { font-size: 28px; font-weight: 800; margin: 8px 0 6px; letter-spacing: -.03e
 }
 .prologue__fallback .muted { color: rgba(255,255,255,.7); }
 
-/* 수호자 지침서 */
-.onboard { background: radial-gradient(600px 400px at 50% -10%, rgba(185,167,247,.30), transparent 62%), var(--bg); }
-.onboard .screen { min-height: 100dvh; }
-/* 3대 과업 — 번호 배지를 단 카드 */
-.guide { margin: 0; padding: 0; list-style: none; counter-reset: g; }
-.guide li {
-  counter-increment: g; position: relative; padding: 16px 18px 16px 54px;
-}
-.guide li + li { margin-top: 12px; }
-.guide li::before {
-  content: counter(g); position: absolute; left: 18px; top: 16px;
-  width: 26px; height: 26px; border-radius: 50%;
-  background: var(--lantern); color: #fff;
-  font-size: 13px; font-weight: 700; display: grid; place-items: center;
-}
-.guide b { display: block; font-size: 15px; font-weight: 800; letter-spacing: -.01em; }
-.guide span { display: block; margin-top: 6px; font-size: 14px; line-height: 1.7; color: var(--text-dim); }
-
 /* 프롤로그 닫기 — 다시 볼 때 중간에 나갈 수 있게 */
 .prologue__close {
   position: absolute; top: calc(12px + env(safe-area-inset-top)); right: 12px;
@@ -462,35 +444,194 @@ h1 { font-size: 28px; font-weight: 800; margin: 8px 0 6px; letter-spacing: -.03e
 /* 배경 그림의 밝은 부분에서도 글씨가 읽히도록 시안 배경톤의 남색으로 채운다 */
 .menu__item { background: rgba(32, 45, 100, .48); }
 
-/* 수호자 지침서 본문 */
-.guide__lead { white-space: pre-line; font-size: 15px; line-height: 1.75; margin: 0 0 26px; }
+/* ─────────────────────────────────────────────────────────────
+   수호자 지침서 — reference/screens/메인 - 수호자 지침서*.png
+   전면 패널 + 아코디언(+/−) + 하단 플로팅 내비
+   ───────────────────────────────────────────────────────────── */
+.gd {
+  --gd-inset: 14px;               /* 화면 가장자리와 패널 사이 */
+  --gd-pad: 21px;                 /* 패널 안쪽 좌우 여백 */
+  --gd-ink: #4a4a4a;              /* 제목·항목명 */
+  --gd-ink-strong: #2b2b2b;       /* 표 라벨·규칙 제목 */
+  --gd-dim: #9b9b9b;              /* 본문 회색 */
+  --gd-pink: #c8a3b1;             /* 분홍 문단 */
+  --gd-pink-strong: #db92a8;      /* 번호·+ 불릿 */
+  --gd-mark: #e4b5bf;             /* 형광펜 */
+  --gd-hair: #d8d8d8;             /* 얇은 선 */
+  --gd-navy: #16375a;             /* 하단 내비 */
+  background: #383838;
+  padding: var(--gd-inset);
+  -webkit-tap-highlight-color: transparent;
+}
 
-/* 섹션 — 작은 대문자형 머리글 + 카드 묶음 */
-.guide__sec + .guide__sec { margin-top: 26px; }
-.guide__head {
+/* 패널 — 그레인 얹은 홀로그램 그러데이션, 모서리는 각지게 */
+.gd__panel {
+  position: relative; isolation: isolate;
+  min-height: calc(100dvh - var(--gd-inset) * 2);
+  max-width: calc(var(--maxw) - var(--gd-inset) * 2);
+  margin: 0 auto;
+  background:
+    radial-gradient(66% 28% at 2% 1%,    rgba(226,224,244,1),   transparent 72%),
+    radial-gradient(84% 40% at 100% 0%,  rgba(186,212,246,1),   transparent 72%),
+    radial-gradient(52% 34% at -12% 32%, rgba(250,241,166,1),   transparent 72%),
+    radial-gradient(50% 30% at -10% 58%, rgba(249,240,186,1),   transparent 74%),
+    radial-gradient(64% 30% at 106% 56%, rgba(250,214,208,1),   transparent 72%),
+    radial-gradient(68% 30% at -6% 100%, rgba(128,203,246,1),   transparent 74%),
+    radial-gradient(82% 36% at 86% 100%, rgba(246,190,208,1),   transparent 74%),
+    #f8f6f3;
+}
+/* 시안의 미세한 노이즈 */
+.gd__panel::before {
+  content: ''; position: absolute; inset: 0; z-index: 0; pointer-events: none;
+  opacity: .55; mix-blend-mode: multiply;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)' opacity='.32'/%3E%3C/svg%3E");
+}
+
+/* 히어로 */
+.gd__hero, .gd__acc { position: relative; z-index: 1; }
+.gd__hero { padding: 29px var(--gd-pad) 47px; }
+.gd__back {
+  appearance: none; background: none; border: 0; cursor: pointer;
+  display: block; padding: 0; margin: 0 0 41px; color: #a3a3a3;
+}
+.gd__back svg { display: block; width: 34px; height: 24px; }
+.gd__title {
+  margin: 0 0 10px; font-size: 25px; font-weight: 500;
+  letter-spacing: -.03em; color: var(--gd-ink);
+}
+.gd__lead {
+  margin: 0; white-space: pre-line;
+  font-size: 13px; line-height: 1.72; color: #a5a5a5; letter-spacing: -.01em;
+}
+
+/* 아코디언 헤더 */
+.gd__row {
+  appearance: none; background: none; border: 0; cursor: pointer; font: inherit;
+  width: 100%; height: 58px; padding: 0 var(--gd-pad);
+  display: flex; align-items: center; justify-content: space-between; gap: 10px;
+  border-top: 1px solid rgba(0,0,0,.09);
+  text-align: left; color: var(--gd-ink);
+}
+.gd__sec:last-child .gd__row { border-bottom: 1px solid rgba(0,0,0,.09); }
+.gd__rowlabel {
   display: flex; align-items: center; gap: 8px;
-  font-size: 13px; font-weight: 800; letter-spacing: .04em;
-  color: var(--lantern); margin: 0 0 10px;
+  font-size: 23px; font-weight: 400; letter-spacing: -.03em;
 }
-.guide__head::before { content: ''; width: 14px; height: 2px; border-radius: 2px; background: var(--lantern); }
+.gd__rowstar { width: 20px; height: 20px; flex: none; color: var(--gd-ink); }
 
-/* 라벨 : 값 목록 (기본 정보 · 운영 안내) */
-.guide__info { margin: 0; display: grid; grid-template-columns: max-content 1fr; column-gap: 14px; row-gap: 8px; font-size: 14px; }
-.guide__info > div { display: contents; }
-.guide__info dt { color: var(--text-dim); }
-.guide__info dd { margin: 0; font-weight: 600; }
-
-/* 카드 안 보조 설명 — 구분선 아래로 내린다 */
-.guide__note, .guide__notes {
-  margin: 14px 0 0; padding-top: 14px; border-top: 1px solid var(--line);
-  font-size: 13px; line-height: 1.7; color: var(--text-dim);
+/* +/− 기호 — 열리면 세로획만 사라진다 */
+.gd__sign { position: relative; width: 19px; height: 19px; flex: none; }
+.gd__sign::before, .gd__sign::after {
+  content: ''; position: absolute; left: 50%; top: 50%; background: #b3b3b3;
+  transform: translate(-50%, -50%);
 }
-.guide__notes { padding-left: 18px; }
-.guide__notes li + li { margin-top: 6px; }
+.gd__sign::before { width: 19px; height: 1.3px; }
+.gd__sign::after  { width: 1.3px; height: 19px; transition: opacity .18s ease; }
+.gd__sign.is-open::after { opacity: 0; }
 
-.guide__rule + .guide__rule { margin-top: 12px; }
-.guide__rule b { display: block; font-size: 15px; font-weight: 800; }
-.guide__rule .guide__notes { margin-top: 12px; padding-top: 12px; }
+/* 펼친 본문 — 그러데이션 위에 무광 회색 판을 덮는다 */
+.gd__body {
+  background: #f5f5f5;
+  box-shadow: inset 0 1px 5px rgba(0,0,0,.06);
+  padding: 61px var(--gd-pad) 58px;
+}
+
+/* 분홍 문단 (프로그램 기본 정보) */
+.gd__pink {
+  margin: 0 0 40px; white-space: pre-line;
+  font-size: 14.5px; line-height: 1.59; color: var(--gd-pink); letter-spacing: -.01em;
+}
+
+/* 라벨 | 값 표 — 좌우 전면, 얇은 가로선 + 세로 구분선 */
+.gd__table {
+  margin: 0 calc(var(--gd-pad) * -1);
+  display: grid; grid-template-columns: 98px 1fr;
+  border-top: 1px solid var(--gd-hair);
+  font-size: 16px;
+}
+.gd__table > div { display: contents; }
+.gd__table dt, .gd__table dd {
+  margin: 0; padding: 12px 0; border-bottom: 1px solid var(--gd-hair);
+  display: flex; align-items: center;
+}
+.gd__table dt {
+  justify-content: center; font-weight: 700; color: var(--gd-ink-strong);
+  letter-spacing: -.03em;
+}
+.gd__table dd {
+  padding-left: 26px; padding-right: 12px;
+  white-space: pre-line; color: #5f5f5f; line-height: 1.6;
+  border-left: 1px solid var(--gd-hair);
+}
+
+/* 운영안내 하단 주의사항 — 분홍 + 불릿 */
+.gd__notes { list-style: none; margin: 44px 0 0 4px; padding: 0; }
+.gd__notes li {
+  position: relative; padding-left: 17px;
+  font-size: 14.5px; line-height: 1.57; color: var(--gd-pink); letter-spacing: -.01em;
+}
+.gd__notes li + li { margin-top: 6px; }
+.gd__notes li::before {
+  content: '+'; position: absolute; left: 0; top: 0;
+  color: var(--gd-pink-strong); font-weight: 700;
+}
+
+/* 3대 과업 */
+.gd__task + .gd__task { margin-top: 46px; }
+.gd__tasknum { display: flex; align-items: center; }
+.gd__tasknum span {
+  width: 77px; flex: none;
+  font-size: 46px; font-weight: 700; line-height: 1;
+  color: var(--gd-pink-strong); letter-spacing: .01em;
+}
+.gd__tasknum i { flex: 1; height: 1px; background: var(--gd-hair); }
+.gd__taskhead {
+  margin: 16px 0 0; padding-left: 77px; white-space: pre-line;
+  font-size: 19.5px; font-weight: 700; line-height: 1.42;
+  color: var(--gd-ink-strong); letter-spacing: -.03em;
+}
+.gd__taskbody {
+  margin: 14px 0 0; padding-left: 77px; white-space: pre-line;
+  font-size: 14.5px; line-height: 1.5; color: var(--gd-dim); letter-spacing: -.01em;
+}
+
+/* 반드시 숙지해 주세요 */
+.gd__rule + .gd__rule { margin-top: 48px; }
+.gd__rulehead { display: flex; align-items: center; gap: 0; margin-bottom: 4px; }
+.gd__rulehead i { flex: 1; height: 1px; background: var(--gd-hair); }
+.gd__rulestar { position: relative; top: 19px; width: 11px; height: 11px; flex: none; color: #8d8d8d; }
+.gd__rule h2 {
+  margin: 4px 0 0; padding-left: 50px;
+  font-size: 25.5px; font-weight: 700; color: #1f1f1f; letter-spacing: -.03em;
+}
+.gd__rule p {
+  margin: 12px 0 0; padding-left: 50px; white-space: pre-line;
+  font-size: 18px; line-height: 1.45; color: var(--gd-dim); letter-spacing: -.01em;
+}
+.gd__rule mark {
+  background: linear-gradient(var(--gd-mark), var(--gd-mark)) 0 100% / 100% 62% no-repeat;
+  color: inherit; padding: 0 1px;
+  -webkit-box-decoration-break: clone; box-decoration-break: clone;
+}
+
+/* 하단 플로팅 내비 */
+.gd__nav {
+  position: fixed; z-index: 2;
+  left: 50%; transform: translateX(-50%);
+  bottom: calc(var(--gd-inset) + 12px + env(safe-area-inset-bottom));
+  width: min(calc(100vw - 68px), calc(var(--maxw) - 68px));
+  height: 56px; border-radius: var(--radius-pill);
+  background: var(--gd-navy);
+  display: grid; grid-auto-flow: column; grid-auto-columns: 1fr;
+  box-shadow: 0 8px 22px rgba(22,55,90,.28);
+}
+.gd__tab {
+  appearance: none; background: none; border: 0; cursor: pointer; font: inherit;
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px;
+  color: #fff; text-decoration: none;
+}
+.gd__tab svg { width: 21px; height: 21px; }
+.gd__tab span { font-size: 10.5px; font-weight: 700; letter-spacing: -.04em; }
 
 /* 코드 지도 — 장소 리스트 */
 .spots { margin-top: 22px; }
