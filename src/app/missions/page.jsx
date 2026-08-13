@@ -1,36 +1,77 @@
 'use client';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Protected from '@/components/Protected';
 import { api } from '@/lib/apiClient';
 import ProgressBar from '@/components/ProgressBar';
 import Loading from '@/components/Loading';
+import { QUEST_TABS } from '@/lib/questGroups';
 
 function Missions() {
   const [data, setData] = useState(null);
   const [err, setErr] = useState('');
+  const [tab, setTab] = useState(0);          // QUEST_TABS의 인덱스
+  const trackRef = useRef(null);
   const router = useRouter();
   useEffect(() => { api.myMissions().then(setData).catch(e => setErr(e.message)); }, []);
+
+  // 탭을 누르면 해당 퀘스트로 밀어준다(스와이프는 스크롤이 알아서 처리)
+  function goTab(i) {
+    setTab(i);
+    const el = trackRef.current;
+    if (el) el.scrollTo({ left: el.clientWidth * i, behavior: 'smooth' });
+  }
+
+  // 스와이프로 넘어간 위치를 탭에 반영한다
+  function onScroll(e) {
+    const el = e.currentTarget;
+    const i = Math.round(el.scrollLeft / el.clientWidth);
+    if (i !== tab) setTab(i);
+  }
+
   if (err) return <div className="screen center"><p className="muted">{err}</p></div>;
   if (!data) return <Loading label="미션을 불러오는 중…" />;
+
   return (
     <div className="screen stack fade-in">
       <div className="spread">
-        <div><div className="eyebrow">나의 미션</div><h1 style={{ margin: 0 }}>{data.user?.nickname || '참가자'}</h1></div>
+        <div><div className="eyebrow">나의 퀘스트</div><h1 style={{ margin: 0 }}>{data.user?.nickname || '참가자'}</h1></div>
         <div className="center"><div style={{ fontSize: 24, fontWeight: 800, color: 'var(--lantern)' }}>{data.totalPoints}</div><div className="muted" style={{ fontSize: 12 }}>점</div></div>
       </div>
       <ProgressBar done={data.progress.done} total={data.progress.total} />
-      <div className="stack" style={{ marginTop: 8 }}>
-        {data.quests.map(q => (
-          <div key={q.id} className="card spread">
-            <div><div className="muted" style={{ fontSize: 12 }}>미션 {q.order_no}</div><div style={{ fontWeight: 700 }}>{q.title}</div></div>
-            <span className={`badge ${q.cleared ? 'done' : ''}`}>{q.cleared ? '완료' : '미완료'}</span>
-          </div>
+
+      <div className="qtabs" role="tablist">
+        {QUEST_TABS.map((g, i) => (
+          <button key={g.value} type="button" role="tab" aria-selected={i === tab}
+            className={`qtabs__item ${i === tab ? 'is-on' : ''}`} onClick={() => goTab(i)}>
+            {g.label}
+          </button>
         ))}
-        {data.quests.length === 0 && <p className="muted">아직 미션이 없어요.</p>}
       </div>
+
+      <div className="qswipe" ref={trackRef} onScroll={onScroll}>
+        {QUEST_TABS.map(g => {
+          const list = data.quests.filter(q => q.quest_group === g.value);
+          const done = list.filter(q => q.cleared).length;
+          return (
+            <section key={g.value} className="qswipe__page" role="tabpanel" aria-label={g.label}>
+              {list.length > 0 && (
+                <p className="muted" style={{ margin: 0 }}>{g.label} · {done}/{list.length} 완료</p>
+              )}
+              {list.map(q => (
+                <div key={q.id} className="card spread">
+                  <div><div className="muted" style={{ fontSize: 12 }}>미션 {q.order_no}</div><div style={{ fontWeight: 700 }}>{q.title}</div></div>
+                  <span className={`badge ${q.cleared ? 'done' : ''}`}>{q.cleared ? '완료' : '미완료'}</span>
+                </div>
+              ))}
+              {list.length === 0 && <p className="muted">아직 미션이 없어요.</p>}
+            </section>
+          );
+        })}
+      </div>
+
       <div className="grow" />
-      {/* <button className="btn" onClick={() => router.push('/scan')}>QR 스캔하기</button> */}
+      <button className="btn ghost" onClick={() => router.replace('/')}>메인으로</button>
     </div>
   );
 }

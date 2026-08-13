@@ -39,20 +39,27 @@ function MainInner() {
       <div className="login fade-in">
         <div className="stage">
           <div className="login__bg" />
-          <div className="login__dim" />
           <div className="screen">
             <div className="grow" />
-            <div className="eyebrow center">이야기 미션 투어</div>
-            <h1 className="center">사라진 신들의 열쇠</h1>
             <p className="center login__sub">
-              측간신의 어둠으로부터 오염된 현세의 유산을 정화하고 회복시켜<br />
-              닫혀버린 하늘 문을 다시 열어낼 ‘수호자’가 되어주세요.
+              {/* 측간신의 어둠으로부터 오염된 현세의 유산을 정화하고 회복시켜<br />
+              닫혀버린 하늘 문을 다시 열어낼 ‘수호자’가 되어주세요. */}
             </p>
             {err && <p className="center" style={{ color: 'var(--talisman)', fontSize: 14 }}>{err}</p>}
             <div className="grow" />
             <div className="stack">
-              <a className="btn btn--kakao" href={startUrl('kakao')}>카카오로 수호자 서약</a>
-              <a className="btn btn--naver" href={startUrl('naver')}>네이버로 수호자 서약</a>
+              <a className="btn btn--oauth menu__item" href={startUrl('naver')}>
+                <svg className="btn__logo" viewBox="0 0 20 20" aria-hidden="true">
+                  <path d="M13.5615 10.6919 6.16846 0H0v20h6.43848V9.30664L13.8315 20H20V0h-6.4385v10.6919Z" />
+                </svg>
+                네이버로 수호자 서약
+              </a>
+              <a className="btn btn--oauth menu__item" href={startUrl('kakao')}>
+                <svg className="btn__logo" viewBox="0 0 24 24" aria-hidden="true">
+                  <path d="M12 3C6.477 3 2 6.463 2 10.75c0 2.708 1.79 5.09 4.5 6.47-.2.73-.72 2.63-.82 3.04-.13.5.18.5.39.36.16-.11 2.6-1.77 3.66-2.49.74.11 1.5.17 2.27.17 5.523 0 10-3.463 10-7.55C22 6.463 17.523 3 12 3Z" />
+                </svg>
+                카카오로 수호자 서약
+              </a>
               <button className="btn ghost" onClick={onTest} disabled={testing}>
                 {testing ? '서약 중…' : '테스트로 시작하기'}
               </button>
@@ -74,20 +81,17 @@ function MainInner() {
     <div className="home fade-in">
       <div className="stage">
         <div className="home__bg" />
-        <div className="home__dim" />
         <div className="screen">
           <div className="topbar">
             <button type="button" onClick={onLogout}>로그아웃</button>
           </div>
           <div className="grow" />
-          <div className="eyebrow center">이야기 미션 투어</div>
-          <h1 className="center">사라진 신들의 열쇠</h1>
-          <p className="muted center">{user?.nickname ? `${user.nickname} 수호자님, 어서 오세요.` : '수호자님, 어서 오세요.'}</p>
+          {/* <p className="muted center">{user?.nickname ? `${user.nickname} 수호자님, 어서 오세요.` : '수호자님, 어서 오세요.'}</p> */}
           <nav className="menu">
             {MENU.map(m => (
               m.to
-                ? <Link key={m.label} href={m.to} className="btn glass menu__item">{m.label}</Link>
-                : <button key={m.label} type="button" className="btn glass menu__item"
+                ? <Link key={m.label} href={m.to} className="btn btn--oauth menu__item">{m.label}</Link>
+                : <button key={m.label} type="button" className="btn btn--oauth menu__item"
                     onClick={() => setView(m.view)}>{m.label}</button>
             ))}
           </nav>

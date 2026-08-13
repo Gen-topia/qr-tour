@@ -83,12 +83,31 @@ a { color: var(--lantern); text-decoration: none; }
   backdrop-filter: blur(14px) saturate(140%);
   -webkit-backdrop-filter: blur(14px) saturate(140%);
   box-shadow: 0 10px 28px rgba(0,0,0,.28), inset 0 1px 0 rgba(255,255,255,.35);
+  /* 배경 이미지의 밝은 부분에서도 흰 글씨가 묻히지 않게 검은 외곽선을 두른다 */
+  text-shadow:
+    -1px -1px 0 rgba(73, 111, 236, 0.65), 1px -1px 0 rgba(51, 76, 219, 0.65),
+    -1px  1px 0 rgba(55, 76, 195, 0.65), 1px  1px 0 rgba(61, 81, 232, 0.65),
+     0 2px 8px rgba(0,0,0,.5);
 }
 .btn.glass:active { background: rgba(255,255,255,.2); box-shadow: 0 6px 16px rgba(0,0,0,.24); }
 
-/* 소셜 로그인 — 각 사의 브랜드 가이드 색 */
-.btn--kakao { background: #fee500; color: #191600; box-shadow: 0 10px 24px rgba(254,229,0,.34); }
-.btn--naver { background: #03c75a; color: #fff;    box-shadow: 0 10px 24px rgba(3,199,90,.26); }
+/* 소셜 로그인 — 시안(reference/components/login_btn.png)
+   배경 이미지가 그대로 비치는 투명 알약 + 흰 테두리, 로고는 왼쪽에 고정하고 글자는 가운데 */
+.btn--oauth {
+  position: relative;
+  padding: 12px 18px;
+  background: none;
+  border: 1px solid rgba(255,255,255,.85);
+  color: #fff;
+  box-shadow: none;
+  text-shadow: 0 1px 6px rgba(0,0,0,.45);
+}
+.btn--oauth:active { background: rgba(255,255,255,.14); box-shadow: none; }
+/* 글자를 버튼 정중앙에 두기 위해 로고는 흐름에서 빼낸다 */
+.btn__logo {
+  position: absolute; left: 24px; top: 50%; transform: translateY(-50%);
+  width: 18px; height: 18px; fill: currentColor;
+}
 
 /* 카드/패널 — 시안의 흰 표면 + 넓고 옅은 그림자 */
 .card {
@@ -358,11 +377,8 @@ h1 { font-size: 28px; font-weight: 800; margin: 8px 0 6px; letter-spacing: -.03e
 .login .screen, .home .screen { flex: 1; min-height: 0; overflow: auto; }
 
 .login__bg { position: absolute; inset: 0; background: url('/intro.png') center / contain no-repeat; }
-.login__dim { position: absolute; inset: 0; background: linear-gradient(rgba(20,16,50,.25), rgba(20,16,50,.62)); }
 .login .screen { position: relative; }
-.login .eyebrow { color: #fff; opacity: .85; }
-.login h1 { color: #fff; text-shadow: 0 2px 18px rgba(0,0,0,.35); }
-.login__sub { color: rgba(255,255,255,.82); font-size: 14px; }
+.login__sub { color: rgba(255,255,255,.82); font-size: 14px; text-shadow: 0 2px 12px rgba(0,0,0,.6); }
 
 /* 프롤로그: 세로형 전체 영상 + 나레이션 */
 .prologue { background: #000; }
@@ -435,16 +451,16 @@ h1 { font-size: 28px; font-weight: 800; margin: 8px 0 6px; letter-spacing: -.03e
 /* 메인 홈 — 인트로 이미지를 배경으로 깔고 검정 반투명으로 덮는다 */
 .home { position: fixed; inset: 0; z-index: 1; }
 .home__bg { position: absolute; inset: 0; background: url('/intro.png') center / contain no-repeat; }
-.home__dim { position: absolute; inset: 0; background: rgba(10,8,26,.62); }
 .home .screen { position: relative; }
-.home .eyebrow { color: #fff; opacity: .85; }
-.home h1 { color: #fff; text-shadow: 0 2px 18px rgba(0,0,0,.45); }
-.home .muted { color: rgba(255,255,255,.78); }
-.home .topbar button { color: rgba(255,255,255,.75); }
+/* 로그아웃을 흐름에서 빼내야 메뉴가 화면 정중앙에 놓인다 */
+.home .topbar { position: absolute; top: calc(20px + env(safe-area-inset-top)); right: 20px; margin: 0; z-index: 2; }
+.home .muted { color: rgba(255,255,255,.82); text-shadow: 0 2px 12px rgba(0,0,0,.6); }
+.home .topbar button { color: rgba(255,255,255,.8); text-shadow: 0 2px 12px rgba(0,0,0,.6); }
 
 /* 메인 메뉴 — 화면 중앙에 세로로 쌓이는 버튼 */
-.menu { display: flex; flex-direction: column; align-items: center; gap: 10px; margin-top: 28px; }
-.menu__item { width: 50%; font-size: 14px; padding: 8px 18px; }
+.menu { display: flex; flex-direction: column; align-items: stretch; gap: 10px; margin-top: 135px; }
+/* 배경 그림의 밝은 부분에서도 글씨가 읽히도록 시안 배경톤의 남색으로 채운다 */
+.menu__item { background: rgba(32, 45, 100, .48); }
 
 /* 수호자 지침서 본문 */
 .guide__lead { white-space: pre-line; font-size: 15px; line-height: 1.75; margin: 0 0 26px; }
@@ -493,3 +509,30 @@ h1 { font-size: 28px; font-weight: 800; margin: 8px 0 6px; letter-spacing: -.03e
 .spot__info dd { margin: 0; }
 .spot__note { font-size: 12px; color: var(--text-dim); line-height: 1.6; margin: 10px 0 0; }
 .spot .btn.sm { margin-top: 12px; }
+
+/* 퀘스트 보기 — 퀘스트1/2/3 탭 + 좌우 스와이프 */
+.qtabs {
+  display: grid; grid-auto-flow: column; grid-auto-columns: 1fr; gap: 4px;
+  padding: 4px; border-radius: var(--radius-pill);
+  background: var(--surface-2); border: 1px solid var(--line);
+}
+.qtabs__item {
+  appearance: none; border: 0; cursor: pointer; font: inherit;
+  padding: 9px 0; border-radius: var(--radius-pill);
+  background: transparent; color: var(--text-dim);
+  font-size: 14px; font-weight: 600; transition: color .16s ease, background .16s ease;
+}
+.qtabs__item.is-on { background: var(--surface); color: var(--lantern); box-shadow: var(--shadow-sm); }
+
+/* 한 화면에 퀘스트 하나씩, 스와이프로 다음 퀘스트에 딱 붙는다 */
+.qswipe {
+  display: flex; overflow-x: auto; scroll-snap-type: x mandatory;
+  overscroll-behavior-x: contain; scrollbar-width: none;
+  margin: 0 -20px;                      /* .screen 좌우 여백까지 스크롤 영역으로 */
+}
+.qswipe::-webkit-scrollbar { display: none; }
+.qswipe__page {
+  flex: 0 0 100%; scroll-snap-align: start;
+  display: flex; flex-direction: column; gap: 12px;
+  padding: 2px 20px;                    /* 카드 그림자가 잘리지 않게 */
+}

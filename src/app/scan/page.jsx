@@ -54,8 +54,8 @@ function Scan() {
 
   return (
     <div className="screen">
-      <div className="eyebrow">QR 스캔</div>
-      <h1>지점의 QR을 비춰주세요</h1>
+      <div className="eyebrow">파수꾼 코드 탐색</div>
+      <h1>코드를 비춰주세요</h1>
       {/* 카메라가 열리기 전에도 같은 크기의 자리를 잡아둬 화면이 밀리지 않게 한다 */}
       <div className="scan-box">
         <div id="qr-reader" />

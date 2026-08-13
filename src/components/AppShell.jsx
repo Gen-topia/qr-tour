@@ -2,8 +2,9 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
-// 메인은 중앙 메뉴로 이동하므로 하단 탭바를 쓰지 않는다
-const IMMERSIVE = [/^\/$/, /^\/quest\//, /^\/scan/];
+// 하단 탭바를 쓰지 않는 화면
+// — 메인은 중앙 메뉴로 이동하고, 나머지는 화면 안에 '메인으로' 버튼을 두고 있다
+const IMMERSIVE = [/^\/$/, /^\/quest\//, /^\/scan/, /^\/missions/, /^\/map/];
 
 export default function AppShell({ children }) {
   const pathname = usePathname() || '/';

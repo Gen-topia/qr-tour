@@ -4,8 +4,9 @@ import AdminShell from '@/components/AdminShell';
 import { api } from '@/lib/apiClient';
 import { STEP_TYPES } from '@/lib/stepTypes';
 import { SPOT_OPTIONS } from '@/lib/spots';
+import { QUEST_GROUPS } from '@/lib/questGroups';
 
-const EMPTY = { title: '', order_no: 1, place: '', cover_image_url: '', reward_points: 100, is_active: 1 };
+const EMPTY = { title: '', order_no: 1, quest_group: 1, place: '', cover_image_url: '', reward_points: 100, is_active: 1 };
 const SAMPLE = JSON.stringify([STEP_TYPES.story.sample, STEP_TYPES.quiz.sample], null, 2);
 
 function Quests() {
@@ -80,10 +81,12 @@ function Quests() {
         <button className="btn sm" onClick={() => openEdit({ ...EMPTY, order_no: quests.length + 1 })}>+ 새 미션</button>
       </div>
       <table className="table">
-        <thead><tr><th>순서</th><th>제목</th><th>유형</th><th>코드(QR)</th><th>포인트</th><th>활성</th><th></th></tr></thead>
+        <thead><tr><th>순서</th><th>구분</th><th>제목</th><th>유형</th><th>코드(QR)</th><th>포인트</th><th>활성</th><th></th></tr></thead>
         <tbody>
           {quests.map(q => (
-            <tr key={q.id}><td>{q.order_no}</td><td>{q.title}</td>
+            <tr key={q.id}><td>{q.order_no}</td>
+              <td>{QUEST_GROUPS.find(g => g.value === q.quest_group)?.label || '—'}</td>
+              <td>{q.title}</td>
               <td>
                 {q.step_types?.length
                   ? <span className="type-tags">
@@ -98,7 +101,7 @@ function Quests() {
               <td className="row-actions"><button className="btn sm ghost" onClick={() => openEdit(q)}>수정</button>
                 <button className="btn sm danger" onClick={() => remove(q.id)}>삭제</button></td></tr>
           ))}
-          {quests.length === 0 && <tr><td colSpan="7" className="muted">등록된 미션이 없습니다.</td></tr>}
+          {quests.length === 0 && <tr><td colSpan="8" className="muted">등록된 미션이 없습니다.</td></tr>}
         </tbody>
       </table>
 
@@ -112,12 +115,20 @@ function Quests() {
             </div>
             <div className="grid2">
               <div className="field">
+                <label>퀘스트 구분</label>
+                <select className="input" value={editing.quest_group ?? 1} onChange={e => setEditing({ ...editing, quest_group: +e.target.value })}>
+                  {QUEST_GROUPS.map(g => <option key={g.value} value={g.value}>{g.label}</option>)}
+                </select>
+              </div>
+              <div className="field">
                 <label>장소 (코드 지도)</label>
                 <select className="input" value={editing.place || ''} onChange={e => setEditing({ ...editing, place: e.target.value })}>
                   <option value="">— 지정 안 함 —</option>
                   {SPOT_OPTIONS.map(s => <option key={s.code} value={s.code}>{s.name}</option>)}
                 </select>
               </div>
+            </div>
+            <div className="grid2">
               <div className="field"><label>보상 포인트</label><input className="input" type="number" value={editing.reward_points} onChange={e => setEditing({ ...editing, reward_points: +e.target.value })} /></div>
             </div>
             <div className="field"><label>커버 이미지 URL</label><input className="input" value={editing.cover_image_url || ''} onChange={e => setEditing({ ...editing, cover_image_url: e.target.value })} /></div>

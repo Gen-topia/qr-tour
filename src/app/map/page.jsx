@@ -58,7 +58,8 @@ function CodeMap() {
         </section>
       ))}
 
-      <button className="btn" style={{ marginTop: 18 }} onClick={() => router.push('/')}>닫기</button>
+      <div className="grow" />
+      <button className="btn ghost" onClick={() => router.replace('/')}>메인으로</button>
     </div>
   );
 }
