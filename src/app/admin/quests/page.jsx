@@ -6,7 +6,7 @@ import { STEP_TYPES } from '@/lib/stepTypes';
 import { SPOT_OPTIONS } from '@/lib/spots';
 import { QUEST_GROUPS } from '@/lib/questGroups';
 
-const EMPTY = { title: '', order_no: 1, quest_group: 1, place: '', cover_image_url: '', reward_points: 100, is_active: 1 };
+const EMPTY = { title: '', order_no: 1, quest_group: 1, place: '', cover_image_url: '', narration_video: '', reward_points: 100, is_active: 1 };
 const SAMPLE = JSON.stringify([STEP_TYPES.story.sample, STEP_TYPES.quiz.sample], null, 2);
 
 function Quests() {
@@ -132,6 +132,14 @@ function Quests() {
               <div className="field"><label>보상 포인트</label><input className="input" type="number" value={editing.reward_points} onChange={e => setEditing({ ...editing, reward_points: +e.target.value })} /></div>
             </div>
             <div className="field"><label>커버 이미지 URL</label><input className="input" value={editing.cover_image_url || ''} onChange={e => setEditing({ ...editing, cover_image_url: e.target.value })} /></div>
+            <div className="field">
+              <label>나레이션 영상 이름</label>
+              <input className="input" placeholder="예: quest_01" value={editing.narration_video || ''}
+                onChange={e => setEditing({ ...editing, narration_video: e.target.value })} />
+              <p className="muted" style={{ fontSize: 12, margin: '6px 0 0' }}>
+                public 폴더의 <code>{`${editing.narration_video || '이름'}.mp4`}</code> 에 연결됩니다. 비워두면 시작 화면에 나레이션 버튼이 나오지 않습니다.
+              </p>
+            </div>
             <div className="field">
               <label>서브페이지 (JSON)</label>
               <div className="spread" style={{ marginBottom: 8 }}>

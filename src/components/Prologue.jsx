@@ -28,8 +28,8 @@ const Icon = ({ name }) => (
   </svg>
 );
 
-// 세계관 학습 — 세로형 프롤로그 영상을 나레이션과 함께 끝까지 본다
-export default function Prologue({ onEnd, onClose }) {
+// 세계관 학습 — 세로형 영상을 나레이션과 함께 본다(미션 나레이션도 같은 플레이어를 쓴다)
+export default function Prologue({ onEnd, onClose, src = '/prologue.mp4', label = '프롤로그' }) {
   const ref = useRef(null);
   const [needTap, setNeedTap] = useState(false);   // 브라우저가 소리 있는 자동재생을 막은 경우
   const [failed, setFailed] = useState(false);     // 영상을 불러오지 못한 경우
@@ -67,7 +67,7 @@ export default function Prologue({ onEnd, onClose }) {
       <video
         ref={ref}
         className="prologue__video"
-        src="/prologue.mp4"
+        src={src}
         playsInline
         preload="auto"
         onEnded={onEnd}
@@ -81,7 +81,7 @@ export default function Prologue({ onEnd, onClose }) {
       {needTap && !failed && (
         <button type="button" className="prologue__tap" onClick={onTap}>
           <span className="prologue__play" />
-          <span>탭하여 프롤로그 보기</span>
+          <span>탭하여 {label} 보기</span>
         </button>
       )}
       <button type="button" className="prologue__close" onClick={onClose} aria-label="닫기">✕</button>
@@ -98,7 +98,7 @@ export default function Prologue({ onEnd, onClose }) {
       )}
       {failed && (
         <div className="prologue__fallback">
-          <p className="muted center">프롤로그 영상을 불러오지 못했어요.</p>
+          <p className="muted center">{label} 영상을 불러오지 못했어요.</p>
           <button className="btn" onClick={onEnd}>다음</button>
         </div>
       )}

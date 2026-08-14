@@ -1,6 +1,7 @@
 'use client';
 import { useState } from 'react';
 import Link from 'next/link';
+import Sparkle from '@/components/Sparkle';
 
 // 6. 수호자 지침서 — reference/screens/메인 - 수호자 지침서*.png 그대로
 // 아코디언: 닫힘 '+' / 열림 '−'
@@ -88,17 +89,6 @@ const RULES = [
 const marked = (text) =>
   text.split(/==([\s\S]+?)==/).map((part, i) => (i % 2 ? <mark key={i}>{part}</mark> : part));
 
-function Sparkle({ className }) {
-  return (
-    <svg className={className} viewBox="0 0 24 24" aria-hidden="true">
-      <g stroke="currentColor" strokeWidth="1.4" strokeLinecap="round">
-        <path d="M12 1.5V22.5M1.5 12H22.5" />
-        <path d="M4.9 4.9 19.1 19.1M19.1 4.9 4.9 19.1" strokeWidth="1.1" />
-      </g>
-    </svg>
-  );
-}
-
 const SECTIONS = [
   { key: 'info', title: '프로그램 기본 정보' },
   { key: 'task', title: '3대 과업' },
@@ -111,10 +101,10 @@ export default function Guide({ onDone }) {
   const toggle = (key) => setOpen(o => (o === key ? null : key));
 
   return (
-    <div className="onboard gd">
-      <div className="gd__panel">
+    <div className="onboard sheet gd">
+      <div className="sheet__panel">
         <header className="gd__hero">
-          <button type="button" className="gd__back" onClick={onDone} aria-label="뒤로">
+          <button type="button" className="sheet__back gd__back" onClick={onDone} aria-label="뒤로">
             <svg viewBox="0 0 34 20" aria-hidden="true">
               <path d="M10.5 2 2 10l8.5 8M2 10h31" fill="none" stroke="currentColor"
                     strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />

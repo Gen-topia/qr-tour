@@ -9,8 +9,8 @@
   --surface-2:  #eceef8;   /* 눌린 면(입력창·게이지 트랙·관리자 사이드바) */
   --text:       #1a1d2b;   /* 본문: 짙은 남색 */
   --text-dim:   #767c93;   /* 보조 텍스트 */
-  --lantern:    #7b6ef6;   /* 주 강조색: 라벤더 바이올렛 */
-  --lantern-dim:#6355e0;
+  --lantern:    #cc6c98;   /* 주 강조색: 타이틀 '사라진 신들의 열쇠' 로즈 핑크 */
+  --lantern-dim:#b2547e;
   --talisman:   #e2415f;   /* 보조 강조: 경고·삭제 (아껴서) */
   --line:       #e6e8f4;
   --radius:     20px;      /* 시안의 큰 둥글기 */
@@ -49,6 +49,7 @@ a { color: var(--lantern); text-decoration: none; }
 /* 모바일 컨테이너 (사용자 화면) */
 .screen {
   min-height: 100dvh;
+  width: 100%;                          /* 넓은 이미지가 프레임을 밀지 않게 폭을 고정 */
   max-width: var(--maxw);
   margin: 0 auto;
   padding: 24px 20px calc(24px + env(safe-area-inset-bottom));
@@ -445,10 +446,10 @@ h1 { font-size: 28px; font-weight: 800; margin: 8px 0 6px; letter-spacing: -.03e
 .menu__item { background: rgba(32, 45, 100, .48); }
 
 /* ─────────────────────────────────────────────────────────────
-   수호자 지침서 — reference/screens/메인 - 수호자 지침서*.png
-   전면 패널 + 아코디언(+/−) + 하단 플로팅 내비
+   공통 시트 — reference/screens/메인 - 수호자 지침서*.png 의 화면 컨셉.
+   수호자 지침서와 미션 화면이 함께 쓰는 전면 패널(그러데이션 + 그레인).
    ───────────────────────────────────────────────────────────── */
-.gd {
+.sheet {
   --gd-inset: 14px;               /* 화면 가장자리와 패널 사이 */
   --gd-pad: 21px;                 /* 패널 안쪽 좌우 여백 */
   --gd-ink: #4a4a4a;              /* 제목·항목명 */
@@ -465,7 +466,7 @@ h1 { font-size: 28px; font-weight: 800; margin: 8px 0 6px; letter-spacing: -.03e
 }
 
 /* 패널 — 그레인 얹은 홀로그램 그러데이션, 모서리는 각지게 */
-.gd__panel {
+.sheet__panel {
   position: relative; isolation: isolate;
   min-height: calc(100dvh - var(--gd-inset) * 2);
   max-width: calc(var(--maxw) - var(--gd-inset) * 2);
@@ -481,20 +482,26 @@ h1 { font-size: 28px; font-weight: 800; margin: 8px 0 6px; letter-spacing: -.03e
     #f8f6f3;
 }
 /* 시안의 미세한 노이즈 */
-.gd__panel::before {
+.sheet__panel::before {
   content: ''; position: absolute; inset: 0; z-index: 0; pointer-events: none;
   opacity: .55; mix-blend-mode: multiply;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)' opacity='.32'/%3E%3C/svg%3E");
 }
 
-/* 히어로 */
-.gd__hero, .gd__acc { position: relative; z-index: 1; }
-.gd__hero { padding: 29px var(--gd-pad) 47px; }
-.gd__back {
+/* 내용은 그레인 위로 */
+.sheet__panel > * { position: relative; z-index: 1; }
+
+/* 뒤로 화살표 — 시트를 쓰는 화면이 공유한다 */
+.sheet__back {
   appearance: none; background: none; border: 0; cursor: pointer;
-  display: block; padding: 0; margin: 0 0 41px; color: #a3a3a3;
+  display: block; padding: 0; margin: 0; color: #a3a3a3;
 }
-.gd__back svg { display: block; width: 34px; height: 24px; }
+.sheet__back svg { display: block; width: 34px; height: 24px; }
+
+/* ── 수호자 지침서 ─────────────────────────────────────────── */
+/* 히어로 */
+.gd__hero { padding: 29px var(--gd-pad) 47px; }
+.gd__back { margin-bottom: 41px; }
 .gd__title {
   margin: 0 0 10px; font-size: 25px; font-weight: 500;
   letter-spacing: -.03em; color: var(--gd-ink);
@@ -565,7 +572,7 @@ h1 { font-size: 28px; font-weight: 800; margin: 8px 0 6px; letter-spacing: -.03e
 }
 
 /* 운영안내 하단 주의사항 — 분홍 + 불릿 */
-.gd__notes { list-style: none; margin: 44px 0 0 4px; padding: 0; }
+.gd__notes { list-style: none; margin: 60px 0 0 4px; padding: 0; }
 .gd__notes li {
   position: relative; padding-left: 17px;
   font-size: 14.5px; line-height: 1.57; color: var(--gd-pink); letter-spacing: -.01em;
@@ -633,6 +640,84 @@ h1 { font-size: 28px; font-weight: 800; margin: 8px 0 6px; letter-spacing: -.03e
 .gd__tab svg { width: 21px; height: 21px; }
 .gd__tab span { font-size: 10.5px; font-weight: 700; letter-spacing: -.04em; }
 
+/* ── 미션 시작 화면 (첫 스텝) ───────────────────────────────── */
+.qi__panel, .qc__panel { display: flex; flex-direction: column; }
+.qi__head { padding: 29px var(--gd-pad) 47px; }
+.qi__head .sheet__back { margin-bottom: 41px; }
+.qi__eyebrow {
+  font-size: 13px; letter-spacing: -.01em; color: var(--gd-pink-strong);
+  margin-bottom: 10px;
+}
+.qi__title {
+  margin: 0 0 14px; font-size: 25px; font-weight: 500;
+  letter-spacing: -.03em; color: var(--gd-ink);
+}
+.qi__text {
+  margin: 0; white-space: pre-line;
+  font-size: 14.5px; line-height: 1.72; color: #8f8f8f; letter-spacing: -.01em;
+}
+.qi__img {
+  display: block; width: calc(100% + var(--gd-pad) * 2);
+  margin: 34px calc(var(--gd-pad) * -1) 0; height: auto;
+}
+/* 시트 위에 얹히는 기존 카드형 요소는 톤을 낮춘다 */
+.qi__head > .card, .qi__head > .btn { margin-top: 24px; }
+.qi__head .card { background: rgba(255,255,255,.62); border-color: rgba(255,255,255,.9); }
+
+/* 하단 — 스크롤 끝에서 만나는 나레이션 + 다음 */
+.qi__foot { margin-top: auto; padding-bottom: calc(30px + env(safe-area-inset-bottom)); }
+.qi__narration {
+  appearance: none; background: none; cursor: pointer; font: inherit;
+  width: 100%; height: 58px; padding: 0 var(--gd-pad);
+  display: flex; align-items: center; justify-content: space-between; gap: 10px;
+  border: 0; border-top: 1px solid rgba(0,0,0,.09); border-bottom: 1px solid rgba(0,0,0,.09);
+  color: var(--gd-ink); text-align: left;
+}
+.qi__narrationlabel {
+  display: flex; align-items: center; gap: 8px;
+  font-size: 19px; font-weight: 400; letter-spacing: -.03em;
+}
+.qi__star { width: 18px; height: 18px; flex: none; }
+.qi__playicon { width: 22px; height: 22px; flex: none; color: #9c9c9c; }
+.qi__next {
+  appearance: none; border: 0; cursor: pointer; font: inherit;
+  display: block; width: calc(100% - var(--gd-pad) * 2); margin: 26px var(--gd-pad) 0;
+  height: 52px; border-radius: var(--radius-pill);
+  background: var(--gd-navy); color: #fff;
+  font-size: 16px; font-weight: 700; letter-spacing: -.02em;
+}
+.qi__next:disabled { background: #9aa7b6; cursor: default; }
+
+/* ── 미션 클리어 화면 ──────────────────────────────────────── */
+.qc__body {
+  flex: 1; display: flex; flex-direction: column; justify-content: center;
+  padding: 48px var(--gd-pad);
+}
+.qc__img {
+  display: block; width: calc(100% + var(--gd-pad) * 2);
+  margin: 0 calc(var(--gd-pad) * -1) 46px; height: auto;
+}
+.qc__rule { display: flex; align-items: center; margin-bottom: 4px; }
+.qc__rule i { flex: 1; height: 1px; background: var(--gd-hair); }
+.qc__star { position: relative; top: 19px; width: 11px; height: 11px; flex: none; color: #8d8d8d; }
+.qc__title {
+  margin: 4px 0 0; text-align: center;
+  font-size: 25.5px; font-weight: 700; color: #1f1f1f; letter-spacing: -.03em;
+}
+.qc__text {
+  margin: 14px 0 0; text-align: center; white-space: pre-line;
+  font-size: 14.5px; line-height: 1.72; color: var(--gd-dim); letter-spacing: -.01em;
+}
+.qc__foot { padding: 0 var(--gd-pad) calc(30px + env(safe-area-inset-bottom)); }
+/* 공유 버튼은 조용한 외곽선으로 낮추고, 메인으로가 주 동작이 되게 한다 */
+.qc__foot .card { background: none; border: 0; box-shadow: none; padding: 0; }
+.qc__foot .btn {
+  background: none; color: var(--gd-ink); box-shadow: none;
+  border: 1px solid var(--gd-hair); height: 52px; padding: 0;
+  font-size: 15px; font-weight: 500;
+}
+.qc__foot .qi__next { width: 100%; margin: 12px 0 0; }
+
 /* 코드 지도 — 장소 리스트 */
 .spots { margin-top: 22px; }
 .spots__group {
@@ -673,7 +758,14 @@ h1 { font-size: 28px; font-weight: 800; margin: 8px 0 6px; letter-spacing: -.03e
 }
 .qswipe::-webkit-scrollbar { display: none; }
 .qswipe__page {
-  flex: 0 0 100%; scroll-snap-align: start;
+  flex: 0 0 100%; min-width: 0;         /* 큰 이미지가 페이지 폭을 밀지 않게 */
+  scroll-snap-align: start;
   display: flex; flex-direction: column; gap: 12px;
   padding: 2px 20px;                    /* 카드 그림자가 잘리지 않게 */
+}
+
+/* 퀘스트 진행 이미지 — 미션을 깰수록 public/quest_{번호}_{클리어수}.png 로 바뀐다 */
+.qhero {
+  display: block; width: 100%; height: auto;
+  border-radius: var(--radius); box-shadow: var(--shadow);
 }

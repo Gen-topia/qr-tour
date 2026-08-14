@@ -7,6 +7,18 @@ import ProgressBar from '@/components/ProgressBar';
 import Loading from '@/components/Loading';
 import { QUEST_TABS } from '@/lib/questGroups';
 
+// 퀘스트 진행 이미지 — public/quest_{퀘스트번호}_{클리어수}.png
+// 해당 번호 파일이 없으면 한 단계씩 낮춰 가장 마지막으로 준비된 이미지를 보여준다.
+function QuestImage({ group, done, label }) {
+  const [n, setN] = useState(done);
+  useEffect(() => { setN(done); }, [done]);
+  if (n < 0) return null;
+  return (
+    <img className="qhero" src={`/quest_${group}_${n}.png`} alt={`${label} 진행 이미지`}
+         onError={() => setN(v => v - 1)} />
+  );
+}
+
 function Missions() {
   const [data, setData] = useState(null);
   const [err, setErr] = useState('');
@@ -35,8 +47,8 @@ function Missions() {
   return (
     <div className="screen stack fade-in">
       <div className="spread">
-        <div><div className="eyebrow">나의 퀘스트</div><h1 style={{ margin: 0 }}>{data.user?.nickname || '참가자'}</h1></div>
-        <div className="center"><div style={{ fontSize: 24, fontWeight: 800, color: 'var(--lantern)' }}>{data.totalPoints}</div><div className="muted" style={{ fontSize: 12 }}>점</div></div>
+        <div><div className="eyebrow">나의 미션</div><h1 style={{ margin: 0 }}>{data.user?.nickname || '참가자'}</h1></div>
+        {/* <div className="center"><div style={{ fontSize: 24, fontWeight: 800, color: 'var(--lantern)' }}>{data.totalPoints}</div><div className="muted" style={{ fontSize: 12 }}>점</div></div> */}
       </div>
       <ProgressBar done={data.progress.done} total={data.progress.total} />
 
@@ -55,12 +67,16 @@ function Missions() {
           const done = list.filter(q => q.cleared).length;
           return (
             <section key={g.value} className="qswipe__page" role="tabpanel" aria-label={g.label}>
+              <QuestImage group={g.value} done={done} label={g.label} />
               {list.length > 0 && (
                 <p className="muted" style={{ margin: 0 }}>{g.label} · {done}/{list.length} 완료</p>
               )}
               {list.map(q => (
                 <div key={q.id} className="card spread">
-                  <div><div className="muted" style={{ fontSize: 12 }}>미션 {q.order_no}</div><div style={{ fontWeight: 700 }}>{q.title}</div></div>
+                  <div>
+                    {/* <div className="muted" style={{ fontSize: 12 }}>미션 {q.order_no}</div> */}
+                    <div style={{ fontWeight: 700 }}>{q.title}</div>
+                  </div>
                   <span className={`badge ${q.cleared ? 'done' : ''}`}>{q.cleared ? '완료' : '미완료'}</span>
                 </div>
               ))}

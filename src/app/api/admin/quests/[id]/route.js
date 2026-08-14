@@ -5,8 +5,8 @@ export async function PUT(request, { params }) {
   if (!verifyFrom(request, 'admin')) return unauthorized();
   const { id } = await params;
   const b = await request.json().catch(() => ({}));
-  await q('UPDATE quests SET title=?, order_no=?, quest_group=?, place=?, cover_image_url=?, reward_points=?, is_active=? WHERE id=?',
-    [b.title, b.order_no || 0, b.quest_group ?? 1, b.place || null, b.cover_image_url || null, b.reward_points ?? 100, b.is_active ?? 1, id]);
+  await q('UPDATE quests SET title=?, order_no=?, quest_group=?, place=?, cover_image_url=?, narration_video=?, reward_points=?, is_active=? WHERE id=?',
+    [b.title, b.order_no || 0, b.quest_group ?? 1, b.place || null, b.cover_image_url || null, b.narration_video || null, b.reward_points ?? 100, b.is_active ?? 1, id]);
   return ok({ ok: true });
 }
 
