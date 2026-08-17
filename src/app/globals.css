@@ -435,15 +435,17 @@ h1 { font-size: 28px; font-weight: 800; margin: 8px 0 6px; letter-spacing: -.03e
 .home { position: fixed; inset: 0; z-index: 1; }
 .home__bg { position: absolute; inset: 0; background: url('/intro.png') center / contain no-repeat; }
 .home .screen { position: relative; }
-/* 로그아웃을 흐름에서 빼내야 메뉴가 화면 정중앙에 놓인다 */
-.home .topbar { position: absolute; top: calc(20px + env(safe-area-inset-top)); right: 20px; margin: 0; z-index: 2; }
 .home .muted { color: rgba(255,255,255,.82); text-shadow: 0 2px 12px rgba(0,0,0,.6); }
-.home .topbar button { color: rgba(255,255,255,.8); text-shadow: 0 2px 12px rgba(0,0,0,.6); }
 
 /* 메인 메뉴 — 화면 중앙에 세로로 쌓이는 버튼 */
 .menu { display: flex; flex-direction: column; align-items: stretch; gap: 10px; margin-top: 135px; }
 /* 배경 그림의 밝은 부분에서도 글씨가 읽히도록 시안 배경톤의 남색으로 채운다 */
 .menu__item { background: rgba(32, 45, 100, .48); }
+/* 로그아웃 — 메뉴 맨 아래, 다른 버튼의 70% 크기로 배경 없이 흰 테두리만 */
+.menu__logout {
+  align-self: center; width: 70%;
+  padding: 8px 13px; font-size: 11px;
+}
 
 /* ─────────────────────────────────────────────────────────────
    공통 시트 — reference/screens/메인 - 수호자 지침서*.png 의 화면 컨셉.

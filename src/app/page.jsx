@@ -82,9 +82,6 @@ function MainInner() {
       <div className="stage">
         <div className="home__bg" />
         <div className="screen">
-          <div className="topbar">
-            <button type="button" onClick={onLogout}>로그아웃</button>
-          </div>
           <div className="grow" />
           {/* <p className="muted center">{user?.nickname ? `${user.nickname} 수호자님, 어서 오세요.` : '수호자님, 어서 오세요.'}</p> */}
           <nav className="menu">
@@ -94,6 +91,7 @@ function MainInner() {
                 : <button key={m.label} type="button" className="btn btn--oauth menu__item"
                     onClick={() => setView(m.view)}>{m.label}</button>
             ))}
+            <button type="button" className="btn btn--oauth menu__logout" onClick={onLogout}>로그아웃</button>
           </nav>
           <div className="grow" />
         </div>
