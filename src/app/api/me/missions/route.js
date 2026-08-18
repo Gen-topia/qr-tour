@@ -7,7 +7,8 @@ export async function GET(request) {
 
   const [me] = await q('SELECT id, nickname, total_points FROM users WHERE id=?', [user.id]);
   const quests = await q(
-    `SELECT q.id, q.title, q.order_no, q.quest_group, q.place, q.reward_points, (p.status='cleared') AS cleared
+    `SELECT q.id, q.title, q.order_no, q.quest_group, q.main_no, q.main_title, q.place, q.reward_points,
+            (p.status='cleared') AS cleared
      FROM quests q LEFT JOIN quest_progress p ON p.quest_id=q.id AND p.user_id=?
      WHERE q.is_active=1 ORDER BY q.order_no ASC`, [user.id]);
 
@@ -17,6 +18,7 @@ export async function GET(request) {
     user: me, totalPoints: me?.total_points ?? 0,
     progress: { done, total },
     quests: quests.map(x => ({ id: x.id, title: x.title, order_no: x.order_no, quest_group: x.quest_group,
+      main_no: x.main_no, main_title: x.main_title,
       place: x.place, reward_points: x.reward_points, cleared: !!Number(x.cleared) })),
   });
 }

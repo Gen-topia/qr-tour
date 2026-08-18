@@ -1,5 +1,6 @@
 import { q } from '@/lib/db';
 import { verifyFrom, ok, bad, unauthorized } from '@/lib/auth';
+import { lockReason } from '@/lib/questLock';
 
 export async function GET(request, { params }) {
   const user = verifyFrom(request, 'user');
@@ -12,10 +13,13 @@ export async function GET(request, { params }) {
   const [{ cnt }] = await q('SELECT COUNT(*) AS cnt FROM quest_steps WHERE quest_id=?', [quest.id]);
   const [prog] = await q('SELECT status FROM quest_progress WHERE user_id=? AND quest_id=?', [user.id, quest.id]);
 
+  const locked = await lockReason(user.id, quest.quest_group);
+
   return ok({
     quest: { id: quest.id, code: quest.code, title: quest.title, order_no: quest.order_no,
              cover_image_url: quest.cover_image_url, reward_points: quest.reward_points },
     stepCount: Number(cnt),
     status: prog?.status || 'new',
+    locked,
   });
 }

@@ -8,23 +8,15 @@ import Loading from '@/components/Loading';
 import { QUEST_TABS, QUEST_REQUIRES, groupLabel } from '@/lib/questGroups';
 
 // 퀘스트 진행 이미지 — public/quest_{퀘스트번호}_{클리어수}.png
-// 하나도 못 깼으면(0단계) 아무것도 보이지 않고, 깬 수만큼 자란 그림을 보여준다.
-// 아직 준비되지 않은 단계의 그림은 깨진 이미지 대신 조용히 숨긴다.
+// 해당 번호 파일이 없으면 한 단계씩 낮춰 가장 마지막으로 준비된 이미지를 보여준다.
 function QuestImage({ group, done, label }) {
-  const [broken, setBroken] = useState(false);
-  useEffect(() => { setBroken(false); }, [group, done]);
-  if (done < 1 || broken) return null;
+  const [n, setN] = useState(done);
+  useEffect(() => { setN(done); }, [done]);
+  if (n < 0) return null;
   return (
-    <img className="qhero" src={`/quest_${group}_${done}.png`} alt={`${label} 진행 이미지`}
-         onError={() => setBroken(true)} />
+    <img className="qhero" src={`/quest_${group}_${n}.png`} alt={`${label} 진행 이미지`}
+         onError={() => setN(v => v - 1)} />
   );
-}
-
-// 나무 단계는 메인 퀘스트(장소) 단위로 센다.
-// QR은 서브미션마다 따로 있고, 한 메인 퀘스트의 서브미션을 모두 깨야 한 단계 자란다.
-function countMainsDone(list) {
-  const nos = [...new Set(list.map(q => q.main_no))];
-  return nos.filter(no => list.filter(q => q.main_no === no).every(q => q.cleared)).length;
 }
 
 function Missions() {
@@ -73,8 +65,6 @@ function Missions() {
         {QUEST_TABS.map(g => {
           const list = data.quests.filter(q => q.quest_group === g.value);
           const done = list.filter(q => q.cleared).length;
-          const mainsDone = countMainsDone(list);        // 나무 단계
-          const mainsTotal = new Set(list.map(q => q.main_no)).size;
           // 선행 퀘스트를 모두 완수해야 열리는 퀘스트라면 조건을 함께 알려준다
           const needGroup = QUEST_REQUIRES[g.value];
           const need = needGroup ? data.quests.filter(q => q.quest_group === needGroup) : [];
@@ -82,7 +72,7 @@ function Missions() {
           const openable = need.length === 0 || needDone >= need.length;
           return (
             <section key={g.value} className="qswipe__page" role="tabpanel" aria-label={g.label}>
-              <QuestImage group={g.value} done={mainsDone} label={g.label} />
+              <QuestImage group={g.value} done={done} label={g.label} />
               {need.length > 0 && (
                 <p className={`qreq${openable ? ' qreq--open' : ''}`}>
                   {openable
@@ -91,15 +81,12 @@ function Missions() {
                 </p>
               )}
               {list.length > 0 && (
-                <p className="muted" style={{ margin: 0 }}>
-                  {g.label} · {mainsDone}/{mainsTotal} 완수 (미션 {done}/{list.length})
-                </p>
+                <p className="muted" style={{ margin: 0 }}>{g.label} · {done}/{list.length} 완료</p>
               )}
               {list.map(q => (
                 <div key={q.id} className="card spread">
                   <div>
-                    {/* 이 미션이 어느 퀘스트에 속하는지 알려준다(QR은 미션마다 따로다) */}
-                    {q.main_title && <div className="muted" style={{ fontSize: 12 }}>{q.main_title}</div>}
+                    {/* <div className="muted" style={{ fontSize: 12 }}>미션 {q.order_no}</div> */}
                     <div style={{ fontWeight: 700 }}>{q.title}</div>
                   </div>
                   <span className={`badge ${q.cleared ? 'done' : ''}`}>{q.cleared ? '완료' : '미완료'}</span>

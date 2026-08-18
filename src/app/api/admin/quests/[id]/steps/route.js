@@ -16,10 +16,10 @@ export async function PUT(request, { params }) {
   let n = 1;
   for (const s of steps) {
     await q(
-      `INSERT INTO quest_steps (quest_id, step_no, type, title, body_text, image_url, audio_url, hint_text, question, options, answer, config)
-       VALUES (?,?,?,?,?,?,?,?,?,?,?,?)`,
+      `INSERT INTO quest_steps (quest_id, step_no, type, title, body_text, image_url, audio_url, hint_text, hint_image_url, question, options, answer, config)
+       VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)`,
       [id, n++, s.type || 'story', s.title || null, s.body_text || null, s.image_url || null,
-       s.audio_url || null, s.hint_text || null, s.question || null,
+       s.audio_url || null, s.hint_text || null, s.hint_image_url || null, s.question || null,
        s.options ? JSON.stringify(s.options) : null, s.answer || null,
        s.config ? JSON.stringify(s.config) : null]);
   }

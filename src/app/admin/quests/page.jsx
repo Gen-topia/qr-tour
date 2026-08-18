@@ -6,7 +6,7 @@ import { STEP_TYPES } from '@/lib/stepTypes';
 import { SPOT_OPTIONS } from '@/lib/spots';
 import { QUEST_GROUPS } from '@/lib/questGroups';
 
-const EMPTY = { title: '', order_no: 1, quest_group: 1, place: '', cover_image_url: '', narration_video: '', reward_points: 100, is_active: 1 };
+const EMPTY = { title: '', order_no: 1, quest_group: 1, main_no: 1, main_title: '', place: '', cover_image_url: '', narration_video: '', clear_text: '', reward_points: 100, is_active: 1 };
 const SAMPLE = JSON.stringify([STEP_TYPES.story.sample, STEP_TYPES.quiz.sample], null, 2);
 
 function Quests() {
@@ -26,7 +26,7 @@ function Quests() {
       // 값이 없는 필드는 빼서 JSON을 읽기 쉽게 유지한다
       setStepsText(JSON.stringify(steps.map(s => {
         const out = { type: s.type };
-        for (const k of ['title', 'body_text', 'image_url', 'audio_url', 'hint_text', 'question', 'answer', 'config']) {
+        for (const k of ['title', 'body_text', 'image_url', 'audio_url', 'hint_text', 'hint_image_url', 'question', 'answer', 'config']) {
           if (s[k] !== null && s[k] !== undefined && s[k] !== '') out[k] = s[k];
         }
         return out;
@@ -58,6 +58,7 @@ function Quests() {
       ...(last.body_text ? { body_text: last.body_text } : {}),
       ...(last.image_url ? { image_url: last.image_url } : {}),
       ...(last.hint_text ? { hint_text: last.hint_text } : {}),
+      ...(last.hint_image_url ? { hint_image_url: last.hint_image_url } : {}),
       type,
     };
     setStepsText(JSON.stringify(steps, null, 2));
@@ -113,6 +114,11 @@ function Quests() {
               <div className="field"><label>제목</label><input className="input" value={editing.title} onChange={e => setEditing({ ...editing, title: e.target.value })} /></div>
               <div className="field"><label>순서</label><input className="input" type="number" value={editing.order_no} onChange={e => setEditing({ ...editing, order_no: +e.target.value })} /></div>
             </div>
+            {/* 이 미션(QR)이 어느 메인 퀘스트에 속하는지 — 같은 번호끼리 모두 깨야 한 퀘스트가 완수된다 */}
+            <div className="grid2">
+              <div className="field"><label>메인 퀘스트 번호</label><input className="input" type="number" min="1" value={editing.main_no ?? 1} onChange={e => setEditing({ ...editing, main_no: +e.target.value })} /></div>
+              <div className="field"><label>메인 퀘스트 이름</label><input className="input" value={editing.main_title || ''} onChange={e => setEditing({ ...editing, main_title: e.target.value })} placeholder="예: 용천수(수기)" /></div>
+            </div>
             <div className="grid2">
               <div className="field">
                 <label>퀘스트 구분</label>
@@ -139,6 +145,11 @@ function Quests() {
               <p className="muted" style={{ fontSize: 12, margin: '6px 0 0' }}>
                 public 폴더의 <code>{`${editing.narration_video || '이름'}.mp4`}</code> 에 연결됩니다. 비워두면 시작 화면에 나레이션 버튼이 나오지 않습니다.
               </p>
+            </div>
+            <div className="field">
+              <label>클리어 문구</label>
+              <textarea style={{ minHeight: 90 }} placeholder="미션을 완수했을 때 클리어 화면에 띄울 문구"
+                value={editing.clear_text || ''} onChange={e => setEditing({ ...editing, clear_text: e.target.value })} />
             </div>
             <div className="field">
               <label>서브페이지 (JSON)</label>

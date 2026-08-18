@@ -8,3 +8,8 @@ export const QUEST_GROUPS = [
 
 // 퀘스트 보기에서 좌우로 넘기는 탭(프롤로그는 홈에서 따로 진입한다)
 export const QUEST_TABS = QUEST_GROUPS.filter(g => g.value > 0);
+
+// 진행 조건 — { 잠긴 퀘스트: 먼저 모두 완수해야 하는 퀘스트 }
+export const QUEST_REQUIRES = { 3: 1 };
+
+export const groupLabel = (v) => QUEST_GROUPS.find(g => g.value === v)?.label || `퀘스트${v}`;

@@ -19,7 +19,7 @@ export async function POST(request) {
   const b = await request.json().catch(() => ({}));
   const code = b.code || shortCode();
   const r = await q(
-    'INSERT INTO quests (code, title, order_no, quest_group, place, cover_image_url, narration_video, reward_points, is_active) VALUES (?,?,?,?,?,?,?,?,?)',
-    [code, b.title || '제목없음', b.order_no || 0, b.quest_group ?? 1, b.place || null, b.cover_image_url || null, b.narration_video || null, b.reward_points ?? 100, b.is_active ?? 1]);
+    'INSERT INTO quests (code, title, order_no, quest_group, main_no, main_title, place, cover_image_url, narration_video, clear_text, reward_points, is_active) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)',
+    [code, b.title || '제목없음', b.order_no || 0, b.quest_group ?? 1, b.main_no ?? 1, b.main_title || null, b.place || null, b.cover_image_url || null, b.narration_video || null, b.clear_text || null, b.reward_points ?? 100, b.is_active ?? 1]);
   return ok({ id: r.insertId, code });
 }

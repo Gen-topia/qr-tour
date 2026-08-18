@@ -1,5 +1,5 @@
 'use client';
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import Sparkle from '@/components/Sparkle';
 
@@ -89,6 +89,39 @@ const RULES = [
 const marked = (text) =>
   text.split(/==([\s\S]+?)==/).map((part, i) => (i % 2 ? <mark key={i}>{part}</mark> : part));
 
+// 지침서를 열면 함께 흐르는 안내 음성 — public/guide/guide.mp3
+// 파일이 없거나 재생이 막히면 조용히 사라진다(브라우저가 자동재생을 막으면 버튼으로 켠다).
+function GuideAudio({ src = '/guide/guide.mp3' }) {
+  const ref = useRef(null);
+  const [playing, setPlaying] = useState(false);
+  const [missing, setMissing] = useState(false);
+
+  useEffect(() => { ref.current?.play().catch(() => {}); }, []);
+  if (missing) return null;
+
+  const toggle = () => {
+    const a = ref.current;
+    if (!a) return;
+    if (a.paused) a.play().catch(() => {}); else a.pause();
+  };
+
+  return (
+    <>
+      <audio ref={ref} src={src} preload="auto"
+        onPlay={() => setPlaying(true)} onPause={() => setPlaying(false)}
+        onEnded={() => setPlaying(false)} onError={() => setMissing(true)} />
+      <button type="button" className="gd__audio" onClick={toggle}
+              aria-label={playing ? '안내 음성 일시정지' : '안내 음성 듣기'}>
+        <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+          {playing
+            ? <path d="M7.4 5.2h3.3v13.6H7.4zM13.3 5.2h3.3v13.6h-3.3z" />
+            : <path d="M8 5.2v13.6L18.4 12z" />}
+        </svg>
+      </button>
+    </>
+  );
+}
+
 const SECTIONS = [
   { key: 'info', title: '프로그램 기본 정보' },
   { key: 'task', title: '3대 과업' },
@@ -104,12 +137,15 @@ export default function Guide({ onDone }) {
     <div className="onboard sheet gd">
       <div className="sheet__panel">
         <header className="gd__hero">
-          <button type="button" className="sheet__back gd__back" onClick={onDone} aria-label="뒤로">
-            <svg viewBox="0 0 34 20" aria-hidden="true">
-              <path d="M10.5 2 2 10l8.5 8M2 10h31" fill="none" stroke="currentColor"
-                    strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />
-            </svg>
-          </button>
+          <div className="gd__toolbar">
+            <button type="button" className="gd__back" onClick={onDone} aria-label="뒤로">
+              <svg viewBox="0 0 34 20" aria-hidden="true">
+                <path d="M10.5 2 2 10l8.5 8M2 10h31" fill="none" stroke="currentColor"
+                      strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+            </button>
+            <GuideAudio />
+          </div>
           <h1 className="gd__title">수호자 지침서</h1>
           <p className="gd__lead">{LEAD}</p>
         </header>

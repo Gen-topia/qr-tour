@@ -7,6 +7,7 @@ import AudioPlayer from '@/components/AudioPlayer';
 import HintModal from '@/components/HintModal';
 import PhotoShare from '@/components/PhotoShare';
 import Loading from '@/components/Loading';
+import InfoModal from '@/components/InfoModal';
 import Prologue from '@/components/Prologue';
 import Sparkle from '@/components/Sparkle';
 import QuizStep from '@/components/steps/QuizStep';
@@ -26,9 +27,12 @@ function Quest() {
   const [err, setErr] = useState('');
   const [result, setResult] = useState(null);
   const [narration, setNarration] = useState(false);
+  const [locked, setLocked] = useState('');   // 선행 퀘스트를 못 깬 경우의 안내 문구
 
   useEffect(() => {
-    api.questSteps(id).then(r => { setQuest(r.quest); setSteps(r.steps); }).catch(e => setErr(e.message));
+    api.questSteps(id)
+      .then(r => { setQuest(r.quest); setLocked(r.locked || ''); setSteps(r.steps); })
+      .catch(e => setErr(e.message));
   }, [id]);
 
   const stepId = steps?.[idx]?.id;
@@ -47,10 +51,21 @@ function Quest() {
 
   if (err) return <div className="screen center"><p className="muted">{err}</p></div>;
   if (!steps) return <Loading label="미션을 여는 중…" />;
-  if (result) return <ResultView result={result} group={quest?.quest_group} onHome={() => router.replace('/')} />;
+  // URL로 바로 들어와도 서버가 잠금을 알려준다
+  if (locked) return (
+    <>
+      <Loading label="미션을 여는 중…" />
+      <InfoModal eyebrow="아직 도전할 수 없어요" title="선행 퀘스트를 먼저 완수해 주세요"
+                 confirmLabel="확인" onClose={() => router.replace('/')}>
+        {locked}
+      </InfoModal>
+    </>
+  );
+  if (result) return <ResultView result={result} quest={quest} onHome={() => router.replace('/')} />;
 
   const step = steps[idx];
-  const next = () => { if (!isLastStep) setIdx(i => i + 1); };
+  const isLast = isLastStep;
+  const next = () => { if (!isLast) setIdx(i => i + 1); };
   const Play = PLAY_COMPONENTS[step.type];
 
   // 관리툴에 적어둔 이름 → public/{이름}.mp4
@@ -58,49 +73,6 @@ function Quest() {
     <Prologue src={`/${quest.narration_video}.mp4`} label="나레이션"
               onEnd={() => setNarration(false)} onClose={() => setNarration(false)} />
   );
-
-  // 미션의 첫 화면 — 수호자 지침서와 같은 시트 컨셉
-  if (idx === 0) {
-    return (
-      <div className="sheet qi">
-        <div className="sheet__panel qi__panel">
-          <div className="qi__head">
-            <button type="button" className="sheet__back" onClick={() => router.replace('/')} aria-label="뒤로">
-              <svg viewBox="0 0 34 20" aria-hidden="true">
-                <path d="M10.5 2 2 10l8.5 8M2 10h31" fill="none" stroke="currentColor"
-                      strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />
-              </svg>
-            </button>
-            <div className="qi__eyebrow">{quest?.title || '미션'}</div>
-            {step.title && <h1 className="qi__title">{step.title}</h1>}
-            {step.body_text && <p className="qi__text">{step.body_text}</p>}
-            {(step.image_url || quest?.cover_image_url) &&
-              <img className="qi__img" src={step.image_url || quest.cover_image_url} alt="" />}
-            <AudioPlayer src={step.audio_url} />
-            <HintModal hint={step.hint_text} />
-            {Play && <Play key={step.id} step={step} submit={submit} />}
-          </div>
-
-          <div className="qi__foot">
-            {quest?.narration_video && (
-              <button type="button" className="qi__narration" onClick={() => setNarration(true)}>
-                <span className="qi__narrationlabel"><Sparkle className="qi__star" />나레이션 듣기</span>
-                <svg className="qi__playicon" viewBox="0 0 24 24" aria-hidden="true">
-                  <circle cx="12" cy="12" r="10.4" fill="none" stroke="currentColor" strokeWidth="1.2" />
-                  <path d="M9.8 7.8v8.4L16.6 12z" fill="currentColor" />
-                </svg>
-              </button>
-            )}
-            {(step.type === 'story' || step.type === 'photo') && (
-              <button type="button" className="qi__next" onClick={next} disabled={isLastStep}>
-                {isLastStep ? '마지막 장' : '다음'}
-              </button>
-            )}
-          </div>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div className="screen stack fade-in">
@@ -112,9 +84,14 @@ function Quest() {
       {step.image_url && <img src={step.image_url} alt="" style={{ width: '100%', borderRadius: 12 }} />}
       {step.body_text && <p style={{ whiteSpace: 'pre-wrap' }}>{step.body_text}</p>}
       <AudioPlayer src={step.audio_url} />
-      <HintModal hint={step.hint_text} />
+      <HintModal hint={step.hint_text} image={step.hint_image_url} />
+      {/* 나레이션 영상은 미션 첫 장에서만 안내한다 */}
+      {idx === 0 && quest?.narration_video && (
+        <button className="btn ghost" onClick={() => setNarration(true)}>▶ 나레이션 보기</button>
+      )}
 
-      {step.type === 'story' && (<><div className="grow" /><button className="btn" onClick={next} disabled={isLastStep}>{isLastStep ? '마지막 장' : '다음'}</button></>)}
+      {/* 이야기로 끝나는 미션은 마지막 장에서 바로 완수 처리한다 */}
+      {step.type === 'story' && (<><div className="grow" /><button className="btn" onClick={isLast ? () => submit({ done: true }) : next}>{isLast ? '미션 완료' : '다음'}</button></>)}
       {step.type === 'photo' && (<><PhotoShare /><div className="grow" /><button className="btn" onClick={next}>다음</button></>)}
       {Play && <Play key={step.id} step={step} submit={submit} />}
     </div>
@@ -129,16 +106,18 @@ function ClearImage({ group }) {
   return <img className="qc__img" src={`/quest_clear_${group}.png`} alt="" onError={() => setFailed(true)} />;
 }
 
-function ResultView({ result, group, onHome }) {
+function ResultView({ result, quest, onHome }) {
   return (
     <div className="sheet qc">
       <div className="sheet__panel qc__panel">
         <div className="qc__body">
-          <ClearImage group={group} />
+          <ClearImage group={quest?.quest_group} />
           <div className="qc__rule">
             <Sparkle className="qc__star" /><i /><Sparkle className="qc__star" />
           </div>
           <h1 className="qc__title">미션 완료</h1>
+          {/* 관리툴에 적어둔 리워드 문구(대본의 '리워드 획득') */}
+          {quest?.clear_text && <p className="qc__reward">{quest.clear_text}</p>}
           <p className="qc__text">
             {result.alreadyCleared ? '이미 완료한 미션이에요.' : `+${result.awarded}점을 획득했어요.`}
             {'\n'}결과가 저장되었습니다.
@@ -146,7 +125,7 @@ function ResultView({ result, group, onHome }) {
         </div>
         <div className="qc__foot">
           <PhotoShare shareOnly />
-          <button type="button" className="qi__next" onClick={onHome}>메인으로</button>
+          <button className="btn" onClick={onHome}>메인으로</button>
         </div>
       </div>
     </div>

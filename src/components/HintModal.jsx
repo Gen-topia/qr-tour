@@ -1,18 +1,27 @@
 'use client';
 import { useState } from 'react';
 
-export default function HintModal({ hint }) {
+// 스텝에 적어둔 힌트(글·그림)를 모달로 보여준다.
+// 힌트 그림은 정답이 한눈에 드러나지 않게 작게 띄우고, 눌러야 크게 본다.
+export default function HintModal({ hint, image }) {
   const [open, setOpen] = useState(false);
-  if (!hint) return null;
+  const [zoom, setZoom] = useState(false);
+  if (!hint && !image) return null;
+
+  const close = () => { setZoom(false); setOpen(false); };
   return (
     <>
       <button className="btn ghost" onClick={() => setOpen(true)}>힌트 보기</button>
       {open && (
-        <div onClick={() => setOpen(false)} style={{ position: 'fixed', inset: 0, background: 'rgba(20,26,46,.35)', display: 'grid', placeItems: 'center', padding: 24, zIndex: 50 }}>
+        <div onClick={close} style={{ position: 'fixed', inset: 0, background: 'rgba(20,26,46,.35)', display: 'grid', placeItems: 'center', padding: 24, zIndex: 50 }}>
           <div className="card stack" style={{ maxWidth: 340 }} onClick={e => e.stopPropagation()}>
             <div className="eyebrow">힌트</div>
-            <p style={{ margin: 0 }}>{hint}</p>
-            <button className="btn" onClick={() => setOpen(false)}>닫기</button>
+            {image && (
+              <img className={`hint__img${zoom ? ' is-zoom' : ''}`} src={image} alt="힌트 그림"
+                   onClick={() => setZoom(z => !z)} />
+            )}
+            {hint && <p style={{ margin: 0 }}>{hint}</p>}
+            <button className="btn" onClick={close}>닫기</button>
           </div>
         </div>
       )}

@@ -14,7 +14,7 @@ export const STEP_TYPES = {
   },
   puzzle: {
     label: '퍼즐(4조각)',
-    hint: '조각을 눌러 자리를 바꿔 원래 그림을 맞추면 성공',
+    hint: '흩어진 조각을 끌어다 제자리에 놓으면 성공. pieces는 좌상·우상·좌하·우하 순서',
     sample: {
       type: 'puzzle', title: '퍼즐 맞추기',
       config: { pieces: ['/puzzle/1.jpg', '/puzzle/2.jpg', '/puzzle/3.jpg', '/puzzle/4.jpg'] },
