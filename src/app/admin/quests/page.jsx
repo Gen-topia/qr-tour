@@ -6,7 +6,7 @@ import { STEP_TYPES } from '@/lib/stepTypes';
 import { SPOT_OPTIONS } from '@/lib/spots';
 import { QUEST_GROUPS } from '@/lib/questGroups';
 
-const EMPTY = { title: '', order_no: 1, quest_group: 1, main_no: 1, main_title: '', place: '', cover_image_url: '', narration_video: '', clear_text: '', reward_points: 100, is_active: 1 };
+const EMPTY = { title: '', order_no: 1, quest_group: 1, main_no: 1, main_title: '', place: '', cover_image_url: '', narration_video: '', clear_text: '', clear_audio_url: '', reward_points: 100, is_active: 1 };
 const SAMPLE = JSON.stringify([STEP_TYPES.story.sample, STEP_TYPES.quiz.sample], null, 2);
 
 function Quests() {
@@ -150,6 +150,11 @@ function Quests() {
               <label>클리어 문구</label>
               <textarea style={{ minHeight: 90 }} placeholder="미션을 완수했을 때 클리어 화면에 띄울 문구"
                 value={editing.clear_text || ''} onChange={e => setEditing({ ...editing, clear_text: e.target.value })} />
+            </div>
+            <div className="field">
+              <label>완수 음성</label>
+              <input className="input" placeholder="예: /audio/01-suwolbong/clear.mp3"
+                value={editing.clear_audio_url || ''} onChange={e => setEditing({ ...editing, clear_audio_url: e.target.value })} />
             </div>
             <div className="field">
               <label>서브페이지 (JSON)</label>

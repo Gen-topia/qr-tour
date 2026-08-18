@@ -30,7 +30,7 @@ export const SPOT_GROUPS = [
     group: '퀘스트2',
     items: [
       { code: 'suligneunjip', name: '제주술익는집',
-        sub: '대한민국식품명인 제84호 / 제주특별자치도 무형문화재 제11호',
+        sub: '',
         address: '제주 서귀포시 표선면 중산간동로 4726',
         hours: '월-토 10:30 ~ 17:00 / 일 12:00 ~ 17:00', tel: '064-787-5046' },
       { code: 'manjanggul', name: '만장굴',

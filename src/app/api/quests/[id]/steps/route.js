@@ -8,7 +8,7 @@ export async function GET(request, { params }) {
   const { id } = await params;
   // 시작 화면(제목·나레이션 영상·클리어 이미지)에 쓸 미션 정보를 함께 내려준다
   const [quest] = await q(
-    'SELECT id, title, quest_group, cover_image_url, narration_video, clear_text FROM quests WHERE id=?', [id]
+    'SELECT id, title, quest_group, cover_image_url, narration_video, clear_text, clear_audio_url FROM quests WHERE id=?', [id]
   );
   const locked = quest ? await lockReason(user.id, quest.quest_group) : null;
   if (locked) return ok({ quest, steps: [], locked });

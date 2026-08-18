@@ -484,7 +484,7 @@ h1 { font-size: 28px; font-weight: 800; margin: 8px 0 6px; letter-spacing: -.03e
 }
 .login .screen, .home .screen { flex: 1; min-height: 0; overflow: auto; }
 
-.login__bg { position: absolute; inset: 0; background: url('/intro.png') center / contain no-repeat; }
+.login__bg { position: absolute; inset: 0; background: url('/intro.jpg') center / contain no-repeat; }
 .login .screen { position: relative; }
 .login__sub { color: rgba(255,255,255,.82); font-size: 14px; text-shadow: 0 2px 12px rgba(0,0,0,.6); }
 
@@ -540,7 +540,7 @@ h1 { font-size: 28px; font-weight: 800; margin: 8px 0 6px; letter-spacing: -.03e
 
 /* 메인 홈 — 인트로 이미지를 배경으로 깔고 검정 반투명으로 덮는다 */
 .home { position: fixed; inset: 0; z-index: 1; }
-.home__bg { position: absolute; inset: 0; background: url('/main.png') center / contain no-repeat; }
+.home__bg { position: absolute; inset: 0; background: url('/main.jpg') center / contain no-repeat; }
 .home .screen { position: relative; }
 .home .muted { color: rgba(255,255,255,.82); text-shadow: 0 2px 12px rgba(0,0,0,.6); }
 

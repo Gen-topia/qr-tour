@@ -225,7 +225,7 @@ export default function Guide({ onDone }) {
         </button>
         <Link className="gd__tab" href="/missions">
           <Sparkle />
-          <span>나의미션</span>
+          <span>퀘스트</span>
         </Link>
         <Link className="gd__tab" href="/map">
           <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor"

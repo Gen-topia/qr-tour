@@ -118,6 +118,8 @@ function ResultView({ result, quest, onHome }) {
           <h1 className="qc__title">미션 완료</h1>
           {/* 관리툴에 적어둔 리워드 문구(대본의 '리워드 획득') */}
           {quest?.clear_text && <p className="qc__reward">{quest.clear_text}</p>}
+          {/* 완수했을 때 들려주는 소리 — 파일이 없으면 버튼이 뜨지 않는다 */}
+          <AudioPlayer src={quest?.clear_audio_url} label="완수 이야기 듣기" />
           <p className="qc__text">
             {result.alreadyCleared ? '이미 완료한 미션이에요.' : `+${result.awarded}점을 획득했어요.`}
             {'\n'}결과가 저장되었습니다.
