@@ -15,7 +15,7 @@ const HINT = '내가 있는 곳에 남겨진 비밀 식별코드를 찾아 거�
 function HintImage() {
   const [failed, setFailed] = useState(false);
   if (failed) return null;
-  return <img className="pq__hintimg" src={`${DIR}/hint.png`} alt="" onError={() => setFailed(true)} />;
+  return <img className="pq__hintimg" src={`${DIR}/hint.png`} alt="동자석" onError={() => setFailed(true)} />;
 }
 
 export default function PreQuest({ onDone }) {

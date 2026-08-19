@@ -253,8 +253,13 @@ h1 { font-size: 28px; font-weight: 800; margin: 8px 0 6px; letter-spacing: -.03e
   pointer-events: none; text-align: center;
   font-size: 12.5px; color: #8e8e8e; letter-spacing: -.01em;
 }
-.pq__hintimg { display: block; width: 100%; height: auto; max-height: 120px; object-fit: contain; border-radius: 10px; }
-.pq__hint.is-open .pq__hintimg { max-height: none; }
+/* 동자석은 세로로 긴 그림이라 폭이 아니라 높이로 크기를 잡는다 */
+.pq__hintimg {
+  display: block; width: auto; max-width: 100%; height: auto;
+  max-height: 118px; object-fit: contain; margin: 0 auto;
+}
+/* 다 지우고 나면 동자석을 글과 나란히 제대로 보여준다 */
+.pq__hint.is-open .pq__hintimg { max-height: 210px; }
 .pq__hinttext { margin: 0; font-size: 14px; line-height: 1.65; letter-spacing: -.01em; }
 .pq__later {
   appearance: none; background: none; border: 0; cursor: pointer; font: inherit;
