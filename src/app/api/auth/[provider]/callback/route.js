@@ -51,7 +51,11 @@ export async function GET(request, { params }) {
     '/ affectedRows:', r.affectedRows);
   const token = signToken({ id: r.insertId, role: 'user' });
 
-  const res = NextResponse.redirect(`${origin}/auth/complete?next=${encodeURIComponent(next)}`);
+  // ON DUPLICATE KEY UPDATE는 새로 넣으면 1, 기존 계정이면 2를 돌려준다.
+  // 이번에 처음 가입한 수호자에게는 사전 퀘스트를 반드시 보여줘야 한다.
+  const signup = r.affectedRows === 1 ? '&signup=1' : '';
+
+  const res = NextResponse.redirect(`${origin}/auth/complete?next=${encodeURIComponent(next)}${signup}`);
   res.cookies.set('tour_session', token, {
     httpOnly: true, sameSite: 'lax', path: '/', maxAge: 300,
     secure: process.env.NODE_ENV === 'production',

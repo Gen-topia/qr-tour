@@ -164,36 +164,15 @@ h1 { font-size: 28px; font-weight: 800; margin: 8px 0 6px; letter-spacing: -.03e
   font-size: 13px; color: var(--text-dim); padding: 4px 6px;
 }
 /* ── 사전 퀘스트 (대본 7-1) ────────────────────────────────
-   알림음과 함께 화면 아래에서 공지가 올라오고, 누르면 메시지가 열린다 */
-.pq__notice {
-  /* 포스터 영역이 아니라 화면 아래에 붙는다(대본: 화면 아래에서 공지가 올라온다) */
-  position: fixed; z-index: 5;
-  left: 50%; transform: translateX(-50%);
-  width: min(calc(100vw - 40px), calc(var(--maxw) - 40px));
-  bottom: calc(22px + env(safe-area-inset-bottom));
-  appearance: none; cursor: pointer; font: inherit; text-align: left;
-  display: flex; align-items: center; gap: 12px;
-  padding: 14px 16px; border-radius: 16px;
-  background: rgba(255,255,255,.90); border: 1px solid rgba(255,255,255,.9);
-  box-shadow: 0 14px 34px rgba(20,26,46,.30);
-  backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
-  animation: pq-up .42s cubic-bezier(.2,.9,.3,1) both;
-}
-/* transform은 가운데 정렬에 쓰고 있어 올라오는 연출은 bottom으로 준다 */
-@keyframes pq-up { from { bottom: -90px; opacity: 0 } }
-.pq__dot {
-  flex: none; width: 9px; height: 9px; border-radius: 50%;
-  background: var(--lantern); box-shadow: 0 0 0 5px rgba(204,108,152,.18);
-}
-.pq__noticetext { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
-.pq__noticetext b { font-size: 15px; font-weight: 700; letter-spacing: -.02em; }
-.pq__noticetext i { font-style: normal; font-size: 12.5px; color: var(--lantern); }
+   알림음과 함께 메시지가 화면 한가운데 바로 열린다 */
 
 /* 메시지 — 거울에 하얀 입김이 서린 듯한 유리면 */
 .pq {
   position: fixed; inset: 0; z-index: 60; padding: 24px;
   background: rgba(20,26,46,.42); display: grid; place-items: center;
+  animation: pq-fade .28s ease both;
 }
+@keyframes pq-fade { from { opacity: 0 } }
 .pq__card {
   width: 100%; max-width: 340px; padding: 26px 22px 20px;
   border-radius: var(--radius); text-align: center;

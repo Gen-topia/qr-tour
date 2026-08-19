@@ -7,7 +7,12 @@ import Loading from '@/components/Loading';
 function CompleteInner() {
   const { completeSocialLogin } = useAuth();
   const router = useRouter();
-  const next = useSearchParams().get('next') || '/';
+  const params = useSearchParams();
+  const rawNext = params.get('next') || '/';
+  // 첫 가입이라는 사실을 도착 화면까지 들고 간다(사전 퀘스트를 반드시 띄우기 위해)
+  const next = params.get('signup')
+    ? `${rawNext}${rawNext.includes('?') ? '&' : '?'}signup=1`
+    : rawNext;
   const [err, setErr] = useState('');
   const once = useRef(false);
 

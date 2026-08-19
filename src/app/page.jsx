@@ -29,14 +29,17 @@ function MainInner() {
   const params = useSearchParams();
   const next = params.get('next') || '/';
   const err = params.get('error');
+  const signup = params.get('signup') === '1';   // 방금 가입한 수호자
 
-  // 최초 로그인 후 메인에 도착하면 사전 퀘스트 안내를 띄운다(SSR에서 localStorage 금지)
+  // 수호자 서약을 막 마친 첫 가입이면 본 적 있는지와 무관하게 바로 띄운다.
+  // 그 외에는 계정마다 한 번만 띄운다(SSR에서 localStorage 금지).
   useEffect(() => {
     if (!ready || !isAuthed) return;
+    if (signup) { setPreq(true); return; }
     if (localStorage.getItem(PREQ_KEY(uuid))) return;
     const t = setTimeout(() => setPreq(true), 700);
     return () => clearTimeout(t);
-  }, [ready, isAuthed, uuid]);
+  }, [ready, isAuthed, uuid, signup]);
 
   // 테스트용 — 메인 화면에서 스페이스바를 누르면 사전 퀘스트를 다시 띄운다
   useEffect(() => {
