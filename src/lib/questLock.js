@@ -18,6 +18,6 @@ export async function lockReason(userId, questGroup) {
   const done = Number(row?.done || 0);
   if (total === 0 || done >= total) return null;
 
-  return `${groupLabel(need)}의 모든 미션을 완수해야 ${groupLabel(questGroup)}에 도전할 수 있어요.\n`
+  return `${groupLabel(need)}의 모든 퀘스트를 완수해야 ${groupLabel(questGroup)}에 도전할 수 있어요.\n`
        + `지금까지 ${done}/${total} 완수했습니다.`;
 }

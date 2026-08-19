@@ -69,7 +69,10 @@ function Quests() {
     try { steps = JSON.parse(stepsText); if (!Array.isArray(steps)) throw 0; }
     catch { setStepsErr('서브페이지 JSON 형식이 올바르지 않습니다.'); return; }
     let id = editing.id;
-    if (id) await api.adminUpdateQuest(id, editing); else id = (await api.adminCreateQuest(editing)).id;
+    // QR 코드가 겹치면 서버가 막는다 — 무엇이 잘못됐는지 알려준다
+    try {
+      if (id) await api.adminUpdateQuest(id, editing); else id = (await api.adminCreateQuest(editing)).id;
+    } catch (e) { alert(e.message); return; }
     await api.adminPutSteps(id, steps);
     setEditing(null); load();
   }
@@ -110,6 +113,17 @@ function Quests() {
         <div style={{ position: 'fixed', inset: 0, background: 'rgba(20,26,46,.35)', display: 'grid', placeItems: 'center', padding: 24, zIndex: 50 }} onClick={() => setEditing(null)}>
           <div className="card" style={{ width: 620, maxHeight: '88vh', overflow: 'auto' }} onClick={e => e.stopPropagation()}>
             <h1 style={{ marginTop: 0, fontSize: 20 }}>{editing.id ? '미션 수정' : '새 미션'}</h1>
+            {/* QR 코드는 곧 접속 주소다. 고치면 이미 인쇄한 QR은 이 퀘스트를 열지 못한다 */}
+            <div className="field">
+              <label>QR 코드</label>
+              <input className="input" style={{ fontFamily: 'monospace' }}
+                value={editing.code || ''} placeholder={editing.id ? '' : '비워두면 자동으로 만듭니다'}
+                onChange={e => setEditing({ ...editing, code: e.target.value.toUpperCase() })} />
+              <p className="muted" style={{ fontSize: 12, margin: '6px 0 0' }}>
+                접속 주소 <code>/q/{editing.code || '(자동)'}</code>
+                {editing.id && ' — 코드를 바꾸면 이미 인쇄한 QR로는 이 미션이 열리지 않습니다.'}
+              </p>
+            </div>
             <div className="grid2">
               <div className="field"><label>제목</label><input className="input" value={editing.title} onChange={e => setEditing({ ...editing, title: e.target.value })} /></div>
               <div className="field"><label>순서</label><input className="input" type="number" value={editing.order_no} onChange={e => setEditing({ ...editing, order_no: +e.target.value })} /></div>
@@ -148,7 +162,7 @@ function Quests() {
             </div>
             <div className="field">
               <label>클리어 문구</label>
-              <textarea style={{ minHeight: 90 }} placeholder="미션을 완수했을 때 클리어 화면에 띄울 문구"
+              <textarea style={{ minHeight: 90 }} placeholder="퀘스트를 완수했을 때 클리어 화면에 띄울 문구"
                 value={editing.clear_text || ''} onChange={e => setEditing({ ...editing, clear_text: e.target.value })} />
             </div>
             <div className="field">

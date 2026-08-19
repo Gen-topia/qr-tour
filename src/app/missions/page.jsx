@@ -21,7 +21,7 @@ function QuestImage({ group, done, label }) {
 }
 
 // 나무 단계는 메인 퀘스트(장소) 단위로 센다.
-// QR은 서브미션마다 따로 있고, 한 메인 퀘스트의 서브미션을 모두 깨야 한 단계 자란다.
+// QR은 서브 퀘스트마다 따로 있고, 한 메인 퀘스트의 서브 퀘스트를 모두 깨야 한 단계 자란다.
 function countMainsDone(list) {
   const nos = [...new Set(list.map(q => q.main_no))];
   return nos.filter(no => list.filter(q => q.main_no === no).every(q => q.cleared)).length;
@@ -50,7 +50,7 @@ function Missions() {
   }
 
   if (err) return <div className="screen center"><p className="muted">{err}</p></div>;
-  if (!data) return <Loading label="미션을 불러오는 중…" />;
+  if (!data) return <Loading label="퀘스트를 불러오는 중…" />;
 
   return (
     <div className="screen stack fade-in">
@@ -87,7 +87,7 @@ function Missions() {
                 <p className={`qreq${openable ? ' qreq--open' : ''}`}>
                   {openable
                     ? `${groupLabel(needGroup)}을 모두 완수했어요. ${g.label}에 도전할 수 있습니다.`
-                    : `${groupLabel(needGroup)}의 모든 미션을 완수해야 ${g.label}에 도전할 수 있어요. (${needDone}/${need.length} 완수)`}
+                    : `${groupLabel(needGroup)}의 모든 퀘스트를 완수해야 ${g.label}에 도전할 수 있어요. (${needDone}/${need.length} 완수)`}
                 </p>
               )}
               {list.length > 0 && (

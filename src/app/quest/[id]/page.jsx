@@ -50,11 +50,11 @@ function Quest() {
   }, [id, stepId]);
 
   if (err) return <div className="screen center"><p className="muted">{err}</p></div>;
-  if (!steps) return <Loading label="미션을 여는 중…" />;
+  if (!steps) return <Loading label="퀘스트를 여는 중…" />;
   // URL로 바로 들어와도 서버가 잠금을 알려준다
   if (locked) return (
     <>
-      <Loading label="미션을 여는 중…" />
+      <Loading label="퀘스트를 여는 중…" />
       <InfoModal eyebrow="아직 도전할 수 없어요" title="선행 퀘스트를 먼저 완수해 주세요"
                  confirmLabel="확인" onClose={() => router.replace('/')}>
         {locked}
@@ -66,6 +66,7 @@ function Quest() {
   const step = steps[idx];
   const isLast = isLastStep;
   const next = () => { if (!isLast) setIdx(i => i + 1); };
+  const prev = () => setIdx(i => Math.max(0, i - 1));
   const Play = PLAY_COMPONENTS[step.type];
 
   // 관리툴에 적어둔 이름 → public/{이름}.mp4
@@ -74,8 +75,10 @@ function Quest() {
               onEnd={() => setNarration(false)} onClose={() => setNarration(false)} />
   );
 
+  // 첫 장(활동 안내)은 수호자 지침서와 같은 톤 — 큰 여백, 옅은 본문
+  const isIntro = idx === 0;
   return (
-    <div className="screen stack fade-in">
+    <div className={`screen stack fade-in${isIntro ? ' qintro' : ''}`}>
       <div className="spread">
         <div className="eyebrow">{quest?.title || '미션'}</div>
         <span className="badge">{idx + 1} / {steps.length}</span>
@@ -91,9 +94,17 @@ function Quest() {
       )}
 
       {/* 이야기로 끝나는 미션은 마지막 장에서 바로 완수 처리한다 */}
-      {step.type === 'story' && (<><div className="grow" /><button className="btn" onClick={isLast ? () => submit({ done: true }) : next}>{isLast ? '미션 완료' : '다음'}</button></>)}
+      {step.type === 'story' && (<><div className="grow" /><button className="btn" onClick={isLast ? () => submit({ done: true }) : next}>{isLast ? '퀘스트 완료' : '다음'}</button></>)}
       {step.type === 'photo' && (<><PhotoShare /><div className="grow" /><button className="btn" onClick={next}>다음</button></>)}
       {Play && <Play key={step.id} step={step} submit={submit} />}
+
+      {/* 문제를 푸는 장에서는 앞 장으로 돌아가거나 그만두고 나갈 수 있어야 한다 */}
+      {Play && (
+        <div className="qnav">
+          <button type="button" className="btn ghost" onClick={prev} disabled={idx === 0}>이전으로</button>
+          <button type="button" className="btn ghost" onClick={() => router.replace('/')}>메인으로</button>
+        </div>
+      )}
     </div>
   );
 }
@@ -115,14 +126,15 @@ function ResultView({ result, quest, onHome }) {
           <div className="qc__rule">
             <Sparkle className="qc__star" /><i /><Sparkle className="qc__star" />
           </div>
-          <h1 className="qc__title">미션 완료</h1>
+          <h1 className="qc__title">퀘스트 완료</h1>
           {/* 관리툴에 적어둔 리워드 문구(대본의 '리워드 획득') */}
           {quest?.clear_text && <p className="qc__reward">{quest.clear_text}</p>}
           {/* 완수했을 때 들려주는 소리 — 파일이 없으면 버튼이 뜨지 않는다 */}
-          <AudioPlayer src={quest?.clear_audio_url} label="완수 이야기 듣기" />
+          <div className="qc__audio">
+            <AudioPlayer src={quest?.clear_audio_url} label="이야기 듣기" plain />
+          </div>
           <p className="qc__text">
-            {result.alreadyCleared ? '이미 완료한 미션이에요.' : `+${result.awarded}점을 획득했어요.`}
-            {'\n'}결과가 저장되었습니다.
+            {result.alreadyCleared ? '이미 완료한 퀘스트에요.' : `+${result.awarded}점을 획득했어요.`}
           </p>
         </div>
         <div className="qc__foot">

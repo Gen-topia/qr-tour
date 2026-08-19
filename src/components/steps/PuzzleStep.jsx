@@ -107,7 +107,7 @@ export default function PuzzleStep({ step, submit }) {
           </div>
         ))}
       </div>
-      {solved && <p style={{ color: 'var(--lantern)', margin: 0, fontWeight: 700 }}>완성했어요!</p>}
+      {solved && <p className="center" style={{ color: 'var(--lantern)', margin: 0, fontWeight: 700 }}>완성했어요!</p>}
     </div>
   );
 }

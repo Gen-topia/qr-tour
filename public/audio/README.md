@@ -9,8 +9,8 @@
 |---|---|---|
 | `start.mp3` | 미션에 들어가면 (등장인물이 사정을 말한다) | `quest_steps.audio_url` |
 | `talk.mp3` | 이야기가 이어지는 중간 장 | 해당 스텝의 `audio_url` |
-| `action.mp3` | 미션을 수행할 때 (문지르기·퍼즐 등의 효과음) | 해당 스텝의 `audio_url` |
-| `clear.mp3` | 미션을 완수했을 때 (고맙다는 대사·완료 효과음) | `quests.clear_audio_url` |
+| `action.mp3` | 퀘스트를 수행할 때 (문지르기·퍼즐 등의 효과음) | 해당 스텝의 `audio_url` |
+| `clear.mp3` | 퀘스트를 완수했을 때 (고맙다는 대사·완료 효과음) | `quests.clear_audio_url` |
 
 파일을 폴더에 넣기만 하면 화면에 재생 버튼이 나타난다. 없으면 버튼이 뜨지 않는다.
 mp3 대신 wav를 쓰려면 DB의 경로도 함께 고쳐야 한다.

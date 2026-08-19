@@ -9,7 +9,7 @@ import InfoModal from '@/components/InfoModal';
 function QrEntry() {
   const { code } = useParams();
   const router = useRouter();
-  const [msg, setMsg] = useState('미션을 확인하는 중…');
+  const [msg, setMsg] = useState('퀘스트를 확인하는 중…');
   const [failed, setFailed] = useState(false);
   const [locked, setLocked] = useState('');   // 선행 퀘스트를 못 깬 경우의 안내 문구
 
@@ -29,7 +29,7 @@ function QrEntry() {
 
   if (locked) return (
     <>
-      <Loading label="미션을 확인하는 중…" />
+      <Loading label="퀘스트를 확인하는 중…" />
       <InfoModal eyebrow="아직 도전할 수 없어요" title="선행 퀘스트를 먼저 완수해 주세요"
                  confirmLabel="확인" onClose={() => router.replace('/')}>
         {locked}

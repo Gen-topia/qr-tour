@@ -208,6 +208,21 @@ h1 { font-size: 28px; font-weight: 800; margin: 8px 0 6px; letter-spacing: -.03e
 .pq__sub { margin: 8px 0 0; font-size: 13.5px; line-height: 1.65; color: var(--text-dim); }
 
 /* 가려진 힌트 — 하얀 입김을 문질러 지우면 그림과 글이 함께 드러난다 */
+/* 미션 첫 장 — 수호자 지침서와 같은 톤. 제목은 가볍게, 본문은 옅고 넉넉하게 */
+.qintro h1 {
+  margin: 18px 0 14px;
+  font-size: 25px; font-weight: 500; letter-spacing: -.03em; color: #4a4a4a;
+}
+.qintro > p {
+  margin: 0; font-size: 13px; line-height: 1.72; letter-spacing: -.01em; color: #a5a5a5;
+}
+.qintro .eyebrow { color: #b9b9b9; }
+.qintro.stack > * + * { margin-top: 18px; }
+
+/* 문제 푸는 장 하단 — 앞 장으로 돌아가기 / 그만두고 나가기 */
+.qnav { display: flex; gap: 10px; margin-top: 16px; }
+.qnav .btn { font-size: 14px; padding: 12px 14px; }
+
 /* 힌트 그림 — 기본은 작게, 누르면 크게 본다 */
 .hint__img {
   display: block; width: 100%; max-height: 120px; object-fit: contain;
@@ -781,6 +796,9 @@ h1 { font-size: 28px; font-weight: 800; margin: 8px 0 6px; letter-spacing: -.03e
   margin: 18px 0 0; text-align: center; white-space: pre-line;
   font-size: 14.5px; line-height: 1.78; color: var(--gd-ink); letter-spacing: -.01em;
 }
+/* 이야기 듣기 버튼 — 완료 문구에 바짝 붙지 않게 띄운다 */
+.qc__audio { margin-top: 34px; }
+.qc__audio .btn { width: auto; display: inline-block; padding: 12px 22px; font-size: 14px; }
 .qc__text {
   margin: 14px 0 0; text-align: center; white-space: pre-line;
   font-size: 13px; line-height: 1.72; color: var(--gd-dim); letter-spacing: -.01em;
@@ -855,7 +873,7 @@ h1 { font-size: 28px; font-weight: 800; margin: 8px 0 6px; letter-spacing: -.03e
 }
 .qreq--open::before { content: '✓ '; }
 
-/* 퀘스트 진행 이미지 — 미션을 깰수록 public/quest_{번호}_{클리어수}.png 로 바뀐다 */
+/* 퀘스트 진행 이미지 — 퀘스트를 깰수록 public/quest_{번호}_{클리어수}.png 로 바뀐다 */
 .qhero {
   display: block; width: 50%; height: auto; align-self: center;
   border-radius: var(--radius); box-shadow: var(--shadow);
