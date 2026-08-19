@@ -211,7 +211,7 @@ h1 { font-size: 28px; font-weight: 800; margin: 8px 0 6px; letter-spacing: -.03e
 
 .pq__hint { margin: 18px 0; }
 .pq__scratch {
-  position: relative; width: 100%; height: 190px;
+  position: relative; width: 100%; height: 250px;
   border-radius: 14px; overflow: hidden;
   background: rgba(255,255,255,.5); border: 1px solid rgba(26,29,43,.10);
 }
@@ -235,10 +235,11 @@ h1 { font-size: 28px; font-weight: 800; margin: 8px 0 6px; letter-spacing: -.03e
 /* 동자석은 세로로 긴 그림이라 폭이 아니라 높이로 크기를 잡는다 */
 .pq__hintimg {
   display: block; width: auto; max-width: 100%; height: auto;
-  max-height: 118px; object-fit: contain; margin: 0 auto;
+  max-height: 170px; object-fit: contain; margin: 0 auto;
 }
-/* 다 지우고 나면 동자석을 글과 나란히 제대로 보여준다 */
-.pq__hint.is-open .pq__hintimg { max-height: 210px; }
+/* 다 지우고 나면 동자석의 얼굴과 모은 손이 보이도록 크게 띄운다.
+   작게 두면 어두운 덩어리라 무엇인지 알아보기 어렵다 */
+.pq__hint.is-open .pq__hintimg { max-height: 300px; }
 .pq__hinttext { margin: 0; font-size: 14px; line-height: 1.65; letter-spacing: -.01em; }
 .pq__later {
   appearance: none; background: none; border: 0; cursor: pointer; font: inherit;
