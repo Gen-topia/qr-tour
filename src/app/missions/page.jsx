@@ -8,13 +8,16 @@ import SheetNav from '@/components/SheetNav';
 import Sparkle from '@/components/Sparkle';
 import { QUEST_TABS, QUEST_REQUIRES, groupLabel } from '@/lib/questGroups';
 
+// 진행 그림이 있는 퀘스트 — 1은 복숭아나무, 2는 측간신. 퀘스트3은 그림이 없다.
+const HERO_GROUPS = [1, 2];
+
 // 퀘스트 진행 이미지 — public/quest_{퀘스트번호}_{완수한 메인 퀘스트 수}.png
-// 하나도 못 깬 0단계에는 갓 돋은 새싹을 보여준다.
+// 하나도 못 깬 0단계 그림부터 보여준다.
 // 아직 준비되지 않은 단계의 그림은 깨진 이미지 대신 조용히 숨긴다.
 function QuestImage({ group, done, label }) {
   const [broken, setBroken] = useState(false);
   useEffect(() => { setBroken(false); }, [group, done]);
-  if (done < 0 || broken) return null;
+  if (!HERO_GROUPS.includes(group) || done < 0 || broken) return null;
   return (
     <img className="qhero" src={`/quest_${group}_${done}.png`} alt={`${label} 진행 이미지`}
          onError={() => setBroken(true)} />
@@ -70,7 +73,7 @@ function Missions() {
           <h1 className="gd__title">나의 퀘스트</h1>
           <p className="gd__lead">
             {data.user?.nickname ? `${data.user.nickname} 수호자님, ` : ''}
-            {`지금까지 ${data.progress.done}/${data.progress.total} 미션을 완수했습니다.`}
+            {`지금까지 ${data.progress.done}/${data.progress.total} 퀘스트를 완수했습니다.`}
           </p>
         </header>
 

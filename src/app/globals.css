@@ -906,6 +906,8 @@ h1 { font-size: 28px; font-weight: 800; margin: 8px 0 6px; letter-spacing: -.03e
 .mq .sheet__panel { padding: 0 var(--gd-pad) calc(110px + env(safe-area-inset-bottom)); }
 .mq .gd__hero { padding-left: 0; padding-right: 0; }
 .mq .gd__acc { margin-top: 4px; }
+/* 펼친 내용은 시트 바탕이 그대로 비치게 둔다(지침서의 흰 판을 쓰지 않는다) */
+.mq .gd__body { background: none; box-shadow: none; padding: 2px 0 16px; }
 
 /* 퀘스트1/2/3 전환 */
 .mq__tabs {
@@ -952,7 +954,8 @@ h1 { font-size: 28px; font-weight: 800; margin: 8px 0 6px; letter-spacing: -.03e
 .qreq--open::before { content: '✓ '; }
 
 /* 퀘스트 진행 이미지 — 퀘스트를 깰수록 public/quest_{번호}_{클리어수}.png 로 바뀐다 */
+/* 진행 그림 — 부모가 flex가 아니어서 align-self가 듣지 않으므로 margin으로 가운데 놓는다 */
 .qhero {
-  display: block; width: 50%; height: auto; align-self: center;
+  display: block; width: 50%; height: auto; margin: 0 auto;
   border-radius: var(--radius); box-shadow: var(--shadow);
 }
