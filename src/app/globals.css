@@ -32,12 +32,16 @@
 * { box-sizing: border-box; }
 html, body, #root { height: 100%; margin: 0; }
 body {
-  /* 시안의 은은한 홀로그램 광원 — 옅게 겹쳐 배경에 색기운만 남긴다 */
+  /* 수호자 지침서 패널(.sheet__panel)과 같은 홀로그램 그러데이션으로 톤을 맞춘다 */
   background:
-    radial-gradient(760px 460px at 12% -6%,  rgba(185,167,247,.34), transparent 62%),
-    radial-gradient(700px 420px at 88%  4%,  rgba(127,216,208,.26), transparent 64%),
-    radial-gradient(620px 400px at 50% 104%, rgba(245,169,211,.22), transparent 62%),
-    var(--bg);
+    radial-gradient(66% 28% at 2% 1%,    rgba(226,224,244,1),   transparent 72%),
+    radial-gradient(84% 40% at 100% 0%,  rgba(186,212,246,1),   transparent 72%),
+    radial-gradient(52% 34% at -12% 32%, rgba(250,241,166,1),   transparent 72%),
+    radial-gradient(50% 30% at -10% 58%, rgba(249,240,186,1),   transparent 74%),
+    radial-gradient(64% 30% at 106% 56%, rgba(250,214,208,1),   transparent 72%),
+    radial-gradient(68% 30% at -6% 100%, rgba(128,203,246,1),   transparent 74%),
+    radial-gradient(82% 36% at 86% 100%, rgba(246,190,208,1),   transparent 74%),
+    #f8f6f3;
   background-attachment: fixed;
   color: var(--text);
   font-family: var(--font-sans);
@@ -233,18 +237,49 @@ h1 { font-size: 28px; font-weight: 800; margin: 8px 0 6px; letter-spacing: -.03e
   font-size: 12.5px; color: #8e8e8e; letter-spacing: -.01em;
 }
 /* 동자석은 세로로 긴 그림이라 폭이 아니라 높이로 크기를 잡는다 */
+/* 식별코드가 숨은 물건들 — 가로로 늘어선 그림이라 폭을 꽉 채워 보여준다 */
 .pq__hintimg {
-  display: block; width: auto; max-width: 100%; height: auto;
+  display: block; width: 100%; max-width: 100%; height: auto;
   max-height: 170px; object-fit: contain; margin: 0 auto;
 }
-/* 다 지우고 나면 동자석의 얼굴과 모은 손이 보이도록 크게 띄운다.
-   작게 두면 어두운 덩어리라 무엇인지 알아보기 어렵다 */
-.pq__hint.is-open .pq__hintimg { max-height: 300px; }
+.pq__hint.is-open .pq__hintimg { max-height: 220px; }
 .pq__hinttext { margin: 0; font-size: 14px; line-height: 1.65; letter-spacing: -.01em; }
-.pq__later {
-  appearance: none; background: none; border: 0; cursor: pointer; font: inherit;
-  margin-top: 10px; padding: 8px; width: 100%; font-size: 13px; color: var(--text-dim);
+
+/* 테스트용 퀘스트 바로가기 (F1) */
+.tj {
+  position: fixed; inset: 0; z-index: 80; padding: 20px;
+  background: rgba(20,26,46,.5); display: grid; place-items: center;
 }
+.tj__panel {
+  width: 100%; max-width: 360px; max-height: 80vh;
+  display: flex; flex-direction: column; gap: 10px;
+  padding: 16px; border-radius: 16px;
+  background: var(--surface); box-shadow: 0 20px 50px rgba(20,26,46,.32);
+}
+.tj__head { display: flex; align-items: center; justify-content: space-between; }
+.tj__head b { font-size: 15px; letter-spacing: -.02em; }
+.tj__x {
+  appearance: none; background: none; border: 0; cursor: pointer;
+  font-size: 15px; color: var(--text-dim); padding: 4px 6px;
+}
+.tj__form { display: flex; gap: 8px; }
+.tj__form .input { flex: 1; }
+.tj__err { margin: 0; font-size: 13px; color: var(--talisman); }
+.tj__list { overflow-y: auto; display: flex; flex-direction: column; }
+.tj__row {
+  appearance: none; border: 0; cursor: pointer; font: inherit; text-align: left;
+  display: flex; align-items: center; gap: 10px;
+  padding: 10px 6px; background: none; border-top: 1px solid var(--line);
+}
+.tj__row:first-child { border-top: 0; }
+.tj__row:active { background: var(--surface-2); }
+.tj__no {
+  flex: none; width: 26px; height: 26px; border-radius: 8px;
+  display: grid; place-items: center;
+  background: var(--surface-2); color: var(--text-dim);
+  font-size: 12px; font-weight: 700;
+}
+.tj__title { flex: 1; min-width: 0; font-size: 14px; letter-spacing: -.01em; }
 
 /* 안내 모달 (InfoModal) */
 .modal {
@@ -491,6 +526,8 @@ h1 { font-size: 28px; font-weight: 800; margin: 8px 0 6px; letter-spacing: -.03e
 .login__bg { position: absolute; inset: 0; background: url('/intro.jpg') center / contain no-repeat; }
 .login .screen { position: relative; }
 .login__sub { color: rgba(255,255,255,.82); font-size: 14px; text-shadow: 0 2px 12px rgba(0,0,0,.6); }
+/* 서약 버튼이 화면 아래에 바짝 붙지 않도록 띄운다 */
+.login .stack { margin-bottom: 50px; }
 
 /* 프롤로그: 세로형 전체 영상 + 나레이션 */
 .prologue { background: #000; }
@@ -553,9 +590,50 @@ h1 { font-size: 28px; font-weight: 800; margin: 8px 0 6px; letter-spacing: -.03e
 /* 배경 그림의 밝은 부분에서도 글씨가 읽히도록 시안 배경톤의 남색으로 채운다 */
 .menu__item { background: rgba(32, 45, 100, .48); }
 /* 로그아웃 — 메뉴 맨 아래, 다른 버튼의 70% 크기로 배경 없이 흰 테두리만 */
+/* 로그아웃 — 메뉴 버튼과 달리 테두리·배경 없이 글자만 놓는다 */
 .menu__logout {
-  align-self: center; width: 70%;
+  align-self: center; width: auto;
   padding: 8px 13px; font-size: 11px;
+  border: 0; background: none; box-shadow: none;
+}
+.menu__logout:active { background: none; opacity: .6; }
+
+/* ── 수호자 서약 ───────────────────────────────────────────
+   시안(성혼선언문)처럼 얇은 테두리를 두른 종이. 글은 가운데로 모으고 크게 둔다 */
+.oath__panel {
+  display: flex; flex-direction: column;
+  padding: 18px var(--gd-pad) calc(24px + env(safe-area-inset-bottom));
+}
+.oath__toolbar { height: 24px; margin-bottom: 10px; }
+/* 선언문 종이 — public/border.png 를 테두리로 두른다.
+   모서리 꽃은 원본 비율 그대로 두고 위아래·좌우 변만 늘려 화면에 꼭 맞춘다
+   (원본 1213×1296에서 모서리 장식이 차지하는 250px을 잘라 쓴다) */
+.oath__frame {
+  flex: 1; display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  padding: 12px 10px;
+  border: 42px solid transparent;
+  border-image: url('/border.png') 250 stretch;
+}
+.oath__title {
+  margin: 0 0 30px; font-size: 20px; font-weight: 500;
+  letter-spacing: .42em; text-indent: .42em;      /* 자간을 벌린 만큼 가운데로 되돌린다 */
+  color: var(--gd-ink-strong);
+}
+.oath__body {
+  margin: 0; white-space: pre-line; text-align: center;
+  font-size: 17px; line-height: 2.05; letter-spacing: -.02em; color: var(--gd-ink);
+}
+.oath__ask {
+  margin: 34px 0 0; white-space: pre-line; text-align: center;
+  font-size: 15px; line-height: 1.95; letter-spacing: -.02em; color: var(--gd-dim);
+}
+.oath__cta { margin-top: 22px; }
+
+@media (max-height: 700px) {
+  .oath__body { font-size: 15.5px; line-height: 1.85; }
+  .oath__frame { padding: 24px 18px; }
+  .oath__title { margin-bottom: 22px; }
 }
 
 /* ─────────────────────────────────────────────────────────────
@@ -746,6 +824,10 @@ h1 { font-size: 28px; font-weight: 800; margin: 8px 0 6px; letter-spacing: -.03e
 }
 
 /* 하단 플로팅 내비 */
+/* 하단 내비는 화면에 떠 있어 글을 덮는다.
+   내비 높이(56) + 아래 여백(inset 14 + 12) 만큼 패널 아래를 비워 둔다 */
+.gd .sheet__panel { padding-bottom: calc(110px + env(safe-area-inset-bottom)); }
+
 .gd__nav {
   position: fixed; z-index: 2;
   left: 50%; transform: translateX(-50%);
@@ -820,33 +902,40 @@ h1 { font-size: 28px; font-weight: 800; margin: 8px 0 6px; letter-spacing: -.03e
 .spot__note { font-size: 12px; color: var(--text-dim); line-height: 1.6; margin: 10px 0 0; }
 .spot .btn.sm { margin-top: 12px; }
 
-/* 퀘스트 보기 — 퀘스트1/2/3 탭 + 좌우 스와이프 */
-.qtabs {
+/* 나의 퀘스트 — 수호자 지침서와 같은 시트 위에 얹는다 */
+.mq .sheet__panel { padding: 0 var(--gd-pad) calc(110px + env(safe-area-inset-bottom)); }
+.mq .gd__hero { padding-left: 0; padding-right: 0; }
+.mq .gd__acc { margin-top: 4px; }
+
+/* 퀘스트1/2/3 전환 */
+.mq__tabs {
   display: grid; grid-auto-flow: column; grid-auto-columns: 1fr; gap: 4px;
-  padding: 4px; border-radius: var(--radius-pill);
-  background: var(--surface-2); border: 1px solid var(--line);
+  padding: 4px; margin-bottom: 18px; border-radius: var(--radius-pill);
+  background: rgba(255,255,255,.55); border: 1px solid rgba(74,74,74,.12);
 }
-.qtabs__item {
+.mq__tab {
   appearance: none; border: 0; cursor: pointer; font: inherit;
   padding: 9px 0; border-radius: var(--radius-pill);
-  background: transparent; color: var(--text-dim);
+  background: transparent; color: var(--gd-dim);
   font-size: 14px; font-weight: 600; transition: color .16s ease, background .16s ease;
 }
-.qtabs__item.is-on { background: var(--surface); color: var(--lantern); box-shadow: var(--shadow-sm); }
+.mq__tab.is-on { background: #fff; color: var(--gd-navy); box-shadow: var(--shadow-sm); }
 
-/* 한 화면에 퀘스트 하나씩, 스와이프로 다음 퀘스트에 딱 붙는다 */
-.qswipe {
-  display: flex; overflow-x: auto; scroll-snap-type: x mandatory;
-  overscroll-behavior-x: contain; scrollbar-width: none;
-  margin: 0 -20px;                      /* .screen 좌우 여백까지 스크롤 영역으로 */
+/* 아코디언 행에 붙는 진행 수 */
+.mq__count {
+  flex: none; margin-left: auto; margin-right: 12px;
+  font-size: 13px; color: var(--gd-dim); letter-spacing: -.01em;
 }
-.qswipe::-webkit-scrollbar { display: none; }
-.qswipe__page {
-  flex: 0 0 100%; min-width: 0;         /* 큰 이미지가 페이지 폭을 밀지 않게 */
-  scroll-snap-align: start;
-  display: flex; flex-direction: column; gap: 12px;
-  padding: 2px 20px;                    /* 카드 그림자가 잘리지 않게 */
+
+/* 펼쳤을 때 나오는 세부 미션 */
+.mq__item { padding: 14px 0; border-top: 1px solid var(--gd-hair); }
+.mq__item:first-child { border-top: 0; }
+.mq__itemhead { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.mq__itemhead h2 {
+  margin: 0; font-size: 15.5px; font-weight: 600;
+  color: var(--gd-ink-strong); letter-spacing: -.02em;
 }
+.mq__itemnote { margin: 6px 0 0; font-size: 13px; line-height: 1.65; color: var(--gd-dim); }
 
 /* 진행 조건 안내 — 선행 퀘스트를 못 깨면 잠금 톤으로 보여준다 */
 .qreq {

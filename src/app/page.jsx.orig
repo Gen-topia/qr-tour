@@ -78,9 +78,9 @@ function MainInner() {
                 </svg>
                 카카오로 수호자 서약
               </a>
-              <button className="btn ghost" onClick={onTest} disabled={testing}>
+              {/* <button className="btn ghost" onClick={onTest} disabled={testing}>
                 {testing ? '서약 중…' : '테스트로 시작하기'}
-              </button>
+              </button> */}
             </div>
           </div>
         </div>

@@ -7,6 +7,8 @@ import Loading from '@/components/Loading';
 import Prologue from '@/components/Prologue';
 import Guide from '@/components/Guide';
 import PreQuest from '@/components/PreQuest';
+import Oath from '@/components/Oath';
+import TestJump from '@/components/TestJump';
 
 // 4. HOME 메뉴 — view는 전체화면으로 열고, to는 페이지로 이동한다
 const MENU = [
@@ -19,13 +21,16 @@ const MENU = [
 
 // 사전 퀘스트 안내는 계정마다 한 번만 띄운다
 const PREQ_KEY = (uuid) => `preq_seen:${uuid || 'guest'}`;
+// 수호자 서약은 이 기기에서 한 번만 받는다
+const OATH_KEY = 'oath_done';
 
 function MainInner() {
-  const { isAuthed, ready, user, uuid, loginAsTest, reset } = useAuth();
+  const { isAuthed, ready, user, uuid, reset } = useAuth();
   const router = useRouter();
-  const [testing, setTesting] = useState(false);
   const [view, setView] = useState(null);   // 'prologue' | 'guide' | null
   const [preq, setPreq] = useState(false);  // 사전 퀘스트 안내 표시 여부
+  const [oath, setOath] = useState(null);   // 서약을 받는 중인 로그인 수단
+  const [jump, setJump] = useState(false);  // 테스트용 퀘스트 바로가기 패널
   const params = useSearchParams();
   const next = params.get('next') || '/';
   const err = params.get('error');
@@ -40,6 +45,24 @@ function MainInner() {
     const t = setTimeout(() => setPreq(true), 700);
     return () => clearTimeout(t);
   }, [ready, isAuthed, uuid, signup]);
+
+  // 테스트용 — F1(맥은 Fn+F1)로 퀘스트 바로가기 패널을 연다.
+  // 브라우저가 F1을 도움말로 가로채는 경우가 있어 잡아채는 단계(capture)에서 먼저 받고,
+  // key와 code를 함께 본다. 막히는 환경을 위해 Ctrl/⌘+Shift+K도 같은 기능으로 둔다.
+  useEffect(() => {
+    if (!ready || !isAuthed) return;
+    const onKey = (e) => {
+      const isF1 = e.key === 'F1' || e.code === 'F1' || e.keyCode === 112;
+      const isAlt = (e.ctrlKey || e.metaKey) && e.shiftKey && (e.key === 'K' || e.key === 'k');
+      if (!isF1 && !isAlt) return;
+      e.preventDefault();
+      e.stopPropagation();
+      setView(null);      // 프롤로그·지침서를 보는 중이어도 바로 열리게
+      setJump(true);
+    };
+    window.addEventListener('keydown', onKey, true);
+    return () => window.removeEventListener('keydown', onKey, true);
+  }, [ready, isAuthed]);
 
   // 테스트용 — 메인 화면에서 스페이스바를 누르면 사전 퀘스트를 다시 띄운다
   useEffect(() => {
@@ -63,11 +86,17 @@ function MainInner() {
   // 1-1. 인트로(수호자 서약 전)
   if (!isAuthed) {
     const startUrl = (provider) => `/api/auth/${provider}/start?next=${encodeURIComponent(next)}`;
-    const onTest = async () => {
-      setTesting(true);
-      try { await loginAsTest(); router.replace(next); }
-      catch (e) { alert(e.message); setTesting(false); }
+    const go = (provider) => { window.location.href = startUrl(provider); };
+    // 서약은 최초 1회만 받는다. 이미 했다면 곧바로 소셜 로그인으로 넘어간다.
+    const ask = (provider) => {
+      if (localStorage.getItem(OATH_KEY)) go(provider);
+      else setOath(provider);
     };
+    if (oath) return (
+      <Oath onBack={() => setOath(null)}
+            onAgree={() => { localStorage.setItem(OATH_KEY, '1'); go(oath); }} />
+    );
+
     return (
       <div className="login fade-in">
         <div className="stage">
@@ -81,20 +110,17 @@ function MainInner() {
             {err && <p className="center" style={{ color: 'var(--talisman)', fontSize: 14 }}>{err}</p>}
             <div className="grow" />
             <div className="stack">
-              <a className="btn btn--oauth menu__item" href={startUrl('naver')}>
+              <button type="button" className="btn btn--oauth menu__item" onClick={() => ask('naver')}>
                 <svg className="btn__logo" viewBox="0 0 20 20" aria-hidden="true">
                   <path d="M13.5615 10.6919 6.16846 0H0v20h6.43848V9.30664L13.8315 20H20V0h-6.4385v10.6919Z" />
                 </svg>
                 네이버로 수호자 서약
-              </a>
-              <a className="btn btn--oauth menu__item" href={startUrl('kakao')}>
+              </button>
+              <button type="button" className="btn btn--oauth menu__item" onClick={() => ask('kakao')}>
                 <svg className="btn__logo" viewBox="0 0 24 24" aria-hidden="true">
                   <path d="M12 3C6.477 3 2 6.463 2 10.75c0 2.708 1.79 5.09 4.5 6.47-.2.73-.72 2.63-.82 3.04-.13.5.18.5.39.36.16-.11 2.6-1.77 3.66-2.49.74.11 1.5.17 2.27.17 5.523 0 10-3.463 10-7.55C22 6.463 17.523 3 12 3Z" />
                 </svg>
                 카카오로 수호자 서약
-              </a>
-              <button className="btn ghost" onClick={onTest} disabled={testing}>
-                {testing ? '서약 중…' : '테스트로 시작하기'}
               </button>
             </div>
           </div>
@@ -133,6 +159,8 @@ function MainInner() {
         </div>
         {/* 프롤로그·지침서를 보는 동안에는 소리가 겹치지 않게 띄우지 않는다 */}
         {preq && <PreQuest onDone={closePreq} />}
+        {/* 테스트용 — F1(맥은 Fn+F1)로 연다 */}
+        {jump && <TestJump onClose={() => setJump(false)} />}
       </div>
     </div>
   );

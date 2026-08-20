@@ -30,8 +30,8 @@ export async function POST(request, { params }) {
   const { id } = await params;
   const { stepId, answer } = await request.json().catch(() => ({}));
 
-  const [quest] = await q('SELECT quest_group FROM quests WHERE id=?', [id]);
-  const locked = quest ? await lockReason(user.id, quest.quest_group) : null;
+  const [quest] = await q('SELECT id, quest_group FROM quests WHERE id=?', [id]);
+  const locked = quest ? await lockReason(user.id, quest.quest_group, quest.id) : null;
   if (locked) return bad(locked.replace('\n', ' '), 403);
 
   const [step] = await q('SELECT * FROM quest_steps WHERE id=? AND quest_id=?', [stepId, id]);

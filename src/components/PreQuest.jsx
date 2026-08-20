@@ -1,11 +1,11 @@
 'use client';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Scratch from '@/components/Scratch';
 
 // 7-1. 사전 퀘스트 — 대본 2차 기준
 //   알림음과 함께 메시지가 화면 한가운데 바로 열린다 → 가려진 힌트 → 코드 탐색
-// 음성·알림음은 public/prequest/ 에 둔다(없으면 조용히 건너뛴다).
+// 동자석의 목소리는 이 모달이 아니라 사전 퀘스트 미션의 '동자석의 메시지' 장에서 들려준다.
 const DIR = '/prequest';
 
 const MESSAGE = '“수호자여, 나를 찾아 주세요.”';
@@ -15,35 +15,27 @@ const HINT = '내가 있는 곳에 남겨진 비밀 식별코드를 찾아 거�
 function HintImage() {
   const [failed, setFailed] = useState(false);
   if (failed) return null;
-  return <img className="pq__hintimg" src={`${DIR}/hint.png`} alt="동자석" onError={() => setFailed(true)} />;
+  return <img className="pq__hintimg" src={`${DIR}/prequest_hint.png`} alt="식별코드가 숨은 물건들"
+              onError={() => setFailed(true)} />;
 }
 
 export default function PreQuest({ onDone }) {
   const [hint, setHint] = useState(false);
   const router = useRouter();
-  const voiceRef = useRef(null);
 
-  // 아직 화면을 누른 적이 없으면 브라우저가 소리를 막는다.
-  // 막히더라도 카드를 누르는 순간 이어서 재생된다.
-  const playVoice = () => {
-    const v = voiceRef.current;
-    if (v && v.paused) v.play().catch(() => {});
-  };
-
+  // 메시지가 도착했음을 알리는 짧은 알림음만 울린다(막히면 조용히 넘어간다).
   useEffect(() => {
     const a = new Audio(`${DIR}/notify.wav`);
     a.play().catch(() => {});
-    playVoice();
     return () => { a.pause(); };
   }, []);
 
-  const close = () => { voiceRef.current?.pause(); onDone(); };
-  const toScan = () => { voiceRef.current?.pause(); onDone(); router.push('/scan'); };
+  // 사전 퀘스트는 건너뛸 수 없다. 힌트를 다 지워야 코드 탐색으로 나갈 수 있다.
+  const toScan = () => { onDone(); router.push('/scan'); };
 
   return (
-    <div className="pq" onClick={close}>
-      <audio ref={voiceRef} src={`${DIR}/prequest.mp3`} preload="auto" />
-      <div className="pq__card" onClick={e => { e.stopPropagation(); playVoice(); }}>
+    <div className="pq">
+      <div className="pq__card">
         <div className="pq__eyebrow">사전 퀘스트가 도착했습니다.</div>
         <p className="pq__msg">{MESSAGE}</p>
         <p className="pq__sub">{SUB}</p>
@@ -61,8 +53,8 @@ export default function PreQuest({ onDone }) {
           )}
         </div>
 
-        <button type="button" className="btn" onClick={toScan}>코드 탐색</button>
-        <button type="button" className="pq__later" onClick={close}>나중에 하기</button>
+        {/* 힌트를 다 지우기 전에는 다음으로 갈 수 없다 */}
+        {hint && <button type="button" className="btn" onClick={toScan}>코드 탐색</button>}
       </div>
     </div>
   );

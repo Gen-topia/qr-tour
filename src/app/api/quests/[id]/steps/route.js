@@ -10,7 +10,7 @@ export async function GET(request, { params }) {
   const [quest] = await q(
     'SELECT id, title, quest_group, cover_image_url, narration_video, clear_text, clear_audio_url FROM quests WHERE id=?', [id]
   );
-  const locked = quest ? await lockReason(user.id, quest.quest_group) : null;
+  const locked = quest ? await lockReason(user.id, quest.quest_group, quest.id) : null;
   if (locked) return ok({ quest, steps: [], locked });
 
   const steps = await q(
