@@ -827,7 +827,7 @@ h1 { font-size: 28px; font-weight: 800; margin: 8px 0 6px; letter-spacing: -.03e
 /* 분홍 문단 (프로그램 기본 정보) */
 .gd__pink {
   margin: 0 0 40px; white-space: pre-line;
-  font-size: var(--t-body); line-height: var(--lh-body); color: var(--gd-pink); letter-spacing: -.01em;
+  font-size: 16px; line-height: 1.5; color: var(--gd-dim); letter-spacing: -.01em;
 }
 
 /* 라벨 | 값 표 — 좌우 전면, 얇은 가로선 + 세로 구분선 */
@@ -856,7 +856,7 @@ h1 { font-size: 28px; font-weight: 800; margin: 8px 0 6px; letter-spacing: -.03e
 .gd__notes { list-style: none; margin: 60px 0 0 4px; padding: 0; }
 .gd__notes li {
   position: relative; padding-left: 17px;
-  font-size: var(--t-body); line-height: var(--lh-body); color: var(--gd-pink); letter-spacing: -.01em;
+  font-size: 16px; line-height: 1.5; color: var(--gd-dim); letter-spacing: -.01em;
 }
 .gd__notes li + li { margin-top: 6px; }
 .gd__notes li::before {
@@ -892,11 +892,11 @@ h1 { font-size: 28px; font-weight: 800; margin: 8px 0 6px; letter-spacing: -.03e
   margin: 4px 0 0; padding-left: 50px;
   font-size: var(--t-subtitle); font-weight: var(--tw-title);
   color: var(--c-ink); letter-spacing: var(--ls-head);
-  font-size: 25.5px; font-weight: 700; color: #1f1f1f; letter-spacing: -.03em;
+  font-size: 20px; font-weight: 700; color: var(--gd-ink); letter-spacing: -.03em;
 }
 .gd__rule p {
   margin: 12px 0 0; padding-left: 50px; white-space: pre-line;
-  font-size: 18px; line-height: 1.45; color: var(--gd-dim); letter-spacing: -.01em;
+  font-size: 15px; line-height: 1.45; color: var(--gd-dim); letter-spacing: -.01em;
 }
 .gd__rule mark {
   background: linear-gradient(var(--gd-mark), var(--gd-mark)) 0 100% / 100% 62% no-repeat;
