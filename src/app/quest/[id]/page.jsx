@@ -75,6 +75,19 @@ function Quest() {
               onEnd={() => setNarration(false)} onClose={() => setNarration(false)} />
   );
 
+  // 짧은 안내 장은 화면 대신 모달로 띄운다(관리툴 config에 { "modal": true }).
+  // 확인 단추를 누르면 다음 장으로 이어진다.
+  if (step.type === 'story' && step.config?.modal) return (
+    <>
+      <AudioPlayer src={step.audio_url} />
+      <InfoModal eyebrow={quest?.title || '미션'} title={step.title}
+                 confirmLabel={step.config.cta || '확인'}
+                 onClose={isLast ? () => submit({ done: true }) : next}>
+        {step.body_text}
+      </InfoModal>
+    </>
+  );
+
   // 첫 장(활동 안내)은 수호자 지침서와 같은 톤 — 큰 여백, 옅은 본문
   const isIntro = idx === 0;
   return (

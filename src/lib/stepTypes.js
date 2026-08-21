@@ -4,7 +4,8 @@
 export const STEP_TYPES = {
   story: {
     label: '이야기',
-    hint: '읽고 넘어가는 페이지',
+    hint: '읽고 넘어가는 페이지. config에 { "modal": true, "cta": "메시지 보기" }를 넣으면 '
+        + '화면 대신 모달로 뜨고, 단추를 누르면 다음 장으로 이어진다',
     sample: { type: 'story', title: '1장', body_text: '이야기 도입...' },
   },
   quiz: {
