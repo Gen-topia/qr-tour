@@ -35,21 +35,11 @@ function MainInner() {
   const [oath, setOath] = useState(null);   // 서약을 받는 중인 로그인 수단
   const [jump, setJump] = useState(false);  // 테스트용 퀘스트 바로가기 패널
   const [onboard, setOnboard] = useState(false); // 로그인 직후 순서 안내
-  const [denied, setDenied] = useState(false);   // 오픈 전이고 테스터도 아닌 경우
+  const [closed, setClosed] = useState(false);   // 오픈 전이라 로그인을 받지 않는 상태
   const params = useSearchParams();
   const next = params.get('next') || '/';
   const err = params.get('error');
   const signup = params.get('signup') === '1';   // 방금 가입한 수호자
-
-  // 오픈 전이면 관리자가 등록한 테스터만 들어올 수 있다
-  useEffect(() => {
-    if (!ready || !isAuthed) return;
-    let alive = true;
-    api.myAccess()
-      .then(r => { if (alive && !r.allowed) setDenied(true); })
-      .catch(() => {});                       // 판정에 실패하면 막지 않는다
-    return () => { alive = false; };
-  }, [ready, isAuthed]);
 
   // 로그인 후 첫 방문이면 안내를 띄운다.
   // 프롤로그 → 지침서 → 사전 퀘스트 순서로 이어지고, 지침서를 닫는 순간 사전 퀘스트가 온다.
@@ -101,14 +91,6 @@ function MainInner() {
     setPreq(false);
   };
 
-  if (denied) return (
-    <InfoModal eyebrow="안내" title="이용할 수 있는 기간이 아닙니다"
-               confirmLabel="확인"
-               onClose={() => { setDenied(false); reset(); router.replace('/'); }}>
-      지금은 퀘스트를 진행할 수 있는 기간이 아니에요.{'\n'}운영 기간에 다시 찾아와 주세요.
-    </InfoModal>
-  );
-
   if (!ready) return <Loading />;
 
   // 1-1. 인트로(수호자 서약 전)
@@ -116,7 +98,13 @@ function MainInner() {
     const startUrl = (provider) => `/api/auth/${provider}/start?next=${encodeURIComponent(next)}`;
     const go = (provider) => { window.location.href = startUrl(provider); };
     // 서약은 최초 1회만 받는다. 이미 했다면 곧바로 소셜 로그인으로 넘어간다.
-    const ask = (provider) => {
+    // 로그인 버튼을 눌렀을 때 오픈 여부를 확인한다.
+    // 닫혀 있으면 안내만 하고 아무 것도 진행하지 않는다.
+    const ask = async (provider) => {
+      try {
+        const r = await api.settings();
+        if (!r.questOpen) { setClosed(true); return; }
+      } catch { /* 확인에 실패하면 막지 않는다 */ }
       if (localStorage.getItem(OATH_KEY)) go(provider);
       else setOath(provider);
     };
@@ -153,6 +141,13 @@ function MainInner() {
             </div>
           </div>
         </div>
+        {/* 오픈 전이라 로그인을 받지 않을 때 — 확인하면 닫히기만 한다 */}
+        {closed && (
+          <InfoModal eyebrow="안내" title="이용할 수 있는 기간이 아닙니다"
+                     confirmLabel="확인" onClose={() => setClosed(false)}>
+            지금은 퀘스트를 진행할 수 있는 기간이 아니에요.{'\n'}운영 기간에 다시 찾아와 주세요.
+          </InfoModal>
+        )}
       </div>
     );
   }

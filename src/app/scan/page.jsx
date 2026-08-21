@@ -78,7 +78,7 @@ function Scan() {
       </div>
       <p className="muted" style={{ fontSize: 12, marginTop: 12 }}>스마트폰 카메라로 스캔해도 바로 열려요.</p>
       <div className="grow" />
-      <button className="btn ghost" onClick={() => router.replace('/')}>메인으로</button>
+      <button className="btn" onClick={() => router.replace('/')}>메인으로</button>
     </div>
   );
 }

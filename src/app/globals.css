@@ -620,11 +620,13 @@ h1 { font-size: 28px; font-weight: 800; margin: 8px 0 6px; letter-spacing: -.03e
   border-left: 20px solid #fff; border-top: 12px solid transparent; border-bottom: 12px solid transparent;
 }
 /* 프롤로그 컨트롤바 — 재생 중에도 항상 보이게 직접 만든다 */
+/* 자막이 화면 아래에 깔리므로 조작 막대는 위에 붙인다.
+   오른쪽 위 닫기 버튼과 겹치지 않게 그만큼 자리를 비워 둔다 */
 .prologue__bar {
-  position: absolute; left: 0; right: 0; bottom: 0; z-index: 2;
+  position: absolute; left: 0; right: 0; top: 0; z-index: 2;
   display: flex; align-items: center; gap: 10px;
-  padding: 14px 14px calc(14px + env(safe-area-inset-bottom));
-  background: linear-gradient(rgba(0,0,0,0), rgba(0,0,0,.68));
+  padding: calc(12px + env(safe-area-inset-top)) 62px 14px 14px;
+  background: linear-gradient(rgba(0,0,0,.68), rgba(0,0,0,0));
   color: #fff;
 }
 .prologue__toggle, .prologue__mute {
