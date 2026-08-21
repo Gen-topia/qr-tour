@@ -54,15 +54,14 @@ function MainInner() {
     if (!localStorage.getItem(PREQ_KEY(uuid))) setPreq(true);
   };
 
-  // 테스트용 — F1(맥은 Fn+F1)로 퀘스트 바로가기 패널을 연다.
-  // 브라우저가 F1을 도움말로 가로채는 경우가 있어 잡아채는 단계(capture)에서 먼저 받고,
-  // key와 code를 함께 본다. 막히는 환경을 위해 Ctrl/⌘+Shift+K도 같은 기능으로 둔다.
+  // 테스트용 — Ctrl+1로 퀘스트 바로가기 패널을 연다.
+  // 키 배열에 따라 key가 달라질 수 있어 code(Digit1)도 함께 보고,
+  // 다른 핸들러보다 먼저 받도록 잡아채는 단계(capture)에서 처리한다.
   useEffect(() => {
     if (!ready || !isAuthed) return;
     const onKey = (e) => {
-      const isF1 = e.key === 'F1' || e.code === 'F1' || e.keyCode === 112;
-      const isAlt = (e.ctrlKey || e.metaKey) && e.shiftKey && (e.key === 'K' || e.key === 'k');
-      if (!isF1 && !isAlt) return;
+      if (!e.ctrlKey || e.altKey || e.metaKey) return;
+      if (e.key !== '1' && e.code !== 'Digit1') return;
       e.preventDefault();
       e.stopPropagation();
       setView(null);      // 프롤로그·지침서를 보는 중이어도 바로 열리게
@@ -172,7 +171,7 @@ function MainInner() {
             onClose={() => setOnboard(false)} />
         )}
         {preq && <PreQuest onDone={closePreq} />}
-        {/* 테스트용 — F1(맥은 Fn+F1)로 연다 */}
+        {/* 테스트용 — Ctrl+1로 연다 */}
         {jump && <TestJump onClose={() => setJump(false)} />}
       </div>
     </div>

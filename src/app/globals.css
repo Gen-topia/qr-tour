@@ -267,7 +267,7 @@ h1 { font-size: 28px; font-weight: 800; margin: 8px 0 6px; letter-spacing: -.03e
 .pq__hint.is-open .pq__hintimg { max-height: 220px; }
 .pq__hinttext { margin: 0; font-size: 14px; line-height: 1.65; letter-spacing: -.01em; }
 
-/* 테스트용 퀘스트 바로가기 (F1) */
+/* 테스트용 퀘스트 바로가기 (Ctrl+1) */
 .tj {
   position: fixed; inset: 0; z-index: 80; padding: 20px;
   background: rgba(20,26,46,.5); display: grid; place-items: center;
