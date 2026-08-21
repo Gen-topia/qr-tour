@@ -10,7 +10,7 @@ const DIR = '/prequest';
 
 const MESSAGE = '“수호자여, 나를 찾아 주세요.”';
 const SUB = '메시지 아래에 가려진 힌트를 확인하세요.';
-const HINT = '내가 있는 곳에 남겨진 비밀 식별코드를 찾아 거울을 비춰 보세요.';
+const HINT = '내가 잠들어 있는 곳입니다.\n이곳에 남겨진 식별 코드를 찾아주세요.';
 
 function HintImage() {
   const [failed, setFailed] = useState(false);
@@ -54,7 +54,12 @@ export default function PreQuest({ onDone }) {
         </div>
 
         {/* 힌트를 다 지우기 전에는 다음으로 갈 수 없다 */}
-        {hint && <button type="button" className="btn" onClick={toScan}>코드 탐색</button>}
+        {hint && (
+          <>
+            <button type="button" className="btn" onClick={toScan}>코드 탐색</button>
+            <button type="button" className="btn pq__skip" onClick={onDone}>넘어가기</button>
+          </>
+        )}
       </div>
     </div>
   );
