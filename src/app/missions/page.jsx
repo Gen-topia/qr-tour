@@ -16,11 +16,16 @@ const HERO_GROUPS = [1, 2];
 // 아직 준비되지 않은 단계의 그림은 깨진 이미지 대신 조용히 숨긴다.
 function QuestImage({ group, done, label }) {
   const [broken, setBroken] = useState(false);
-  useEffect(() => { setBroken(false); }, [group, done]);
+  const [loaded, setLoaded] = useState(false);
+  const src = `/quest_${group}_${done}.png`;
+  // 퀘스트를 바꾸면 새 그림이 다 실릴 때까지 아무것도 보이지 않게 한다
+  // (안 그러면 브라우저가 이전 그림을 계속 그려서 바뀌는 순간이 어색하다)
+  useEffect(() => { setBroken(false); setLoaded(false); }, [src]);
   if (!HERO_GROUPS.includes(group) || done < 0 || broken) return null;
   return (
-    <img className="qhero" src={`/quest_${group}_${done}.png`} alt={`${label} 진행 이미지`}
-         onError={() => setBroken(true)} />
+    <img key={src} className={`qhero${loaded ? ' is-on' : ''}`} src={src}
+         alt={`${label} 진행 이미지`}
+         onLoad={() => setLoaded(true)} onError={() => setBroken(true)} />
   );
 }
 

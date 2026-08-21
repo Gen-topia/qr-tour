@@ -78,7 +78,7 @@ function Quest() {
   // 첫 장(활동 안내)은 수호자 지침서와 같은 톤 — 큰 여백, 옅은 본문
   const isIntro = idx === 0;
   return (
-    <div className={`screen stack fade-in${isIntro ? ' qintro' : ''}`}>
+    <div className={`screen stack fade-in qpage${isIntro ? ' qintro' : ''}`}>
       <div className="spread">
         <div className="eyebrow">{quest?.title || '미션'}</div>
         <span className="badge">{idx + 1} / {steps.length}</span>
@@ -130,9 +130,7 @@ function ResultView({ result, quest, onHome }) {
           {/* 관리툴에 적어둔 리워드 문구(대본의 '리워드 획득') */}
           {quest?.clear_text && <p className="qc__reward">{quest.clear_text}</p>}
           {/* 완수했을 때 들려주는 소리 — 파일이 없으면 버튼이 뜨지 않는다 */}
-          <div className="qc__audio">
-            <AudioPlayer src={quest?.clear_audio_url} label="이야기 듣기" plain />
-          </div>
+          <AudioPlayer src={quest?.clear_audio_url} />
           <p className="qc__text">
             {result.alreadyCleared ? '이미 완료한 퀘스트에요.' : `+${result.awarded}점을 획득했어요.`}
           </p>

@@ -353,6 +353,23 @@ h1 { font-size: 28px; font-weight: 800; margin: 8px 0 6px; letter-spacing: -.03e
   color: var(--c-body); letter-spacing: var(--ls-body);
 }
 
+/* 미션 음성 토글 — 프롤로그 조작 단추와 같은 모양으로 오른쪽 위에 띄운다 */
+.audiobtn {
+  position: fixed; z-index: 20;
+  top: calc(14px + env(safe-area-inset-top));
+  right: max(16px, calc((100% - var(--maxw)) / 2 + 16px));
+  width: 38px; height: 38px; border-radius: 50%;
+  appearance: none; cursor: pointer; display: grid; place-items: center;
+  border: 1px solid rgba(74,74,74,.16);
+  background: rgba(255,255,255,.72); color: var(--c-ink);
+  backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+  box-shadow: 0 6px 16px rgba(90,84,160,.14);
+}
+.audiobtn svg { width: 15px; height: 15px; }
+/* 머리줄(제목 · n/총)이 음성 단추와 겹치지 않게 오른쪽을 비운다 */
+.qpage > .spread:first-child { padding-right: 46px; }
+.audiobtn:active { background: rgba(255,255,255,.9); }
+
 /* 안내 모달 (InfoModal) */
 .modal {
   position: fixed; inset: 0; z-index: 60; padding: 24px;
@@ -951,9 +968,6 @@ h1 { font-size: 28px; font-weight: 800; margin: 8px 0 6px; letter-spacing: -.03e
   font-size: var(--t-body); line-height: var(--lh-body);
   color: var(--c-body); letter-spacing: var(--ls-body);
 }
-/* 이야기 듣기 버튼 — 완료 문구에 바짝 붙지 않게 띄운다 */
-.qc__audio { margin-top: 34px; }
-.qc__audio .btn { width: auto; display: inline-block; padding: 12px 22px; font-size: 14px; }
 .qc__text {
   margin: 14px 0 0; text-align: center; white-space: pre-line;
   font-size: var(--t-body); line-height: var(--lh-body);
