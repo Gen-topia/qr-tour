@@ -92,6 +92,14 @@ function Missions() {
           ))}
         </div>
 
+        {/* 이 퀘스트가 무엇을 하는 여정인지 */}
+        {g.title && (
+          <section className="mq__intro">
+            <h2 className="mq__introtitle">{g.title}</h2>
+            <p className="mq__introdesc">{g.desc}</p>
+          </section>
+        )}
+
         <QuestImage group={g.value} done={mainsDone} label={g.label} />
 
         {need.length > 0 && (

@@ -1,4 +1,5 @@
 'use client';
+import AudioPlayer from '@/components/AudioPlayer';
 
 // 수호자 서약 — 소셜 로그인 전에 한 번만 거치는 선언문.
 // 시안(성혼선언문)처럼 얇은 테두리를 두른 종이 위에 글을 가운데로 앉힌다.
@@ -20,6 +21,9 @@ export default function Oath({ onAgree, onBack }) {
   return (
     <div className="onboard sheet oath">
       <div className="sheet__panel oath__panel">
+        {/* 서약을 읽어 주는 소리 — public/oath/oath.mp3 */}
+        <AudioPlayer src="/oath/oath.mp3" />
+
         <div className="oath__toolbar">
           <button type="button" className="gd__back" onClick={onBack} aria-label="뒤로">
             <svg viewBox="0 0 34 20" aria-hidden="true">
