@@ -11,7 +11,8 @@ export const STEP_TYPES = {
   quiz: {
     label: '퀴즈(주관식·객관식)',
     hint: 'options에 보기를 배열로 넣으면 골라서 푸는 문제가 되고, 비우면 직접 입력하는 문제가 된다. '
-        + 'answer에는 정답 보기와 똑같은 글자를 적는다',
+        + 'answer에는 정답 보기와 똑같은 글자를 적는다. '
+        + 'config에 { "skip": true }를 두면 정답을 정하기 전까지 넘어가기 단추가 나온다',
     sample: { type: 'quiz', title: '퀴즈', question: '질문을 입력하세요', answer: '정답' },
   },
   choice: {

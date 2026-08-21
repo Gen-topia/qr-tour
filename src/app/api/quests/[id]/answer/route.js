@@ -6,6 +6,10 @@ import { lockReason } from '@/lib/questLock';
 // 유형별 완료 판정.
 // quiz·dial은 서버가 값을 검증하고, 나머지 인터랙션 유형은 클라이언트의 완료 신호를 받는다.
 function judge(step, answer) {
+  // 정답이 아직 정해지지 않은 문제는 config에 { "skip": true }를 둬서 건너뛸 수 있게 한다.
+  // 정답이 확정되면 이 설정만 지우면 된다.
+  if (step.config?.skip && answer?.skip === true) return true;
+
   if (step.type === 'quiz') {
     return String(answer ?? '').trim() === String(step.answer ?? '').trim();
   }
