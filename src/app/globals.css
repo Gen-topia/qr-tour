@@ -987,6 +987,11 @@ h1 { font-size: 28px; font-weight: 800; margin: 8px 0 6px; letter-spacing: -.03e
   font-size: var(--t-head); font-weight: var(--tw-head);
   color: var(--c-ink); letter-spacing: var(--ls-head);
 }
+/* 한 이야기를 다 끝내고 얻는 정기 그림 — 제목 바로 아래에 놓는다 */
+.qc__spirit {
+  display: block; width: 58%; max-width: 220px; height: auto;
+  margin: 18px auto 0;
+}
 .qc__reward {
   margin: 18px 0 0; text-align: center; white-space: pre-line;
   font-size: var(--t-body); line-height: var(--lh-body);

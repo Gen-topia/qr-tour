@@ -34,7 +34,7 @@ export async function POST(request, { params }) {
   const { id } = await params;
   const { stepId, answer } = await request.json().catch(() => ({}));
 
-  const [quest] = await q('SELECT id, quest_group FROM quests WHERE id=?', [id]);
+  const [quest] = await q('SELECT id, quest_group, main_no FROM quests WHERE id=?', [id]);
   const locked = quest ? await lockReason(user.id, quest.quest_group, quest.id) : null;
   if (locked) return bad(locked.replace('\n', ' '), 403);
 
@@ -48,12 +48,26 @@ export async function POST(request, { params }) {
   const [last] = await q('SELECT MAX(step_no) AS mx FROM quest_steps WHERE quest_id=?', [id]);
   const isFinal = step.step_no >= Number(last.mx);
 
-  let awarded = 0, alreadyCleared = false;
+  let awarded = 0, alreadyCleared = false, mainCleared = false;
   if (isFinal) {
     const r = await clearQuest(user.id, id);
     awarded = r.awarded; alreadyCleared = r.alreadyCleared;
+    mainCleared = await isMainCleared(user.id, quest);
   }
-  return ok({ correct: true, isFinal, awarded, alreadyCleared });
+  return ok({ correct: true, isFinal, awarded, alreadyCleared, mainCleared, mainNo: quest?.main_no ?? null });
+}
+
+// 한 이야기(main_no)에 묶인 미션을 모두 완수했는지 — 정기 그림을 보여줄 조건이다.
+async function isMainCleared(userId, quest) {
+  if (!quest?.main_no) return false;
+  const [row] = await q(
+    `SELECT COUNT(*) AS total, SUM(p.status='cleared') AS done
+       FROM quests qq
+       LEFT JOIN quest_progress p ON p.quest_id=qq.id AND p.user_id=?
+      WHERE qq.quest_group=? AND qq.main_no=?`,
+    [userId, quest.quest_group, quest.main_no]
+  );
+  return Number(row?.total) > 0 && Number(row?.done) === Number(row?.total);
 }
 
 async function clearQuest(userId, questId) {

@@ -1,6 +1,6 @@
 'use client';
-import { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { Suspense, useEffect, useState } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import Protected from '@/components/Protected';
 import { api } from '@/lib/apiClient';
 import Loading from '@/components/Loading';
@@ -56,7 +56,10 @@ function toMains(list) {
 function Missions() {
   const [data, setData] = useState(null);
   const [err, setErr] = useState('');
-  const [tab, setTab] = useState(0);          // QUEST_TABS의 인덱스
+  // 퀘스트를 완수하고 넘어올 때는 ?quest=1처럼 볼 탭을 지정해 온다
+  const asked = useSearchParams().get('quest');
+  const wanted = QUEST_TABS.findIndex(t => String(t.value) === asked);
+  const [tab, setTab] = useState(wanted < 0 ? 0 : wanted);   // QUEST_TABS의 인덱스
   const [open, setOpen] = useState(null);     // 펼쳐 둔 메인 퀘스트 키
   const router = useRouter();
   useEffect(() => { api.myMissions().then(setData).catch(e => setErr(e.message)); }, []);
@@ -171,4 +174,11 @@ function Missions() {
     </div>
   );
 }
-export default function Page() { return <Protected><Missions /></Protected>; }
+// useSearchParams를 쓰므로 Suspense로 감싼다(빌드 오류 방지)
+export default function Page() {
+  return (
+    <Protected>
+      <Suspense fallback={<Loading label="퀘스트를 불러오는 중…" />}><Missions /></Suspense>
+    </Protected>
+  );
+}

@@ -43,7 +43,8 @@ function Quest() {
     try {
       const r = await api.submitAnswer(id, stepId, payload);
       if (!r.correct) return false;
-      if (r.isFinal) setResult({ awarded: r.awarded, alreadyCleared: r.alreadyCleared });
+      if (r.isFinal) setResult({ awarded: r.awarded, alreadyCleared: r.alreadyCleared,
+                                 mainCleared: r.mainCleared, mainNo: r.mainNo });
       else setIdx(i => i + 1);
       return true;
     } catch (e) { setErr(e.message); return false; }
@@ -61,7 +62,11 @@ function Quest() {
       </InfoModal>
     </>
   );
-  if (result) return <ResultView result={result} quest={quest} onHome={() => router.replace('/')} />;
+  if (result) return (
+    <ResultView result={result} quest={quest}
+                onHome={() => router.replace('/')}
+                onQuestList={() => router.replace(`/missions?quest=${quest?.quest_group}`)} />
+  );
 
   const step = steps[idx];
   const isLast = isLastStep;
@@ -130,7 +135,17 @@ function ClearImage({ group }) {
   return <img className="qc__img" src={`/quest_clear_${group}.png`} alt="" onError={() => setFailed(true)} />;
 }
 
-function ResultView({ result, quest, onHome }) {
+// 한 이야기를 모두 완수하면 얻는 정기 그림 — public/quest_spirit_{메인번호}.png
+function SpiritImage({ no }) {
+  const [failed, setFailed] = useState(false);
+  useEffect(() => { setFailed(false); }, [no]);
+  if (!no || failed) return null;
+  return <img className="qc__spirit" src={`/quest_spirit_${no}.png`} alt="" onError={() => setFailed(true)} />;
+}
+
+function ResultView({ result, quest, onHome, onQuestList }) {
+  // 퀘스트1은 모은 정기로 복숭아나무가 자라므로 나무를 보러 가게 한다
+  const toPeach = quest?.quest_group === 1;
   return (
     <div className="sheet qc">
       <div className="sheet__panel qc__panel">
@@ -140,6 +155,7 @@ function ResultView({ result, quest, onHome }) {
             <Sparkle className="qc__star" /><i /><Sparkle className="qc__star" />
           </div>
           <h1 className="qc__title">퀘스트 완료</h1>
+          {result.mainCleared && <SpiritImage no={result.mainNo} />}
           {/* 관리툴에 적어둔 리워드 문구(대본의 '리워드 획득') */}
           {quest?.clear_text && <p className="qc__reward">{quest.clear_text}</p>}
           {/* 완수했을 때 들려주는 소리 — 파일이 없으면 버튼이 뜨지 않는다 */}
@@ -149,7 +165,9 @@ function ResultView({ result, quest, onHome }) {
           </p>
         </div>
         <div className="qc__foot">
-          <button className="btn" onClick={onHome}>메인으로</button>
+          <button className="btn" onClick={toPeach ? onQuestList : onHome}>
+            {toPeach ? '복숭아 나무 보기' : '메인으로'}
+          </button>
         </div>
       </div>
     </div>
