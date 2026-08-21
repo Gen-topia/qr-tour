@@ -3,7 +3,7 @@ import { useEffect, useRef } from 'react';
 
 // 문지르기 덮개 — children 위에 캔버스를 덮고 손가락으로 지운다.
 // 지워진 비율(0~1)을 onProgress로 알린다. 판정은 쓰는 쪽에서 한다.
-export default function Scratch({ className = 'scratch', cover = '#c9cede', radius = 22, onProgress, children }) {
+export default function Scratch({ className = 'scratch', cover = '#c9cede', coverImage, radius = 22, onProgress, children }) {
   const canvasRef = useRef(null);
   const drawingRef = useRef(false);
 
@@ -18,9 +18,19 @@ export default function Scratch({ className = 'scratch', cover = '#c9cede', radi
     cv.height = Math.round(h * dpr);
     const ctx = cv.getContext('2d');
     ctx.scale(dpr, dpr);
-    ctx.fillStyle = cover;
-    ctx.fillRect(0, 0, w, h);
-  }, [cover]);
+    const paintColor = () => { ctx.fillStyle = cover; ctx.fillRect(0, 0, w, h); };
+    if (!coverImage) { paintColor(); return; }
+    // 덮개 그림은 여백 없이 꽉 채운다(짧은 변에 맞춰 키우고 가운데를 담는다)
+    const img = new Image();
+    img.onload = () => {
+      const s = Math.max(w / img.width, h / img.height);
+      const dw = img.width * s, dh = img.height * s;
+      ctx.globalCompositeOperation = 'source-over';
+      ctx.drawImage(img, (w - dw) / 2, (h - dh) / 2, dw, dh);
+    };
+    img.onerror = paintColor;   // 그림을 아직 안 넣었으면 단색 덮개로
+    img.src = coverImage;
+  }, [cover, coverImage]);
 
   // 투명해진 픽셀 비율을 센다 (성능을 위해 격자로 샘플링)
   function measure() {
