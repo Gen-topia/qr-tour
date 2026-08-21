@@ -915,9 +915,10 @@ h1 { font-size: 28px; font-weight: 800; margin: 8px 0 6px; letter-spacing: -.03e
   bottom: calc(var(--gd-inset) + 12px + env(safe-area-inset-bottom));
   width: min(calc(100vw - 68px), calc(var(--maxw) - 68px));
   height: 56px; border-radius: var(--radius-pill);
-  background: var(--gd-navy);
+  /* 다른 버튼과 같은 핑크 계열로 맞춘다 */
+  background: linear-gradient(135deg, #dd8fb2, #c25c8c);
   display: grid; grid-auto-flow: column; grid-auto-columns: 1fr;
-  box-shadow: 0 8px 22px rgba(22,55,90,.28);
+  box-shadow: 0 8px 22px rgba(194,92,140,.30);
 }
 .gd__tab {
   appearance: none; background: none; border: 0; cursor: pointer; font: inherit;
@@ -1012,7 +1013,7 @@ h1 { font-size: 28px; font-weight: 800; margin: 8px 0 6px; letter-spacing: -.03e
   background: transparent; color: var(--gd-dim);
   font-size: 14px; font-weight: 600; transition: color .16s ease, background .16s ease;
 }
-.mq__tab.is-on { background: #fff; color: var(--gd-navy); box-shadow: var(--shadow-sm); }
+.mq__tab.is-on { background: #fff; color: var(--lantern-dim); box-shadow: var(--shadow-sm); }
 
 /* 아코디언 행에 붙는 진행 수 */
 .mq__count {
