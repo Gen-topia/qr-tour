@@ -34,4 +34,10 @@ export const api = {
   settings: () => req('/api/settings'),
   adminSettings: () => req('/api/admin/settings', { admin: true }),
   adminSetOpen: (questOpen) => req('/api/admin/settings', { method: 'PUT', body: { questOpen }, admin: true }),
+
+  // 오픈 전 예외 허용(테스터)
+  myAccess: () => req('/api/me/access'),
+  adminTesters: () => req('/api/admin/testers', { admin: true }),
+  adminAddTester: (email, note) => req('/api/admin/testers', { method: 'POST', body: { email, note }, admin: true }),
+  adminDelTester: (email) => req(`/api/admin/testers?email=${encodeURIComponent(email)}`, { method: 'DELETE', admin: true }),
 };

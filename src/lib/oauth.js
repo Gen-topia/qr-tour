@@ -7,13 +7,14 @@ export const PROVIDERS = {
     authUrl: 'https://kauth.kakao.com/oauth/authorize',
     tokenUrl: 'https://kauth.kakao.com/oauth/token',
     profileUrl: 'https://kapi.kakao.com/v2/user/me',
-    scope: 'profile_nickname',
+    scope: 'profile_nickname account_email',
     clientId: () => process.env.KAKAO_REST_API_KEY,
     clientSecret: () => process.env.KAKAO_CLIENT_SECRET || '',
-    // 응답: { id: 1234567890, kakao_account: { profile: { nickname } } }
+    // 응답: { id: 1234567890, kakao_account: { email, profile: { nickname } } }
     parseProfile: (d) => ({
       providerId: String(d.id),
       nickname: d.kakao_account?.profile?.nickname || null,
+      email: d.kakao_account?.email || null,
     }),
   },
   naver: {
@@ -24,10 +25,11 @@ export const PROVIDERS = {
     scope: '',
     clientId: () => process.env.NAVER_CLIENT_ID,
     clientSecret: () => process.env.NAVER_CLIENT_SECRET || '',
-    // 응답: { resultcode: '00', response: { id, nickname, ... } }
+    // 응답: { resultcode: '00', response: { id, nickname, email, ... } }
     parseProfile: (d) => ({
       providerId: String(d.response?.id || ''),
       nickname: d.response?.nickname || null,
+      email: d.response?.email || null,
     }),
   },
 };

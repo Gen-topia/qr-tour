@@ -12,6 +12,9 @@ const SAMPLE = JSON.stringify([STEP_TYPES.story.sample, STEP_TYPES.quiz.sample],
 function Quests() {
   const [quests, setQuests] = useState([]);
   const [open, setOpen] = useState(null);   // 앱 오픈 여부(null이면 확인 중)
+  const [testers, setTesters] = useState([]);   // 오픈 전에도 쓸 수 있는 이메일
+  const [tEmail, setTEmail] = useState('');
+  const [tNote, setTNote] = useState('');
   const [editing, setEditing] = useState(null);
   const [stepsText, setStepsText] = useState('');
   const [stepsErr, setStepsErr] = useState('');
@@ -20,6 +23,8 @@ function Quests() {
   async function load() { setQuests((await api.adminQuests()).quests); }
   useEffect(() => { load(); }, []);
   useEffect(() => { api.adminSettings().then(r => setOpen(r.questOpen)).catch(() => {}); }, []);
+  useEffect(() => { loadTesters(); }, []);
+  function loadTesters() { api.adminTesters().then(r => setTesters(r.testers)).catch(() => {}); }
 
   async function openEdit(qst) {
     setEditing(qst); setStepsErr('');
@@ -78,6 +83,15 @@ function Quests() {
     await api.adminPutSteps(id, steps);
     setEditing(null); load();
   }
+  async function addTester() {
+    try { await api.adminAddTester(tEmail, tNote); setTEmail(''); setTNote(''); loadTesters(); }
+    catch (e) { alert(e.message); }
+  }
+  async function delTester(email) {
+    if (!confirm(`${email} 을(를) 목록에서 뺄까요?`)) return;
+    try { await api.adminDelTester(email); loadTesters(); }
+    catch (e) { alert(e.message); }
+  }
   async function toggleOpen() {
     try { const r = await api.adminSetOpen(!open); setOpen(r.questOpen); }
     catch (e) { alert(e.message); }
@@ -103,6 +117,44 @@ function Quests() {
         </div>
         <button className={`btn sm${open ? '' : ' ghost'}`} disabled={open === null}
                 onClick={toggleOpen}>{open ? '오픈 (1)' : '마감 (0)'}</button>
+      </div>
+
+      {/* 마감(0)이어도 여기 등록한 이메일로 로그인하면 그대로 진행할 수 있다 */}
+      <div className="card stack" style={{ marginBottom: 18 }}>
+        <div>
+          <div style={{ fontWeight: 700 }}>테스터 이메일</div>
+          <div className="muted" style={{ fontSize: 13 }}>
+            마감 상태에서도 이 이메일로 카카오·네이버 로그인하면 퀘스트를 진행할 수 있습니다.
+          </div>
+        </div>
+        <div className="grid2">
+          <div className="field" style={{ margin: 0 }}>
+            <input className="input" placeholder="tester@example.com" value={tEmail}
+                   onChange={e => setTEmail(e.target.value)}
+                   onKeyDown={e => e.key === 'Enter' && addTester()} />
+          </div>
+          <div className="field" style={{ margin: 0, display: 'flex', gap: 8 }}>
+            <input className="input" placeholder="메모(선택)" value={tNote}
+                   onChange={e => setTNote(e.target.value)}
+                   onKeyDown={e => e.key === 'Enter' && addTester()} />
+            <button className="btn sm" onClick={addTester}>추가</button>
+          </div>
+        </div>
+        {testers.length > 0 && (
+          <table className="table">
+            <thead><tr><th>이메일</th><th>메모</th><th></th></tr></thead>
+            <tbody>
+              {testers.map(t => (
+                <tr key={t.email}>
+                  <td>{t.email}</td>
+                  <td>{t.note || '—'}</td>
+                  <td><button className="btn sm ghost" onClick={() => delTester(t.email)}>삭제</button></td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
+        {testers.length === 0 && <p className="muted" style={{ margin: 0, fontSize: 13 }}>등록된 이메일이 없습니다.</p>}
       </div>
       <table className="table">
         <thead><tr><th>순서</th><th>구분</th><th>제목</th><th>유형</th><th>코드(QR)</th><th>포인트</th><th>활성</th><th></th></tr></thead>
