@@ -145,11 +145,10 @@ function ResultView({ result, quest, onHome }) {
           {/* 완수했을 때 들려주는 소리 — 파일이 없으면 버튼이 뜨지 않는다 */}
           <AudioPlayer src={quest?.clear_audio_url} />
           <p className="qc__text">
-            {result.alreadyCleared ? '이미 완료한 퀘스트에요.' : `+${result.awarded}점을 획득했어요.`}
+            {result.alreadyCleared ? '이미 완료한 퀘스트에요.' : ``}
           </p>
         </div>
         <div className="qc__foot">
-          <PhotoShare shareOnly />
           <button className="btn" onClick={onHome}>메인으로</button>
         </div>
       </div>
