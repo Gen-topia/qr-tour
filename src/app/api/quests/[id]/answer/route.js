@@ -34,7 +34,7 @@ export async function POST(request, { params }) {
   const { id } = await params;
   const { stepId, answer } = await request.json().catch(() => ({}));
 
-  const [quest] = await q('SELECT id, quest_group, main_no FROM quests WHERE id=?', [id]);
+  const [quest] = await q('SELECT id, quest_group, main_no, main_title FROM quests WHERE id=?', [id]);
   const locked = quest ? await lockReason(user.id, quest.quest_group, quest.id) : null;
   if (locked) return bad(locked.replace('\n', ' '), 403);
 
@@ -57,15 +57,16 @@ export async function POST(request, { params }) {
   return ok({ correct: true, isFinal, awarded, alreadyCleared, mainCleared, mainNo: quest?.main_no ?? null });
 }
 
-// 한 이야기(main_no)에 묶인 미션을 모두 완수했는지 — 정기 그림을 보여줄 조건이다.
+// 한 이야기에 묶인 미션을 모두 완수했는지 — 정기 그림을 보여줄 조건이다.
+// 이야기 이름(main_title)으로 묶는다. 이름이 없는 미션은 정기를 주지 않는다.
 async function isMainCleared(userId, quest) {
-  if (!quest?.main_no) return false;
+  if (!quest?.main_title) return false;
   const [row] = await q(
     `SELECT COUNT(*) AS total, SUM(p.status='cleared') AS done
        FROM quests qq
        LEFT JOIN quest_progress p ON p.quest_id=qq.id AND p.user_id=?
-      WHERE qq.quest_group=? AND qq.main_no=?`,
-    [userId, quest.quest_group, quest.main_no]
+      WHERE qq.quest_group=? AND qq.main_title=?`,
+    [userId, quest.quest_group, quest.main_title]
   );
   return Number(row?.total) > 0 && Number(row?.done) === Number(row?.total);
 }
