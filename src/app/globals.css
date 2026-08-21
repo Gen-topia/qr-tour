@@ -32,8 +32,8 @@
      본문       14.5px / 400 / 회색   — 본문·헤드라인 설명 공통 */
   --t-head:     25px;
   --t-title:    20px;
-  --t-subtitle: 16.5px;
-  --t-body:     14.5px;
+  --t-subtitle: 20px;
+  --t-body:     15px;
   --t-small:    13px;      /* 배지·라벨 등 보조 */
   --tw-head:    500;
   --tw-title:   500;
