@@ -97,6 +97,7 @@ function Missions() {
           <section className="mq__intro">
             <h2 className="mq__introtitle">{g.title}</h2>
             <p className="mq__introdesc">{g.desc}</p>
+            <img className="mq__art" src={`/quest_${g.value}.png`} alt={`${g.label} 삽화`} />
           </section>
         )}
 
