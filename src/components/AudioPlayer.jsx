@@ -14,8 +14,14 @@ export default function AudioPlayer({ src }) {
     setMissing(false);
     const a = ref.current;
     if (!a) return;
+    let onFirstTouch = null;
     a.currentTime = 0;
-    a.play().catch(() => {});
+    a.play().catch(() => {
+      // 막혔으면 화면을 처음 건드리는 순간 흐르게 한다(단추를 누를 필요가 없다)
+      onFirstTouch = () => a.play().catch(() => {});
+      document.addEventListener('pointerdown', onFirstTouch, { once: true });
+    });
+    return () => { if (onFirstTouch) document.removeEventListener('pointerdown', onFirstTouch); };
   }, [src]);
 
   if (!src || missing) return null;

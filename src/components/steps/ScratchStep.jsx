@@ -20,7 +20,8 @@ export default function ScratchStep({ step, submit }) {
     <div className="card stack">
       <div className="eyebrow">미션 · 문지르기</div>
       <p className="muted" style={{ margin: 0 }}>손가락으로 문질러 가려진 그림을 드러내 주세요.</p>
-      <Scratch cover={cfg.cover_color || '#c9cede'} coverImage={cfg.cover_image_url} onProgress={onProgress}>
+      <Scratch cover={cfg.cover_color || '#c9cede'} coverImage={cfg.cover_image_url}
+               coverOpacity={Number(cfg.cover_opacity ?? 1)} onProgress={onProgress}>
         {cfg.reveal_image_url && !revealBroken
           ? <img className="scratch__under" src={cfg.reveal_image_url} alt=""
                  onError={() => setRevealBroken(true)} />
