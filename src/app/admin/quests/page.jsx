@@ -11,6 +11,7 @@ const SAMPLE = JSON.stringify([STEP_TYPES.story.sample, STEP_TYPES.quiz.sample],
 
 function Quests() {
   const [quests, setQuests] = useState([]);
+  const [open, setOpen] = useState(null);   // 앱 오픈 여부(null이면 확인 중)
   const [editing, setEditing] = useState(null);
   const [stepsText, setStepsText] = useState('');
   const [stepsErr, setStepsErr] = useState('');
@@ -18,6 +19,7 @@ function Quests() {
 
   async function load() { setQuests((await api.adminQuests()).quests); }
   useEffect(() => { load(); }, []);
+  useEffect(() => { api.adminSettings().then(r => setOpen(r.questOpen)).catch(() => {}); }, []);
 
   async function openEdit(qst) {
     setEditing(qst); setStepsErr('');
@@ -76,6 +78,10 @@ function Quests() {
     await api.adminPutSteps(id, steps);
     setEditing(null); load();
   }
+  async function toggleOpen() {
+    try { const r = await api.adminSetOpen(!open); setOpen(r.questOpen); }
+    catch (e) { alert(e.message); }
+  }
   async function remove(id) { if (confirm('삭제할까요?')) { await api.adminDeleteQuest(id); load(); } }
 
   return (
@@ -83,6 +89,20 @@ function Quests() {
       <div className="spread" style={{ marginBottom: 18 }}>
         <h1 style={{ margin: 0 }}>미션 관리</h1>
         <button className="btn sm" onClick={() => openEdit({ ...EMPTY, order_no: quests.length + 1 })}>+ 새 미션</button>
+      </div>
+
+      {/* 앱 전체 오픈 스위치 — 끄면 QR로 들어와도 '이용 가능한 기간이 아닙니다'가 뜬다 */}
+      <div className="card spread" style={{ marginBottom: 18 }}>
+        <div>
+          <div style={{ fontWeight: 700 }}>퀘스트 오픈</div>
+          <div className="muted" style={{ fontSize: 13 }}>
+            {open === null ? '확인하는 중…'
+              : open ? '참가자가 QR로 퀘스트를 진행할 수 있습니다.'
+                     : '참가자에게 «이용 가능한 기간이 아닙니다» 안내가 나갑니다.'}
+          </div>
+        </div>
+        <button className={`btn sm${open ? '' : ' ghost'}`} disabled={open === null}
+                onClick={toggleOpen}>{open ? '오픈 (1)' : '마감 (0)'}</button>
       </div>
       <table className="table">
         <thead><tr><th>순서</th><th>구분</th><th>제목</th><th>유형</th><th>코드(QR)</th><th>포인트</th><th>활성</th><th></th></tr></thead>

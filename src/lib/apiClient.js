@@ -29,4 +29,9 @@ export const api = {
   adminGetSteps: (id) => req(`/api/admin/quests/${id}/steps`, { admin: true }),
   adminPutSteps: (id, steps) => req(`/api/admin/quests/${id}/steps`, { method: 'PUT', body: { steps }, admin: true }),
   adminUsers: () => req('/api/admin/users', { admin: true }),
+
+  // 앱 오픈 여부
+  settings: () => req('/api/settings'),
+  adminSettings: () => req('/api/admin/settings', { admin: true }),
+  adminSetOpen: (questOpen) => req('/api/admin/settings', { method: 'PUT', body: { questOpen }, admin: true }),
 };
