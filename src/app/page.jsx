@@ -8,6 +8,7 @@ import Prologue from '@/components/Prologue';
 import Guide from '@/components/Guide';
 import PreQuest from '@/components/PreQuest';
 import Oath from '@/components/Oath';
+import Onboarding from '@/components/Onboarding';
 import TestJump from '@/components/TestJump';
 
 // 4. HOME 메뉴 — view는 전체화면으로 열고, to는 페이지로 이동한다
@@ -31,20 +32,27 @@ function MainInner() {
   const [preq, setPreq] = useState(false);  // 사전 퀘스트 안내 표시 여부
   const [oath, setOath] = useState(null);   // 서약을 받는 중인 로그인 수단
   const [jump, setJump] = useState(false);  // 테스트용 퀘스트 바로가기 패널
+  const [onboard, setOnboard] = useState(false); // 로그인 직후 순서 안내
   const params = useSearchParams();
   const next = params.get('next') || '/';
   const err = params.get('error');
   const signup = params.get('signup') === '1';   // 방금 가입한 수호자
 
-  // 수호자 서약을 막 마친 첫 가입이면 본 적 있는지와 무관하게 바로 띄운다.
-  // 그 외에는 계정마다 한 번만 띄운다(SSR에서 localStorage 금지).
+  // 로그인 후 첫 방문이면 안내를 띄운다.
+  // 프롤로그 → 지침서 → 사전 퀘스트 순서로 이어지고, 지침서를 닫는 순간 사전 퀘스트가 온다.
+  // (SSR에서 localStorage 금지)
   useEffect(() => {
     if (!ready || !isAuthed) return;
-    if (signup) { setPreq(true); return; }
     if (localStorage.getItem(PREQ_KEY(uuid))) return;
-    const t = setTimeout(() => setPreq(true), 700);
+    const t = setTimeout(() => setOnboard(true), 500);
     return () => clearTimeout(t);
   }, [ready, isAuthed, uuid, signup]);
+
+  // 지침서를 덮으면 순서의 마지막인 사전 퀘스트가 도착한다
+  const onGuideDone = () => {
+    setView(null);
+    if (!localStorage.getItem(PREQ_KEY(uuid))) setPreq(true);
+  };
 
   // 테스트용 — F1(맥은 Fn+F1)로 퀘스트 바로가기 패널을 연다.
   // 브라우저가 F1을 도움말로 가로채는 경우가 있어 잡아채는 단계(capture)에서 먼저 받고,
@@ -134,7 +142,7 @@ function MainInner() {
     <Prologue audioSrc="/prologue/prologue.mp3"
               onEnd={() => setView('guide')} onClose={() => setView(null)} />
   );
-  if (view === 'guide') return <Guide onDone={() => setView(null)} />;
+  if (view === 'guide') return <Guide onDone={onGuideDone} />;
 
   // 저장된 계정 정보를 지우고 로그인 화면으로(next 쿼리도 제거)
   const onLogout = () => { reset(); router.replace('/'); };
@@ -158,6 +166,11 @@ function MainInner() {
           <div className="grow" />
         </div>
         {/* 프롤로그·지침서를 보는 동안에는 소리가 겹치지 않게 띄우지 않는다 */}
+        {onboard && (
+          <Onboarding
+            onStart={() => { setOnboard(false); setView('prologue'); }}
+            onClose={() => setOnboard(false)} />
+        )}
         {preq && <PreQuest onDone={closePreq} />}
         {/* 테스트용 — F1(맥은 Fn+F1)로 연다 */}
         {jump && <TestJump onClose={() => setJump(false)} />}

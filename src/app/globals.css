@@ -303,6 +303,51 @@ h1 { font-size: 28px; font-weight: 800; margin: 8px 0 6px; letter-spacing: -.03e
 }
 .tj__title { flex: 1; min-width: 0; font-size: 14px; letter-spacing: -.01em; }
 
+/* 로그인 직후 순서 안내 */
+.ob {
+  position: fixed; inset: 0; z-index: 62; padding: 24px;
+  background: rgba(20,26,46,.45); display: grid; place-items: center;
+  animation: pq-fade .28s ease both;
+}
+.ob__card {
+  position: relative; width: 100%; max-width: 340px;
+  padding: 24px 22px 20px; border-radius: var(--radius);
+  background: rgba(255,255,255,.92); border: 1px solid rgba(255,255,255,.95);
+  box-shadow: 0 20px 50px rgba(20,26,46,.28);
+  backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px);
+}
+.ob__x {
+  position: absolute; top: 10px; right: 10px;
+  appearance: none; background: none; border: 0; cursor: pointer;
+  width: 32px; height: 32px; font-size: 14px; color: var(--c-body);
+}
+.ob__eyebrow {
+  font-size: var(--t-small); font-weight: var(--tw-title);
+  color: var(--lantern); letter-spacing: -.01em;
+}
+.ob__msg {
+  margin: 6px 0 18px; font-size: var(--t-subtitle); font-weight: var(--tw-title);
+  color: var(--c-ink); letter-spacing: var(--ls-head);
+}
+.ob__steps { list-style: none; margin: 0 0 22px; padding: 0; }
+.ob__steps li { display: flex; align-items: flex-start; gap: 12px; }
+.ob__steps li + li { margin-top: 12px; }
+.ob__no {
+  flex: none; width: 24px; height: 24px; border-radius: 50%;
+  display: grid; place-items: center;
+  background: var(--lantern); color: #fff;
+  font-size: 12px; font-weight: 700;
+}
+.ob__text { display: flex; flex-direction: column; gap: 2px; }
+.ob__text b {
+  font-size: var(--t-body); font-weight: var(--tw-title);
+  color: var(--c-ink); letter-spacing: var(--ls-body);
+}
+.ob__text i {
+  font-style: normal; font-size: var(--t-small);
+  color: var(--c-body); letter-spacing: var(--ls-body);
+}
+
 /* 안내 모달 (InfoModal) */
 .modal {
   position: fixed; inset: 0; z-index: 60; padding: 24px;
