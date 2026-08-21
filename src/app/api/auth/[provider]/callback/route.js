@@ -43,11 +43,13 @@ export async function GET(request, { params }) {
 
   // 이미 가입한 계정이면 기존 id를 그대로 반환(ON DUPLICATE KEY UPDATE + LAST_INSERT_ID)
   const r = await q(
-    `INSERT INTO users (uuid, provider, provider_id, nickname, email) VALUES (?, ?, ?, ?, ?)
+    `INSERT INTO users (uuid, provider, provider_id, nickname, email, phone) VALUES (?, ?, ?, ?, ?, ?)
      ON DUPLICATE KEY UPDATE id = LAST_INSERT_ID(id),
        nickname = COALESCE(VALUES(nickname), nickname),
-       email    = COALESCE(VALUES(email), email)`,
-    [randomUUID(), provider, profile.providerId, profile.nickname, profile.email || null]
+       email    = COALESCE(VALUES(email), email),
+       phone    = COALESCE(VALUES(phone), phone)`,
+    [randomUUID(), provider, profile.providerId, profile.nickname,
+     profile.email || null, profile.phone || null]
   );
   console.log(`[auth/${provider}/callback] users 저장 완료 — userId:`, r.insertId,
     '/ affectedRows:', r.affectedRows);

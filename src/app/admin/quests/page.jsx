@@ -66,7 +66,8 @@ function Quests() {
       ...(last.image_url ? { image_url: last.image_url } : {}),
       ...(last.hint_text ? { hint_text: last.hint_text } : {}),
       ...(last.hint_image_url ? { hint_image_url: last.hint_image_url } : {}),
-      type,
+      // 목록 이름과 실제 저장 유형이 다를 수 있다(예: 4지선다 → quiz)
+      type: STEP_TYPES[type].sample.type || type,
     };
     setStepsText(JSON.stringify(steps, null, 2));
     setStepsErr('');

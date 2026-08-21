@@ -1,15 +1,17 @@
 'use client';
 import { useState } from 'react';
 
-// 주관식 — 정답 입력 후 제출. 검증은 서버가 한다.
+// 퀴즈 — options가 있으면 보기에서 고르고, 없으면 직접 입력한다.
+// 정답 확인은 어느 쪽이든 서버가 한다.
 export default function QuizStep({ step, submit }) {
+  const options = Array.isArray(step.options) ? step.options : null;
   const [answer, setAnswer] = useState('');
   const [wrong, setWrong] = useState(false);
   const [busy, setBusy] = useState(false);
 
-  async function onSubmit() {
+  async function send(value) {
     setBusy(true); setWrong(false);
-    const ok = await submit(answer);
+    const ok = await submit(value);
     if (!ok) setWrong(true);
     setBusy(false);
   }
@@ -18,9 +20,27 @@ export default function QuizStep({ step, submit }) {
     <div className="card stack">
       <div className="eyebrow">미션 · 퀴즈</div>
       <p style={{ margin: 0 }}>{step.question}</p>
-      <input className="input" value={answer} onChange={e => { setAnswer(e.target.value); setWrong(false); }}
-        placeholder="정답 입력" onKeyDown={e => e.key === 'Enter' && answer.trim() && !busy && onSubmit()} />
-      <button className="btn" disabled={busy || !answer.trim()} onClick={onSubmit}>제출</button>
+
+      {options ? (
+        <div className="choice">
+          {options.map((opt, i) => (
+            <button key={opt} type="button" className="choice__item"
+                    disabled={busy} onClick={() => send(opt)}>
+              <span className="choice__no">{i + 1}</span>
+              <span>{opt}</span>
+            </button>
+          ))}
+        </div>
+      ) : (
+        <>
+          <input className="input" value={answer}
+                 onChange={e => { setAnswer(e.target.value); setWrong(false); }}
+                 placeholder="정답 입력"
+                 onKeyDown={e => e.key === 'Enter' && answer.trim() && !busy && send(answer)} />
+          <button className="btn" disabled={busy || !answer.trim()} onClick={() => send(answer)}>제출</button>
+        </>
+      )}
+
       {wrong && <p style={{ color: 'var(--talisman)', margin: 0 }}>정답이 아니에요. 다시 시도해 보세요.</p>}
     </div>
   );

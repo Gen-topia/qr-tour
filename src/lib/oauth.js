@@ -7,14 +7,16 @@ export const PROVIDERS = {
     authUrl: 'https://kauth.kakao.com/oauth/authorize',
     tokenUrl: 'https://kauth.kakao.com/oauth/token',
     profileUrl: 'https://kapi.kakao.com/v2/user/me',
-    scope: 'profile_nickname account_email',
+    scope: 'profile_nickname account_email phone_number',
     clientId: () => process.env.KAKAO_REST_API_KEY,
     clientSecret: () => process.env.KAKAO_CLIENT_SECRET || '',
-    // 응답: { id: 1234567890, kakao_account: { email, profile: { nickname } } }
+    // 응답: { id: 1234567890, kakao_account: { email, phone_number, profile: { nickname } } }
+    // 전화번호는 "+82 10-1234-5678" 꼴로 온다
     parseProfile: (d) => ({
       providerId: String(d.id),
       nickname: d.kakao_account?.profile?.nickname || null,
       email: d.kakao_account?.email || null,
+      phone: d.kakao_account?.phone_number || null,
     }),
   },
   naver: {
@@ -25,11 +27,12 @@ export const PROVIDERS = {
     scope: '',
     clientId: () => process.env.NAVER_CLIENT_ID,
     clientSecret: () => process.env.NAVER_CLIENT_SECRET || '',
-    // 응답: { resultcode: '00', response: { id, nickname, email, ... } }
+    // 응답: { resultcode: '00', response: { id, nickname, email, mobile, ... } }
     parseProfile: (d) => ({
       providerId: String(d.response?.id || ''),
       nickname: d.response?.nickname || null,
       email: d.response?.email || null,
+      phone: d.response?.mobile || d.response?.mobile_e164 || null,
     }),
   },
 };

@@ -8,7 +8,7 @@ const inter = Inter({ subsets: ['latin'], weight: ['400', '500', '700', '800'], 
 const notoKr = Noto_Sans_KR({ subsets: ['latin'], weight: ['400', '500', '700', '800'], variable: '--font-noto-kr', display: 'swap' });
 
 export const metadata = {
-  title: '이야기 미션 투어',
+  title: '제주 이야기 미션 투어',
   description: 'QR 미션 모바일 웹 투어 게임',
 };
 export const viewport = {
