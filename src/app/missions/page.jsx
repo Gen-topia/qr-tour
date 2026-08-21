@@ -29,6 +29,18 @@ function QuestImage({ group, done, label }) {
   );
 }
 
+// 퀘스트 삽화 — public/quest_{퀘스트번호}.png
+// 탭을 바꾸면 새 그림이 다 실릴 때까지 이전 그림이 남지 않게 감춰 둔다.
+function QuestArt({ group, label }) {
+  const [loaded, setLoaded] = useState(false);
+  const src = `/quest_${group}.png`;
+  useEffect(() => { setLoaded(false); }, [src]);
+  return (
+    <img key={src} className={`mq__art${loaded ? ' is-on' : ''}`} src={src}
+         alt={`${label} 삽화`} onLoad={() => setLoaded(true)} />
+  );
+}
+
 // 서브 퀘스트(QR)를 메인 퀘스트별로 묶는다. QR은 미션마다 따로이고,
 // 한 메인 퀘스트에 속한 미션을 모두 깨야 그 퀘스트가 완수된다.
 function toMains(list) {
@@ -97,7 +109,7 @@ function Missions() {
           <section className="mq__intro">
             <h2 className="mq__introtitle">{g.title}</h2>
             <p className="mq__introdesc">{g.desc}</p>
-            <img className="mq__art" src={`/quest_${g.value}.png`} alt={`${g.label} 삽화`} />
+            <QuestArt group={g.value} label={g.label} />
           </section>
         )}
 

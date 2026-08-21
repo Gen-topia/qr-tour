@@ -1064,11 +1064,15 @@ h1 { font-size: 28px; font-weight: 800; margin: 8px 0 6px; letter-spacing: -.03e
   font-size: var(--t-body); line-height: var(--lh-body);
   color: var(--c-body); letter-spacing: var(--ls-body);
 }
-/* 퀘스트 삽화 — public/quest_{번호}.png */
+/* 퀘스트 삽화 — public/quest_{번호}.png. 원본(768×1376) 높이의 60%만 가운데로 잘라 보여준다 */
 .mq__art {
-  display: block; width: 100%; height: auto; margin: 14px 0 0;
+  display: block; width: 100%; margin: 14px 0 0;
+  aspect-ratio: 768 / 826; object-fit: cover; object-position: center;
   border-radius: var(--radius); box-shadow: var(--shadow);
+  opacity: 0; transition: opacity .22s ease;
 }
+/* 탭을 바꾸면 새 그림이 다 실린 뒤에 나타난다 */
+.mq__art.is-on { opacity: 1; }
 
 /* 아코디언 행에 붙는 진행 수 */
 .mq__count {
