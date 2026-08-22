@@ -45,8 +45,7 @@ function CodeMap() {
           </p>
         </header>
 
-        {/* 추후 지도 일러스트로 교체할 자리 */}
-        <div className="cm__art">지도 삽입</div>
+        <img className="cm__art" src="/map.png" alt="파수꾼 코드가 있는 장소를 표시한 지도" />
 
         {SPOT_GROUPS.map(g => (
           <section key={g.group} className="cm__group">
