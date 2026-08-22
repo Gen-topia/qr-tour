@@ -226,9 +226,10 @@ h1 { font-size: 28px; font-weight: 800; margin: 8px 0 6px; letter-spacing: -.03e
 
 /* 가려진 힌트 — 하얀 입김을 문질러 지우면 그림과 글이 함께 드러난다 */
 /* 미션 첫 장 — 수호자 지침서와 같은 톤. 제목은 가볍게, 본문은 옅고 넉넉하게 */
-.qintro h1 {
+/* 제목 크기는 어느 장에서나 같게 둔다(장마다 커졌다 작아지지 않도록) */
+.qpage h1 {
   margin: 18px 0 14px;
-  font-size: var(--t-head); font-weight: var(--tw-head);
+  font-size: 20px; font-weight: var(--tw-head);
   letter-spacing: var(--ls-head); color: var(--c-ink);
 }
 .qintro > p {
