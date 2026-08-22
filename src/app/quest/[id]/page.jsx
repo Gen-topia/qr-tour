@@ -156,8 +156,8 @@ function Quest() {
                  fallback={isIntro ? (quest?.cover_image_url || `/quest_intro_${id}.png`) : null} />
       {step.body_text && <p style={{ whiteSpace: 'pre-wrap' }}>{step.body_text}</p>}
       <AudioPlayer src={step.audio_url} />
-      {/* 퀴즈는 제출 단추 바로 위에 힌트를 두므로 여기서는 그리지 않는다 */}
-      {step.type !== 'quiz' && <HintModal hint={step.hint_text} image={step.hint_image_url} />}
+      {/* 문제 푸는 장은 하단 이동 단추 줄에 힌트를 두므로 여기서는 그리지 않는다 */}
+      {!Play && <HintModal hint={step.hint_text} image={step.hint_image_url} />}
       {/* 나레이션 영상은 미션 첫 장에서만 안내한다 */}
       {idx === 0 && quest?.narration_video && (
         <button className="btn ghost" onClick={() => setNarration(true)}>▶ 나레이션 보기</button>
@@ -187,6 +187,7 @@ function Quest() {
       {Play && (
         <div className="qnav">
           <button type="button" className="btn ghost" onClick={prev} disabled={idx === 0}>이전으로</button>
+          <HintModal hint={step.hint_text} image={step.hint_image_url} className="btn outline" />
           <button type="button" className="btn ghost" onClick={() => router.replace('/')}>메인으로</button>
         </div>
       )}

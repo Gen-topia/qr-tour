@@ -449,16 +449,18 @@ h1 { font-size: 28px; font-weight: 800; margin: 8px 0 6px; letter-spacing: -.03e
   touch-action: none;                    /* 드래그 중 화면이 따라 스크롤되지 않게 */
 }
 .clr__bg { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+/* 조각은 투명 PNG라 판을 덮지 않는다 — 배경 사진이 조각 사이로 그대로 비친다.
+   들어 올린 느낌은 네모난 그림자 대신 그림 모양을 따라가는 drop-shadow로 준다 */
 .clr__piece {
   position: absolute; width: 50%; height: 50%;
-  display: grid; place-items: center; overflow: hidden;
-  background: var(--surface); box-shadow: 0 6px 16px rgba(90,84,160,.22);
+  display: grid; place-items: center;
   cursor: grab; touch-action: none; user-select: none; -webkit-user-select: none;
-  transition: left .16s ease, top .16s ease, box-shadow .16s ease;
+  transition: left .16s ease, top .16s ease, filter .16s ease;
 }
-.clr__piece img { width: 100%; height: 100%; object-fit: cover; display: block; pointer-events: none; }
-.clr__piece--drag { z-index: 3; transition: none; cursor: grabbing; box-shadow: 0 12px 26px rgba(90,84,160,.32); }
-.clr__num { font-size: 28px; font-weight: 800; color: var(--text-dim); }
+.clr__piece img { width: 100%; height: 100%; object-fit: contain; display: block; pointer-events: none; }
+.clr__piece--drag { z-index: 3; transition: none; cursor: grabbing; filter: drop-shadow(0 10px 16px rgba(20,26,46,.38)); }
+/* 조각 그림이 없을 때 뜨는 번호 — 배경 사진 위에서도 읽히게 그림자를 준다 */
+.clr__num { font-size: 28px; font-weight: 800; color: #fff; text-shadow: 0 2px 8px rgba(20,26,46,.65); }
 
 /* 문지르기: 아래 그림 위에 캔버스 덮개 */
 .scratch { position: relative; width: 100%; aspect-ratio: 1 / 1; border-radius: 12px; overflow: hidden; }

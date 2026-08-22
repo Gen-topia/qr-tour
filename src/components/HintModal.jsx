@@ -3,7 +3,7 @@ import { useState } from 'react';
 
 // 스텝에 적어둔 힌트(글·그림)를 모달로 보여준다.
 // 힌트 그림은 정답이 한눈에 드러나지 않게 작게 띄우고, 눌러야 크게 본다.
-export default function HintModal({ hint, image }) {
+export default function HintModal({ hint, image, className = 'btn ghost' }) {
   const [open, setOpen] = useState(false);
   const [zoom, setZoom] = useState(false);
   if (!hint && !image) return null;
@@ -11,7 +11,7 @@ export default function HintModal({ hint, image }) {
   const close = () => { setZoom(false); setOpen(false); };
   return (
     <>
-      <button className="btn ghost" onClick={() => setOpen(true)}>힌트 보기</button>
+      <button type="button" className={className} onClick={() => setOpen(true)}>힌트 보기</button>
       {open && (
         <div onClick={close} style={{ position: 'fixed', inset: 0, background: 'rgba(20,26,46,.35)', display: 'grid', placeItems: 'center', padding: 24, zIndex: 50 }}>
           <div className="card stack" style={{ maxWidth: 340 }} onClick={e => e.stopPropagation()}>
