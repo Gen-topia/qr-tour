@@ -59,11 +59,16 @@ export default function GaugeStep({ step, submit }) {
       <p className="muted" style={{ margin: 0 }}>
         {cfg.label || (invert ? '위에서 아래로 끝까지 끌어내려 주세요.' : '아래에서 위로 끝까지 밀어 올려주세요.')}
       </p>
-      <div ref={trackRef} className={`vgauge${invert ? ' vgauge--invert' : ''}`}
+      <div ref={trackRef}
+        className={`vgauge${invert ? ' vgauge--invert' : ''}${cfg.bg_image_url ? ' vgauge--art' : ''}`}
         onMouseDown={start} onMouseMove={move} onMouseUp={end} onMouseLeave={end}
         onTouchStart={start} onTouchMove={move} onTouchEnd={end}>
         {cfg.bg_image_url && <img className="vgauge__bg" src={cfg.bg_image_url} alt="" />}
-        <div className="vgauge__fill" style={{ height: `${value * 100}%` }} />
+        {/* 채우는 그림이 있으면 아래에서부터 차오르게 잘라 보여준다(항아리에 물 붓듯) */}
+        {cfg.fill_image_url
+          ? <img className="vgauge__water" src={cfg.fill_image_url} alt=""
+                 style={{ clipPath: `inset(${(1 - value) * 100}% 0 0 0)` }} />
+          : <div className="vgauge__fill" style={{ height: `${value * 100}%` }} />}
 
         {/* 기압표 눈금 — 위가 scale_top, 아래가 scale_bottom */}
         {scaled && (

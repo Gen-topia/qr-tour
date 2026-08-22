@@ -501,21 +501,31 @@ h1 { font-size: 28px; font-weight: 800; margin: 8px 0 6px; letter-spacing: -.03e
   transition: height .08s linear;
 }
 .vgauge__label {
-  position: absolute; inset: 0; display: grid; place-items: center;
+  position: absolute; inset: 0; display: grid; place-items: center; z-index: 3;
   font-weight: 800; font-size: 18px; color: var(--text);
 }
 .vgauge__arrow {
-  position: absolute; left: 0; right: 0; bottom: 10px; text-align: center;
+  position: absolute; left: 0; right: 0; bottom: 10px; text-align: center; z-index: 3;
   font-size: 20px; color: var(--text-dim); animation: nudge 1.6s ease-in-out infinite;
 }
 
 /* 거꾸로 게이지(기압 내리기) — 붉은 열기가 그림을 덮고 있고, 수위를 아래로 끌어내려 걷어낸다.
-   덮개는 눈금과 같이 아래쪽에서 높이를 재므로, 내릴수록 그림이 위에서부터 드러난다 */
-.vgauge--invert {
+   덮개는 눈금과 같이 아래쪽에서 높이를 재므로, 내릴수록 그림이 위에서부터 드러난다.
+   그림을 깐 게이지(--art)도 같은 판을 쓴다 */
+.vgauge--invert,
+.vgauge--art {
   height: auto; aspect-ratio: 3 / 4;
   border: 0; background: var(--surface-2);
 }
 .vgauge__bg { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+/* 차오르는 그림 — 아래에서 위로 드러난다 */
+.vgauge__water {
+  position: absolute; inset: 0; width: 100%; height: 100%;
+  object-fit: cover; z-index: 1;
+  transition: clip-path .08s linear;
+}
+.vgauge--art .vgauge__label,
+.vgauge--art .vgauge__arrow { color: #fff; text-shadow: 0 2px 8px rgba(0,0,0,.5); }
 .vgauge--invert .vgauge__fill {
   background: linear-gradient(180deg, rgba(214,40,40,.78), rgba(247,127,0,.45));
 }
