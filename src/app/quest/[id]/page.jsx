@@ -248,6 +248,10 @@ function ResultView({ result, quest, onHome, onQuestList, onScan }) {
           <button className="btn" onClick={heroLabel ? onQuestList : toScan ? onScan : onHome}>
             {heroLabel || (toScan ? '코드 탐색' : '메인으로')}
           </button>
+          {/* 주 단추가 메인으로가 아닐 때만 빠져나갈 길을 하나 더 둔다 */}
+          {(heroLabel || toScan) && (
+            <button type="button" className="btn outline" onClick={onHome}>이전으로</button>
+          )}
         </div>
       </div>
     </div>
