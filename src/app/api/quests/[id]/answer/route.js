@@ -23,7 +23,7 @@ function judge(step, answer) {
     const diff = Math.abs(((angle - target + 540) % 360) - 180);
     return diff <= tol;
   }
-  // puzzle · scratch · gauge — 클라이언트가 완료를 판정한다
+  // puzzle · clear · scratch · gauge — 클라이언트가 완료를 판정한다
   // story — 읽는 것으로 끝나는 미션(QR을 비추면 성공)이라 완료 신호만 받는다
   return answer?.done === true;
 }

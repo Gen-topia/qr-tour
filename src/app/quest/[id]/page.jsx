@@ -12,11 +12,12 @@ import Prologue from '@/components/Prologue';
 import Sparkle from '@/components/Sparkle';
 import QuizStep from '@/components/steps/QuizStep';
 import PuzzleStep from '@/components/steps/PuzzleStep';
+import ClearStep from '@/components/steps/ClearStep';
 import ScratchStep from '@/components/steps/ScratchStep';
 import GaugeStep from '@/components/steps/GaugeStep';
 import DialStep from '@/components/steps/DialStep';
 
-const PLAY_COMPONENTS = { quiz: QuizStep, puzzle: PuzzleStep, scratch: ScratchStep, gauge: GaugeStep, dial: DialStep };
+const PLAY_COMPONENTS = { quiz: QuizStep, puzzle: PuzzleStep, clear: ClearStep, scratch: ScratchStep, gauge: GaugeStep, dial: DialStep };
 
 // 장에 붙는 그림 — 그 장에 적어둔 주소를 먼저 쓰고,
 // 없으면 첫 장에 한해 관리툴의 '첫 페이지 이미지 URL'을,

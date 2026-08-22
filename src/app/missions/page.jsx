@@ -5,6 +5,7 @@ import Protected from '@/components/Protected';
 import { api } from '@/lib/apiClient';
 import Loading from '@/components/Loading';
 import SheetNav from '@/components/SheetNav';
+import InfoModal from '@/components/InfoModal';
 import Sparkle from '@/components/Sparkle';
 import { QUEST_TABS, QUEST_REQUIRES, groupLabel } from '@/lib/questGroups';
 
@@ -41,6 +42,16 @@ function QuestArt({ group, label }) {
   );
 }
 
+// 하늘 문 열쇠 — public/sky_key.png. 파일이 없으면 글만 남는다.
+function KeyImage() {
+  const [failed, setFailed] = useState(false);
+  if (failed) return null;
+  return <img className="skykey__img" src="/sky_key.png" alt="하늘 문 열쇠" onError={() => setFailed(true)} />;
+}
+
+// 짧은 효과음 — public/audio/quest1-clear/{이름}.wav
+const playSfx = (name) => { new Audio(`/audio/quest1-clear/${name}.wav`).play().catch(() => {}); };
+
 // 서브 퀘스트(QR)를 메인 퀘스트별로 묶는다. QR은 미션마다 따로이고,
 // 한 메인 퀘스트에 속한 미션을 모두 깨야 그 퀘스트가 완수된다.
 function toMains(list) {
@@ -61,6 +72,8 @@ function Missions() {
   const wanted = QUEST_TABS.findIndex(t => String(t.value) === asked);
   const [tab, setTab] = useState(wanted < 0 ? 0 : wanted);   // QUEST_TABS의 인덱스
   const [open, setOpen] = useState(null);     // 펼쳐 둔 메인 퀘스트 키
+  // 복숭아 따기 연출 — '' → picking(나무가 스러진다) → key(열쇠) → quest3(열림 안내)
+  const [phase, setPhase] = useState('');
   const router = useRouter();
   useEffect(() => { api.myMissions().then(setData).catch(e => setErr(e.message)); }, []);
 
@@ -77,6 +90,21 @@ function Missions() {
   const need = needGroup ? data.quests.filter(q => q.quest_group === needGroup) : [];
   const needDone = need.filter(q => q.cleared).length;
   const openable = need.length === 0 || needDone >= need.length;
+
+  // 퀘스트1을 모두 완수했는데 아직 열쇠를 얻지 않았다면, 나무의 복숭아를 딸 수 있다
+  const canPick = g.value === 1 && mains.length > 0 && mainsDone === mains.length && !data.skyKey;
+
+  // 복숭아 따기 — 띠링(pick) 하고 나무가 스러진 뒤 열쇠(key)가 뜬다
+  const pickPeach = async () => {
+    if (phase) return;
+    setPhase('picking');
+    playSfx('pick');
+    try {
+      await api.claimSkyKey();
+      setData(d => ({ ...d, skyKey: true }));
+    } catch (e) { setErr(e.message); return; }
+    setTimeout(() => { playSfx('key'); setPhase('key'); }, 900);
+  };
 
   return (
     <div className="onboard sheet gd mq">
@@ -112,11 +140,21 @@ function Missions() {
           <section className="mq__intro">
             <h2 className="mq__introtitle">{g.title}</h2>
             <p className="mq__introdesc">{g.desc}</p>
-            <QuestArt group={g.value} label={g.label} />
+            {(g.value !== 3 || data.skyKey) && <QuestArt group={g.value} label={g.label} />}
           </section>
         )}
 
-        <QuestImage group={g.value} done={mainsDone} label={g.label} />
+        {canPick ? (
+          <button type="button" className={`peach${phase === 'picking' ? ' is-picking' : ''}`}
+                  onClick={pickPeach} disabled={!!phase}>
+            <QuestImage group={g.value} done={mainsDone} label={g.label} />
+            <span className="peach__hint">복숭아를 터치하세요</span>
+          </button>
+        ) : (
+          <QuestImage group={g.value} done={mainsDone} label={g.label} />
+        )}
+
+        {g.value === 1 && data.skyKey && <p className="qkey">하늘 문 열쇠를 얻었습니다.</p>}
 
         {need.length > 0 && (
           <p className={`qreq${openable ? ' qreq--open' : ''}`}>
@@ -169,6 +207,23 @@ function Missions() {
           {mains.length === 0 && <p className="muted" style={{ padding: '18px 0' }}>아직 퀘스트가 없어요.</p>}
         </div>
       </div>
+
+      {phase === 'key' && (
+        <InfoModal eyebrow="퀘스트1 완수" title="하늘 문 열쇠를 얻었습니다"
+                   confirmLabel="확인" onClose={() => setPhase('quest3')}>
+          <KeyImage />
+          <p style={{ margin: '10px 0 0' }}>
+            유산의 정기로 열린 복숭아가 하늘 문 열쇠가 되었습니다.
+          </p>
+        </InfoModal>
+      )}
+      {phase === 'quest3' && (
+        <InfoModal eyebrow="새로운 여정" title="퀘스트3이 열렸습니다"
+                   confirmLabel="하늘 문으로"
+                   onClose={() => { setPhase(''); setOpen(null); setTab(QUEST_TABS.findIndex(t => t.value === 3)); }}>
+          하늘 문을 열고, 사라진 일만 팔천 신들을 되찾아 주세요.
+        </InfoModal>
+      )}
 
       <SheetNav />
     </div>

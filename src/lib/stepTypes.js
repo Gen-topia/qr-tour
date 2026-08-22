@@ -31,6 +31,15 @@ export const STEP_TYPES = {
       config: { pieces: ['/puzzle/1.jpg', '/puzzle/2.jpg', '/puzzle/3.jpg', '/puzzle/4.jpg'] },
     },
   },
+  clear: {
+    label: '걷어내기(4조각)',
+    hint: '배경 사진을 덮은 네 조각을 판 바깥으로 끌어내면 성공. background_url은 밑에 깔 사진, '
+        + 'pieces는 그 위를 덮는 조각으로 좌상·우상·좌하·우하 순서(비우면 1~4 숫자가 뜬다)',
+    sample: {
+      type: 'clear', title: '덮인 것을 걷어내기',
+      config: { background_url: '/clear/bg.png', pieces: [] },
+    },
+  },
   scratch: {
     label: '문지르기',
     hint: '화면을 문질러 덮개를 지우면 성공',
@@ -63,6 +72,6 @@ export const STEP_TYPES = {
 export const SERVER_VERIFIED = ['quiz', 'dial'];
 
 // 클라이언트 조작만으로 통과할 수 있는 유형(= 완료 신호를 신뢰하는 유형)
-export const CLIENT_COMPLETED = ['puzzle', 'scratch', 'gauge'];
+export const CLIENT_COMPLETED = ['puzzle', 'clear', 'scratch', 'gauge'];
 
 export const isPlayable = (type) => type in STEP_TYPES && type !== 'story' && type !== 'photo';

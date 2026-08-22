@@ -21,6 +21,7 @@ export const api = {
   questSteps: (id) => req(`/api/quests/${id}/steps`),
   submitAnswer: (id, stepId, answer) => req(`/api/quests/${id}/answer`, { method: 'POST', body: { stepId, answer } }),
   myMissions: () => req('/api/me/missions'),
+  claimSkyKey: () => req('/api/me/key', { method: 'POST' }),
   adminLogin: (username, password) => req('/api/admin/login', { method: 'POST', body: { username, password } }),
   adminQuests: () => req('/api/admin/quests', { admin: true }),
   adminCreateQuest: (b) => req('/api/admin/quests', { method: 'POST', body: b, admin: true }),

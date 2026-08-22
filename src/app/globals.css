@@ -442,6 +442,24 @@ h1 { font-size: 28px; font-weight: 800; margin: 8px 0 6px; letter-spacing: -.03e
 }
 @keyframes jigdone { from { opacity: 0 } to { opacity: 1 } }
 
+/* 걷어내기: 배경 사진을 덮은 네 조각을 판 바깥으로 끌어낸다 */
+.clr {
+  position: relative; width: 100%; aspect-ratio: 1 / 1;
+  border-radius: 14px; background: var(--surface-2); overflow: hidden;
+  touch-action: none;                    /* 드래그 중 화면이 따라 스크롤되지 않게 */
+}
+.clr__bg { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.clr__piece {
+  position: absolute; width: 50%; height: 50%;
+  display: grid; place-items: center; overflow: hidden;
+  background: var(--surface); box-shadow: 0 6px 16px rgba(90,84,160,.22);
+  cursor: grab; touch-action: none; user-select: none; -webkit-user-select: none;
+  transition: left .16s ease, top .16s ease, box-shadow .16s ease;
+}
+.clr__piece img { width: 100%; height: 100%; object-fit: cover; display: block; pointer-events: none; }
+.clr__piece--drag { z-index: 3; transition: none; cursor: grabbing; box-shadow: 0 12px 26px rgba(90,84,160,.32); }
+.clr__num { font-size: 28px; font-weight: 800; color: var(--text-dim); }
+
 /* 문지르기: 아래 그림 위에 캔버스 덮개 */
 .scratch { position: relative; width: 100%; aspect-ratio: 1 / 1; border-radius: 12px; overflow: hidden; }
 /* 덮개 그림과 어긋나지 않도록 여백 없이 꽉 채운다(가운데 기준으로 잘린다) */
@@ -1165,3 +1183,32 @@ h1 { font-size: 28px; font-weight: 800; margin: 8px 0 6px; letter-spacing: -.03e
   display: block; width: 50%; height: auto; margin: 0 auto;
   border-radius: var(--radius); box-shadow: var(--shadow);
 }
+
+/* 퀘스트1을 다 깨면 나무의 복숭아를 따서 하늘 문 열쇠를 얻는다 */
+.peach {
+  display: block; width: 100%; padding: 0; border: 0; background: none;
+  cursor: pointer; -webkit-tap-highlight-color: transparent;
+}
+.peach .qhero { transition: opacity .8s ease, transform .8s ease; }
+.peach.is-picking .qhero { opacity: 0; transform: scale(.92); }
+.peach__hint {
+  display: block; margin: 12px auto 0; width: fit-content;
+  padding: 9px 16px; border-radius: var(--radius-pill);
+  font-size: 13px; font-weight: 600; letter-spacing: -.01em;
+  background: rgba(204,108,152,.12); color: var(--lantern-dim);
+  animation: peach-pulse 1.6s ease-in-out infinite;
+}
+.peach.is-picking .peach__hint { opacity: 0; transition: opacity .3s ease; animation: none; }
+@keyframes peach-pulse { 0%,100% { transform: scale(1); opacity: .75 } 50% { transform: scale(1.05); opacity: 1 } }
+
+/* 열쇠를 얻은 뒤 퀘스트1 화면에 남는 표시 */
+.qkey {
+  margin: 14px 0 0; padding: 11px 14px; border-radius: 12px; text-align: center;
+  font-size: 13px; line-height: 1.6; letter-spacing: -.01em;
+  background: rgba(204,108,152,.08); border: 1px solid rgba(204,108,152,.24);
+  color: var(--lantern-dim);
+}
+.qkey::before { content: '🔑 '; }
+
+/* 열쇠 획득 안내에 얹는 그림 — public/sky_key.png */
+.skykey__img { display: block; width: 56%; height: auto; margin: 0 auto; }
