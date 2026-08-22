@@ -6,7 +6,7 @@ import Loading from '@/components/Loading';
 import SheetNav from '@/components/SheetNav';
 import Sparkle from '@/components/Sparkle';
 import { api } from '@/lib/apiClient';
-import { SPOT_GROUPS } from '@/lib/spots';
+import { SPOT_GROUPS, naverMapUrl } from '@/lib/spots';
 
 function CodeMap() {
   const [quests, setQuests] = useState(null);
@@ -83,6 +83,8 @@ function CodeMap() {
                           {s.hours && <><dt>운영</dt><dd>{s.hours}</dd></>}
                           {s.tel && <><dt>문의</dt><dd><a href={`tel:${s.tel}`}>{s.tel}</a></dd></>}
                         </dl>
+                        <a className="btn sm outline cm__link" href={naverMapUrl(s)}
+                           target="_blank" rel="noreferrer">네이버 지도로 보기</a>
                         {s.notes?.map(n => <p key={n} className="cm__note">※ {n}</p>)}
                         {s.link && (
                           <a className="btn sm cm__link" href={s.link.url} target="_blank" rel="noreferrer">

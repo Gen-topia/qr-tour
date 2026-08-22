@@ -5,7 +5,7 @@ export const SPOT_GROUPS = [
     group: '수호 본부',
     items: [
       { code: 'hyangsadang', name: '향사당',
-        address: '제주 제주시 삼도이동 향사당',
+        address: '제주 제주시 삼도이동 향사당', map: '제주 향사당',
         hours: '매일 09:00 ~ 18:00' },
     ],
   },
@@ -13,15 +13,15 @@ export const SPOT_GROUPS = [
     group: '퀘스트1',
     items: [
       { code: 'gwandeokjeong', name: '관덕정 & 제주목 관아',
-        address: '제주 제주시 관덕로 19 / 제주 제주시 관덕로 25 (삼도이동)',
+        address: '제주 제주시 관덕로 19 / 제주 제주시 관덕로 25 (삼도이동)', map: '제주목 관아',
         hours: '매일 09:00 ~ 18:00', tel: '064-710-6717',
         notes: ['입장료 : 어른 1,500원 / 청소년·군인 800원 / 어린이 400원'] },
       { code: 'suwolbong', name: '수월봉',
-        address: '제주 제주시 한경면 고산리' },
+        address: '제주 제주시 한경면 고산리', map: '수월봉' },
       { code: 'cheonggulmul', name: '청굴물',
-        address: '제주 제주시 구좌읍 김녕로1길 75-1' },
+        address: '제주 제주시 구좌읍 김녕로1길 75-1', map: '청굴물' },
       { code: 'bijarim', name: '평대리 비자나무 숲',
-        address: '제주 제주시 구좌읍 비자숲길 55',
+        address: '제주 제주시 구좌읍 비자숲길 55', map: '제주 비자림',
         hours: '매일 09:00 ~ 18:00', tel: '064-710-7912',
         notes: ['입장료 : 일반 3,000원 / 청소년 1,500원 / 어린이 1,500원'] },
     ],
@@ -31,10 +31,10 @@ export const SPOT_GROUPS = [
     items: [
       { code: 'suligneunjip', name: '제주술익는집',
         sub: '',
-        address: '제주 서귀포시 표선면 중산간동로 4726',
+        address: '제주 서귀포시 표선면 중산간동로 4726', map: '제주술익는집',
         hours: '월-토 10:30 ~ 17:00 / 일 12:00 ~ 17:00', tel: '064-787-5046' },
       { code: 'manjanggul', name: '만장굴',
-        address: '제주 제주시 구좌읍 만장굴길 182',
+        address: '제주 제주시 구좌읍 만장굴길 182', map: '만장굴',
         hours: '매일 09:00 ~ 18:00 (17:00 입장 마감)', tel: '064-710-7903',
         notes: ['휴관일 : 매월 첫째 수요일',
                 '입장료 : 성인 4,000원 / 군인·청소년 2,000원 / 어린이 2,000원'] },
@@ -45,12 +45,16 @@ export const SPOT_GROUPS = [
     items: [
       { code: 'singyemul', name: '싱계물공원',
         sub: '신창 풍차해안 공영주차장',
-        address: '제주 제주시 한경면 신창리 1322-1',
+        address: '제주 제주시 한경면 신창리 1322-1', map: '싱계물공원',
         notes: ['방문 전 당일 물때표(간조 시간)를 꼭 확인하세요!'],
         link: { label: '물때표 확인하기', url: 'https://www.badatime.com/67/daily/2026-08' } },
     ],
   },
 ];
+
+// 네이버 지도 검색 주소 — map에 적어둔 검색어로 찾고, 없으면 장소 이름으로 찾는다
+export const naverMapUrl = (spot) =>
+  `https://map.naver.com/p/search/${encodeURIComponent(spot.map || spot.name)}`;
 
 // 관리자 미션 편집의 장소 선택용
 export const SPOT_OPTIONS = SPOT_GROUPS.flatMap(g => g.items.map(s => ({ code: s.code, name: s.name })));

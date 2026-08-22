@@ -72,13 +72,14 @@ function Quest() {
   }, [id, steps, result]);
 
   const stepId = steps?.[idx]?.id;
+  const stepNo = steps?.[idx]?.step_no;   // id가 바뀌어도 장 번호로 찾을 수 있게 함께 보낸다
   const isLastStep = steps ? idx >= steps.length - 1 : false;
 
   // 모든 유형이 공유하는 제출 — 통과했으면 true를 돌려준다.
   // silent를 주면 마지막 장이라도 완료 화면을 띄우지 않는다(바로 다른 곳으로 보낼 때 쓴다)
   const submit = useCallback(async (payload, silent = false) => {
     try {
-      const r = await api.submitAnswer(id, stepId, payload);
+      const r = await api.submitAnswer(id, stepId, payload, stepNo);
       if (!r.correct) return false;
       if (r.isFinal) {
         if (!silent) setResult({ awarded: r.awarded, alreadyCleared: r.alreadyCleared,
@@ -86,7 +87,7 @@ function Quest() {
       } else setIdx(i => i + 1);
       return true;
     } catch (e) { setErr(e.message); return false; }
-  }, [id, stepId]);
+  }, [id, stepId, stepNo]);
 
   if (err) return <div className="screen center"><p className="muted">{err}</p></div>;
   if (!steps) return <Loading label="퀘스트를 여는 중…" />;

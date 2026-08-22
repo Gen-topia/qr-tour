@@ -19,7 +19,7 @@ export const api = {
   testLogin: () => req('/api/auth/test', { method: 'POST' }),
   questByCode: (code) => req(`/api/quests/by-code/${encodeURIComponent(code)}`),
   questSteps: (id) => req(`/api/quests/${id}/steps`),
-  submitAnswer: (id, stepId, answer) => req(`/api/quests/${id}/answer`, { method: 'POST', body: { stepId, answer } }),
+  submitAnswer: (id, stepId, answer, stepNo) => req(`/api/quests/${id}/answer`, { method: 'POST', body: { stepId, stepNo, answer } }),
   myMissions: () => req('/api/me/missions'),
   claimSkyKey: () => req('/api/me/key', { method: 'POST' }),
   // 테스트용 — 행사 전에 서버의 /api/me/testclear와 함께 지운다

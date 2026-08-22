@@ -12,7 +12,10 @@ function judge(step, answer) {
   if (step.config?.skip && answer?.skip === true) return true;
 
   if (step.type === 'quiz') {
-    return String(answer ?? '').trim() === String(step.answer ?? '').trim();
+    // 정답을 |로 나눠 적어두면 그 중 아무거나 맞으면 통과한다.
+    // (안내판을 ‘나’로 읽는 사람과 ‘나나’로 읽는 사람이 갈리는 문제 등)
+    const given = String(answer ?? '').trim();
+    return String(step.answer ?? '').split('|').some(a => a.trim() === given);
   }
   if (step.type === 'dial') {
     const cfg = step.config || {};
@@ -24,7 +27,7 @@ function judge(step, answer) {
     const diff = Math.abs(((angle - target + 540) % 360) - 180);
     return diff <= tol;
   }
-  // puzzle · clear · draw · scratch · gauge — 클라이언트가 완료를 판정한다
+  // puzzle · clear · draw · way · scratch · gauge — 클라이언트가 완료를 판정한다
   // story — 읽는 것으로 끝나는 미션(QR을 비추면 성공)이라 완료 신호만 받는다
   return answer?.done === true;
 }
@@ -33,13 +36,18 @@ export async function POST(request, { params }) {
   const user = verifyFrom(request, 'user');
   if (!user) return unauthorized();
   const { id } = await params;
-  const { stepId, answer } = await request.json().catch(() => ({}));
+  const { stepId, stepNo, answer } = await request.json().catch(() => ({}));
 
   const [quest] = await q('SELECT id, quest_group, main_no, main_title FROM quests WHERE id=?', [id]);
   const locked = quest ? await lockReason(user.id, quest.quest_group, quest.id) : null;
   if (locked) return bad(locked.replace('\n', ' '), 403);
 
-  const [step] = await q('SELECT * FROM quest_steps WHERE id=? AND quest_id=?', [stepId, id]);
+  let [step] = await q('SELECT * FROM quest_steps WHERE id=? AND quest_id=?', [stepId, id]);
+  // 관리툴에서 미션을 다시 저장하면 장의 id가 새로 생긴다.
+  // 이미 열어 둔 화면이 옛 id로 제출해도 막히지 않게 장 번호로 한 번 더 찾는다.
+  if (!step && stepNo) {
+    [step] = await q('SELECT * FROM quest_steps WHERE quest_id=? AND step_no=?', [id, stepNo]);
+  }
   // 이야기만으로 끝나는 미션도 마지막 장에서 완료할 수 있어야 한다
   if (!step || !(isPlayable(step.type) || step.type === 'story')) return bad('완료 처리할 수 있는 단계가 아닙니다.');
 
