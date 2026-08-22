@@ -38,8 +38,11 @@ export async function GET(request, { params }) {
     console.error(`[auth/${provider}/callback] 토큰·프로필 실패:`, e.message);
     return fail(`${p.label} 로그인에 실패했습니다: ${e.message}`);
   }
+  // 소셜이 무엇을 내려줬는지 남긴다 — 이메일·전화가 비면 콘솔의 제공 항목 설정을 봐야 한다
   console.log(`[auth/${provider}/callback] 프로필 조회 성공 — providerId:`, profile.providerId,
-    '/ nickname:', profile.nickname);
+    '/ nickname:', profile.nickname ?? '(없음)',
+    '/ email:', profile.email ?? '(없음)',
+    '/ phone:', profile.phone ?? '(없음)');
 
   // 이미 가입한 계정이면 기존 id를 그대로 반환(ON DUPLICATE KEY UPDATE + LAST_INSERT_ID)
   const r = await q(
