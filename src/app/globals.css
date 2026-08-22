@@ -221,7 +221,7 @@ h1 { font-size: 28px; font-weight: 800; margin: 8px 0 6px; letter-spacing: -.03e
   margin: 0; font-size: var(--t-body); line-height: var(--lh-body);
   letter-spacing: var(--ls-body); color: var(--c-body);
 }
-.qintro .eyebrow { color: #b9b9b9; }
+/* 미션 이름은 첫 장에서도 분홍으로 둔다(기본 .eyebrow 색을 그대로 쓴다) */
 .qintro.stack > * + * { margin-top: 18px; }
 
 /* 문제 푸는 장 하단 — 앞 장으로 돌아가기 / 그만두고 나가기 */
