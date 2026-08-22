@@ -3,6 +3,7 @@ import { useState } from 'react';
 
 // 퀴즈 — options가 있으면 보기에서 고르고, 없으면 직접 입력한다.
 // 정답 확인은 어느 쪽이든 서버가 한다.
+// 힌트는 화면 아래 '이전으로 · 메인으로' 사이에 둔다(quest/[id]/page.jsx).
 export default function QuizStep({ step, submit }) {
   const options = Array.isArray(step.options) ? step.options : null;
   const [answer, setAnswer] = useState('');

@@ -199,7 +199,7 @@ function Quest() {
       {Play && step.type !== 'way' && (
         <div className="qnav">
           <button type="button" className="btn ghost" onClick={prev} disabled={idx === 0}>이전으로</button>
-          <HintModal hint={step.hint_text} image={step.hint_image_url} className="btn outline" />
+          <HintModal hint={step.hint_text} image={step.hint_image_url} className="btn outline outline--bare" />
           <button type="button" className="btn ghost" onClick={() => router.replace('/')}>메인으로</button>
         </div>
       )}
