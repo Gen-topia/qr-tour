@@ -7,7 +7,7 @@ export default function InfoModal({ eyebrow, title, onClose, confirmLabel = '닫
     <div className="modal" onClick={onClose}>
       <div className="card stack modal__panel" onClick={e => e.stopPropagation()}>
         {eyebrow && <div className="eyebrow">{eyebrow}</div>}
-        {title && <h1 style={{ margin: 0, fontSize: 22 }}>{title}</h1>}
+        {title && <h1 style={{ margin: 0, fontSize: 20 }}>{title}</h1>}
         <div className="modal__body">{children}</div>
         {onClose && <button className="btn" onClick={onClose}>{confirmLabel}</button>}
       </div>
