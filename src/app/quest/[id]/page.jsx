@@ -119,7 +119,8 @@ function Quest() {
                  fallback={isIntro ? (quest?.cover_image_url || `/quest_intro_${id}.png`) : null} />
       {step.body_text && <p style={{ whiteSpace: 'pre-wrap' }}>{step.body_text}</p>}
       <AudioPlayer src={step.audio_url} />
-      <HintModal hint={step.hint_text} image={step.hint_image_url} />
+      {/* 퀴즈는 제출 단추 바로 위에 힌트를 두므로 여기서는 그리지 않는다 */}
+      {step.type !== 'quiz' && <HintModal hint={step.hint_text} image={step.hint_image_url} />}
       {/* 나레이션 영상은 미션 첫 장에서만 안내한다 */}
       {idx === 0 && quest?.narration_video && (
         <button className="btn ghost" onClick={() => setNarration(true)}>▶ 나레이션 보기</button>
