@@ -423,6 +423,8 @@ h1 { font-size: 28px; font-weight: 800; margin: 8px 0 6px; letter-spacing: -.03e
   border-radius: 14px; background: var(--surface-2); overflow: hidden;
   touch-action: none;                    /* 드래그 중 화면이 따라 스크롤되지 않게 */
 }
+/* 다 맞춘 뒤에는 판도 지워 완성 그림만 남긴다 */
+.jig--done { background: none; }
 /* 완성 위치를 알려주는 옅은 안내선 */
 .jig__guide {
   position: absolute; left: 20%; top: 20%; width: 60%; height: 60%;

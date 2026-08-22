@@ -92,8 +92,8 @@ export default function PuzzleStep({ step, submit }) {
     <div className="card stack">
       <div className="eyebrow">미션 · 퍼즐</div>
       <p className="muted" style={{ margin: 0 }}>흩어진 조각을 끌어다 가운데에서 그림을 맞춰주세요.</p>
-      <div className="jig" ref={areaRef}>
-        <div className="jig__guide" />
+      <div className={`jig${showDone ? ' jig--done' : ''}`} ref={areaRef}>
+        {!showDone && <div className="jig__guide" />}
         {/* 완성 그림을 얹은 뒤에는 조각을 걷어낸다 */}
         {!showDone && pos.map((p, i) => (
           <div key={i}
