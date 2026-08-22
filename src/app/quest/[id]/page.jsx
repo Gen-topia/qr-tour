@@ -18,9 +18,10 @@ import DialStep from '@/components/steps/DialStep';
 
 const PLAY_COMPONENTS = { quiz: QuizStep, puzzle: PuzzleStep, scratch: ScratchStep, gauge: GaugeStep, dial: DialStep };
 
-// 장에 붙는 그림 — 관리툴에 적어둔 주소를 먼저 쓰고,
-// 없으면 미션 첫 장에 한해 public/quest_intro_{미션번호}.png를 찾는다.
-// 파일을 넣지 않았으면 아무것도 그리지 않는다.
+// 장에 붙는 그림 — 그 장에 적어둔 주소를 먼저 쓰고,
+// 없으면 첫 장에 한해 관리툴의 '첫 페이지 이미지 URL'을,
+// 그것도 없으면 public/quest_intro_{미션번호}.png를 찾는다.
+// 어느 쪽도 없으면 아무것도 그리지 않는다.
 function StepImage({ src, fallback }) {
   const url = src || fallback;
   const [failed, setFailed] = useState(false);
@@ -113,7 +114,8 @@ function Quest() {
         <span className="badge">{idx + 1} / {steps.length}</span>
       </div>
       {step.title && <h1 style={{ margin: '4px 0' }}>{step.title}</h1>}
-      <StepImage src={step.image_url} fallback={isIntro ? `/quest_intro_${id}.png` : null} />
+      <StepImage src={step.image_url}
+                 fallback={isIntro ? (quest?.cover_image_url || `/quest_intro_${id}.png`) : null} />
       {step.body_text && <p style={{ whiteSpace: 'pre-wrap' }}>{step.body_text}</p>}
       <AudioPlayer src={step.audio_url} />
       <HintModal hint={step.hint_text} image={step.hint_image_url} />

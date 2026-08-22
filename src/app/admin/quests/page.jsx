@@ -224,7 +224,15 @@ function Quests() {
             <div className="grid2">
               <div className="field"><label>보상 포인트</label><input className="input" type="number" value={editing.reward_points} onChange={e => setEditing({ ...editing, reward_points: +e.target.value })} /></div>
             </div>
-            <div className="field"><label>커버 이미지 URL</label><input className="input" value={editing.cover_image_url || ''} onChange={e => setEditing({ ...editing, cover_image_url: e.target.value })} /></div>
+            <div className="field">
+              <label>첫 페이지 이미지 URL</label>
+              <input className="input" placeholder="예: /quest_intro_5.png (비우면 그림 없음)"
+                value={editing.cover_image_url || ''}
+                onChange={e => setEditing({ ...editing, cover_image_url: e.target.value })} />
+              <p className="muted" style={{ margin: '6px 0 0', fontSize: 13 }}>
+                public 폴더에 넣은 그림의 주소. 첫 페이지 제목 아래에 나옵니다.
+              </p>
+            </div>
             <div className="field">
               <label>나레이션 영상 이름</label>
               <input className="input" placeholder="예: quest_01" value={editing.narration_video || ''}
