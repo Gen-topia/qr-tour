@@ -9,15 +9,17 @@ import PhotoShare from '@/components/PhotoShare';
 import Loading from '@/components/Loading';
 import InfoModal from '@/components/InfoModal';
 import Prologue from '@/components/Prologue';
+import Ending from '@/components/Ending';
 import Sparkle from '@/components/Sparkle';
 import QuizStep from '@/components/steps/QuizStep';
 import PuzzleStep from '@/components/steps/PuzzleStep';
 import ClearStep from '@/components/steps/ClearStep';
+import DrawStep from '@/components/steps/DrawStep';
 import ScratchStep from '@/components/steps/ScratchStep';
 import GaugeStep from '@/components/steps/GaugeStep';
 import DialStep from '@/components/steps/DialStep';
 
-const PLAY_COMPONENTS = { quiz: QuizStep, puzzle: PuzzleStep, clear: ClearStep, scratch: ScratchStep, gauge: GaugeStep, dial: DialStep };
+const PLAY_COMPONENTS = { quiz: QuizStep, puzzle: PuzzleStep, clear: ClearStep, draw: DrawStep, scratch: ScratchStep, gauge: GaugeStep, dial: DialStep };
 
 // 장에 붙는 그림 — 그 장에 적어둔 주소를 먼저 쓰고,
 // 없으면 첫 장에 한해 관리툴의 '첫 페이지 이미지 URL'을,
@@ -39,6 +41,7 @@ function Quest() {
   const [idx, setIdx] = useState(0);
   const [err, setErr] = useState('');
   const [result, setResult] = useState(null);
+  const [ending, setEnding] = useState(false);   // 설문대할망의 메시지를 보는 중
   const [narration, setNarration] = useState(false);
   const [locked, setLocked] = useState('');   // 선행 퀘스트를 못 깬 경우의 안내 문구
 
@@ -60,7 +63,7 @@ function Quest() {
       e.stopPropagation();
       api.testClear(id)
         .then(r => setResult({ awarded: r.awarded, alreadyCleared: r.alreadyCleared,
-                               mainCleared: r.mainCleared, mainNo: r.mainNo }))
+                               mainCleared: r.mainCleared, groupCleared: r.groupCleared, mainNo: r.mainNo }))
         .catch(e2 => setErr(e2.message));
     };
     window.addEventListener('keydown', onKey, true);
@@ -78,7 +81,7 @@ function Quest() {
       if (!r.correct) return false;
       if (r.isFinal) {
         if (!silent) setResult({ awarded: r.awarded, alreadyCleared: r.alreadyCleared,
-                                 mainCleared: r.mainCleared, mainNo: r.mainNo });
+                                 mainCleared: r.mainCleared, groupCleared: r.groupCleared, mainNo: r.mainNo });
       } else setIdx(i => i + 1);
       return true;
     } catch (e) { setErr(e.message); return false; }
@@ -96,11 +99,17 @@ function Quest() {
       </InfoModal>
     </>
   );
+  // 퀘스트3까지 모두 끝낸 사람이 '메시지 듣기'를 누르면 설문대할망의 엔딩으로 넘어간다
+  if (ending) return (
+    <Ending onHome={() => router.replace('/')}
+            onMap={() => router.replace('/map?spot=hyangsadang')} />
+  );
   if (result) return (
     <ResultView result={result} quest={quest}
                 onHome={() => router.replace('/')}
                 onQuestList={() => router.replace(`/missions?quest=${quest?.quest_group}`)}
-                onScan={() => router.replace('/scan')} />
+                onScan={() => router.replace('/scan')}
+                onEnding={() => setEnding(true)} />
   );
 
   const step = steps[idx];
@@ -217,10 +226,17 @@ function SpiritImage({ group, no }) {
   return <img className="qc__spirit" src={src} alt="" onError={() => setFailed(true)} />;
 }
 
+// 리워드 문구에서 **…**로 감싼 부분은 두 배 크기로 키운다(비밀번호처럼 크게 보여야 하는 값)
+const big = (text) =>
+  text.split(/\*\*([\s\S]+?)\*\*/).map((part, i) =>
+    (i % 2 ? <b key={i} className="qc__big">{part}</b> : part));
+
 // 이야기를 다 끝냈을 때 진행 그림을 보러 가는 버튼 — 퀘스트1은 복숭아나무, 퀘스트2는 측간신
 const HERO_BUTTON = { 1: '복숭아 나무 보기', 2: '측간신 상태보기' };
 
-function ResultView({ result, quest, onHome, onQuestList, onScan }) {
+function ResultView({ result, quest, onHome, onQuestList, onScan, onEnding }) {
+  // 퀘스트3까지 모두 끝내면 최종 완료 — 설문대할망의 메시지로 이어진다
+  const isFinal = quest?.quest_group === 3 && result.groupCleared;
   // 이야기를 다 끝냈으면 진행 그림을 보러 '나의 퀘스트'의 그 탭으로 보낸다.
   // 퀘스트1은 아직 남았을 때 다음 코드를 찾으러 보낸다.
   const heroLabel = result.mainCleared ? HERO_BUTTON[quest?.quest_group] : null;
@@ -233,12 +249,14 @@ function ResultView({ result, quest, onHome, onQuestList, onScan }) {
             <Sparkle className="qc__star" /><i /><Sparkle className="qc__star" />
           </div>
           <h1 className="qc__title">퀘스트 완료</h1>
-          {/* 제목 바로 아래 그림 — 이야기를 다 끝냈으면 정기를, 아니면 그 퀘스트의 완료 그림을 */}
-          {result.mainCleared
+          {isFinal && <p className="qc__final">최종 퀘스트 완료</p>}
+          {/* 제목 바로 아래 그림 — 이야기를 다 끝냈으면 정기를, 아니면 그 퀘스트의 완료 그림을.
+              최종 완료는 열린 하늘 문 그림을 쓴다 */}
+          {result.mainCleared && !isFinal
             ? <SpiritImage group={quest?.quest_group} no={result.mainNo} />
             : <ClearImage src={quest?.clear_image_url} group={quest?.quest_group} />}
           {/* 관리툴에 적어둔 리워드 문구(대본의 '리워드 획득') */}
-          {quest?.clear_text && <p className="qc__reward">{quest.clear_text}</p>}
+          {quest?.clear_text && <p className="qc__reward">{big(quest.clear_text)}</p>}
           {/* 완수했을 때 들려주는 소리 — 파일이 없으면 버튼이 뜨지 않는다 */}
           <AudioPlayer src={quest?.clear_audio_url} />
           <p className="qc__text">
@@ -246,11 +264,11 @@ function ResultView({ result, quest, onHome, onQuestList, onScan }) {
           </p>
         </div>
         <div className="qc__foot">
-          <button className="btn" onClick={heroLabel ? onQuestList : toScan ? onScan : onHome}>
-            {heroLabel || (toScan ? '코드 탐색' : '메인으로')}
+          <button className="btn" onClick={isFinal ? onEnding : heroLabel ? onQuestList : toScan ? onScan : onHome}>
+            {isFinal ? '메시지 듣기' : heroLabel || (toScan ? '코드 탐색' : '메인으로')}
           </button>
           {/* 주 단추가 메인으로가 아닐 때만 빠져나갈 길을 하나 더 둔다 */}
-          {(heroLabel || toScan) && (
+          {(isFinal || heroLabel || toScan) && (
             <button type="button" className="btn outline" onClick={onHome}>이전으로</button>
           )}
         </div>

@@ -1,6 +1,6 @@
 'use client';
-import { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { Suspense, useEffect, useState } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import Protected from '@/components/Protected';
 import Loading from '@/components/Loading';
 import SheetNav from '@/components/SheetNav';
@@ -11,8 +11,16 @@ import { SPOT_GROUPS } from '@/lib/spots';
 function CodeMap() {
   const [quests, setQuests] = useState(null);
   const [err, setErr] = useState('');
-  const [open, setOpen] = useState(null);   // 펼쳐 둔 장소 코드
+  // 다른 화면에서 ?spot=hyangsadang처럼 장소를 지정해 오면 그 장소를 펼쳐 둔다
+  const asked = useSearchParams().get('spot');
+  const [open, setOpen] = useState(asked || null);
   const router = useRouter();
+
+  // 지정해 온 장소는 화면 안으로 끌어와 보여준다
+  useEffect(() => {
+    if (!asked || !quests) return;
+    document.getElementById(`spot-${asked}`)?.scrollIntoView({ block: 'center' });
+  }, [asked, quests]);
 
   useEffect(() => { api.myMissions().then(d => setQuests(d.quests)).catch(e => setErr(e.message)); }, []);
 
@@ -54,7 +62,7 @@ function CodeMap() {
               {g.items.map(s => {
                 const state = stateOf(s.code);
                 return (
-                  <section key={s.code} className="gd__sec">
+                  <section key={s.code} id={`spot-${s.code}`} className="gd__sec">
                     <button type="button" className="gd__row" aria-expanded={open === s.code}
                             onClick={() => setOpen(o => (o === s.code ? null : s.code))}>
                       <span className="gd__rowlabel">
@@ -96,4 +104,11 @@ function CodeMap() {
   );
 }
 
-export default function Page() { return <Protected><CodeMap /></Protected>; }
+// useSearchParams를 쓰므로 Suspense로 감싼다(빌드 오류 방지)
+export default function Page() {
+  return (
+    <Protected>
+      <Suspense fallback={<Loading label="코드 지도를 불러오는 중…" />}><CodeMap /></Suspense>
+    </Protected>
+  );
+}

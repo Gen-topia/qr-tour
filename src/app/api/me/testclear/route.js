@@ -1,7 +1,7 @@
 import { q } from '@/lib/db';
 import { verifyFrom, ok, bad, unauthorized } from '@/lib/auth';
 import { lockReason } from '@/lib/questLock';
-import { clearQuest, isMainCleared } from '@/lib/questClear';
+import { clearQuest, isMainCleared, isGroupCleared } from '@/lib/questClear';
 
 // 테스트용 — 미션 화면에서 Ctrl+2를 누르면 이 미션을 곧바로 완수 처리한다.
 // 문제를 풀지 않고 진행을 채우므로, 행사 전에는 이 파일을 지워야 한다.
@@ -19,5 +19,6 @@ export async function POST(request) {
 
   const r = await clearQuest(user.id, quest.id);
   const mainCleared = await isMainCleared(user.id, quest);
-  return ok({ awarded: r.awarded, alreadyCleared: r.alreadyCleared, mainCleared, mainNo: quest.main_no ?? null });
+  const groupCleared = await isGroupCleared(user.id, quest.quest_group);
+  return ok({ awarded: r.awarded, alreadyCleared: r.alreadyCleared, mainCleared, groupCleared, mainNo: quest.main_no ?? null });
 }

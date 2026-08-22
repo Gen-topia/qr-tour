@@ -33,3 +33,14 @@ export async function clearQuest(userId, questId) {
   } catch (e) { await conn.rollback(); throw e; }
   finally { conn.release(); }
 }
+
+// 한 퀘스트 묶음(퀘스트1·2·3)의 미션을 모두 완수했는지.
+// 퀘스트3까지 끝내면 최종 완료 화면으로 이어진다.
+export async function isGroupCleared(userId, group) {
+  const [row] = await q(
+    `SELECT COUNT(*) AS total, SUM(p.status='cleared') AS done
+       FROM quests qq
+       LEFT JOIN quest_progress p ON p.quest_id=qq.id AND p.user_id=?
+      WHERE qq.is_active=1 AND qq.quest_group=?`, [userId, group]);
+  return Number(row?.total) > 0 && Number(row?.done) === Number(row?.total);
+}

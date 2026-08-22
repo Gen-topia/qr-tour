@@ -2,7 +2,7 @@ import { q } from '@/lib/db';
 import { verifyFrom, ok, bad, unauthorized } from '@/lib/auth';
 import { isPlayable, SERVER_VERIFIED } from '@/lib/stepTypes';
 import { lockReason } from '@/lib/questLock';
-import { clearQuest, isMainCleared } from '@/lib/questClear';
+import { clearQuest, isMainCleared, isGroupCleared } from '@/lib/questClear';
 
 // 유형별 완료 판정.
 // quiz·dial은 서버가 값을 검증하고, 나머지 인터랙션 유형은 클라이언트의 완료 신호를 받는다.
@@ -24,7 +24,7 @@ function judge(step, answer) {
     const diff = Math.abs(((angle - target + 540) % 360) - 180);
     return diff <= tol;
   }
-  // puzzle · clear · scratch · gauge — 클라이언트가 완료를 판정한다
+  // puzzle · clear · draw · scratch · gauge — 클라이언트가 완료를 판정한다
   // story — 읽는 것으로 끝나는 미션(QR을 비추면 성공)이라 완료 신호만 받는다
   return answer?.done === true;
 }
@@ -49,11 +49,12 @@ export async function POST(request, { params }) {
   const [last] = await q('SELECT MAX(step_no) AS mx FROM quest_steps WHERE quest_id=?', [id]);
   const isFinal = step.step_no >= Number(last.mx);
 
-  let awarded = 0, alreadyCleared = false, mainCleared = false;
+  let awarded = 0, alreadyCleared = false, mainCleared = false, groupCleared = false;
   if (isFinal) {
     const r = await clearQuest(user.id, id);
     awarded = r.awarded; alreadyCleared = r.alreadyCleared;
     mainCleared = await isMainCleared(user.id, quest);
+    groupCleared = await isGroupCleared(user.id, quest.quest_group);
   }
-  return ok({ correct: true, isFinal, awarded, alreadyCleared, mainCleared, mainNo: quest?.main_no ?? null });
+  return ok({ correct: true, isFinal, awarded, alreadyCleared, mainCleared, groupCleared, mainNo: quest?.main_no ?? null });
 }

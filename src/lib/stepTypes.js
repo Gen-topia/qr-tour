@@ -42,6 +42,15 @@ export const STEP_TYPES = {
       config: { background_url: '/clear/bg.png', pieces: [] },
     },
   },
+  draw: {
+    label: '손글씨 쓰기',
+    hint: '종이 그림 위에 손가락으로 글씨를 쓰고 단추를 누르면 성공. bg_image_url은 밑에 깔 종이, '
+        + 'cta는 단추 글. line_color·line_width로 획 색과 굵기를 바꾼다',
+    sample: {
+      type: 'draw', title: '소원지 작성',
+      config: { bg_image_url: '/wish/paper.png', cta: '소원지 달기' },
+    },
+  },
   scratch: {
     label: '문지르기',
     hint: '화면을 문질러 덮개를 지우면 성공',
@@ -74,6 +83,6 @@ export const STEP_TYPES = {
 export const SERVER_VERIFIED = ['quiz', 'dial'];
 
 // 클라이언트 조작만으로 통과할 수 있는 유형(= 완료 신호를 신뢰하는 유형)
-export const CLIENT_COMPLETED = ['puzzle', 'clear', 'scratch', 'gauge'];
+export const CLIENT_COMPLETED = ['puzzle', 'clear', 'draw', 'scratch', 'gauge'];
 
 export const isPlayable = (type) => type in STEP_TYPES && type !== 'story' && type !== 'photo';
