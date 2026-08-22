@@ -152,10 +152,11 @@ function MainInner() {
     );
   }
 
-  // 5. 프롤로그 영상 → 끝나면 6. 수호자 지침서로 이어진다
+  // 5. 프롤로그 영상 → 6. 수호자 지침서로 이어진다.
+  // 끝까지 보든 중간에 닫든 지침서는 거쳐야 한다.
   if (view === 'prologue') return (
     <Prologue audioSrc="/prologue/prologue.mp3"
-              onEnd={() => setView('guide')} onClose={() => setView(null)} />
+              onEnd={() => setView('guide')} onClose={() => setView('guide')} />
   );
   if (view === 'guide') return <Guide onDone={onGuideDone} />;
 
