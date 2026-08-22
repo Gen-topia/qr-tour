@@ -30,6 +30,7 @@ const clamp = (v) => Math.min(MAX, Math.max(0, v));
 
 export default function PuzzleStep({ step, submit }) {
   const pieces = step.config?.pieces || [];
+  const doneImage = step.config?.done_image_url;   // 다 맞췄을 때 얹을 완성 그림
   const [pos, setPos] = useState(scattered);
   const [placed, setPlaced] = useState([false, false, false, false]);
   const [dragging, setDragging] = useState(null);
@@ -106,6 +107,8 @@ export default function PuzzleStep({ step, submit }) {
               : <span className="jig__num">{i + 1}</span>}
           </div>
         ))}
+        {/* 다 맞추면 조각 경계 없이 완성 그림을 얹는다 */}
+        {solved && doneImage && <img className="jig__done" src={doneImage} alt="" />}
       </div>
       {solved && <p className="center" style={{ color: 'var(--lantern)', margin: 0, fontWeight: 700 }}>완성했어요!</p>}
     </div>

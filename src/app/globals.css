@@ -434,6 +434,13 @@ h1 { font-size: 28px; font-weight: 800; margin: 8px 0 6px; letter-spacing: -.03e
 }
 .jig__piece--set { z-index: 1; box-shadow: none; border-radius: 0; cursor: default; }
 .jig__num { font-size: 28px; font-weight: 800; color: var(--text-dim); }
+/* 다 맞췄을 때 조각 위에 얹는 완성 그림 — 조각 자리와 똑같은 가운데 60% */
+.jig__done {
+  position: absolute; left: 20%; top: 20%; width: 60%; height: 60%;
+  object-fit: cover; border-radius: 6px; z-index: 2;
+  animation: jigdone .28s ease both;
+}
+@keyframes jigdone { from { opacity: 0 } to { opacity: 1 } }
 
 /* 문지르기: 아래 그림 위에 캔버스 덮개 */
 .scratch { position: relative; width: 100%; aspect-ratio: 1 / 1; border-radius: 12px; overflow: hidden; }
