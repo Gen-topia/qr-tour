@@ -31,6 +31,7 @@ const clamp = (v) => Math.min(MAX, Math.max(0, v));
 export default function PuzzleStep({ step, submit }) {
   const pieces = step.config?.pieces || [];
   const doneImage = step.config?.done_image_url;   // 다 맞췄을 때 얹을 완성 그림
+  const [doneBroken, setDoneBroken] = useState(false);
   const [pos, setPos] = useState(scattered);
   const [placed, setPlaced] = useState([false, false, false, false]);
   const [dragging, setDragging] = useState(null);
@@ -45,6 +46,7 @@ export default function PuzzleStep({ step, submit }) {
   };
 
   const solved = placed.every(Boolean);
+  const showDone = solved && doneImage && !doneBroken;
   useEffect(() => {
     if (!solved || doneRef.current) return;
     doneRef.current = true;
@@ -92,7 +94,8 @@ export default function PuzzleStep({ step, submit }) {
       <p className="muted" style={{ margin: 0 }}>흩어진 조각을 끌어다 가운데에서 그림을 맞춰주세요.</p>
       <div className="jig" ref={areaRef}>
         <div className="jig__guide" />
-        {pos.map((p, i) => (
+        {/* 완성 그림을 얹은 뒤에는 조각을 걷어낸다 */}
+        {!showDone && pos.map((p, i) => (
           <div key={i}
             className={'jig__piece'
               + (dragging === i ? ' jig__piece--drag' : '')
@@ -107,8 +110,11 @@ export default function PuzzleStep({ step, submit }) {
               : <span className="jig__num">{i + 1}</span>}
           </div>
         ))}
-        {/* 다 맞추면 조각 경계 없이 완성 그림을 얹는다 */}
-        {solved && doneImage && <img className="jig__done" src={doneImage} alt="" />}
+        {/* 다 맞추면 조각 경계 없이 완성 그림을 얹는다.
+            그림을 못 불러오면 맞춘 조각이 그대로 남는다 */}
+        {showDone && (
+          <img className="jig__done" src={doneImage} alt="" onError={() => setDoneBroken(true)} />
+        )}
       </div>
       {solved && <p className="center" style={{ color: 'var(--lantern)', margin: 0, fontWeight: 700 }}>완성했어요!</p>}
     </div>
