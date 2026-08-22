@@ -3,7 +3,10 @@ import { useRef, useState } from 'react';
 
 // 게이지 올리기 — 아래에서 위로 밀어 끝까지 채우면 성공(휴대폰 잠금 해제 제스처).
 // config에 { "invert": true }를 두면 거꾸로 — 거의 다 찬 상태에서 위에서 아래로 끌어내려 비운다.
+// scale_top·scale_bottom을 적어 두면 기압표처럼 눈금과 수치를 함께 보여준다.
 // 손을 떼면 아직 끝나지 않은 만큼 처음 자리로 되돌아간다.
+const TICKS = 5;
+
 export default function GaugeStep({ step, submit }) {
   const cfg = step.config || {};
   const invert = cfg.invert === true;
@@ -12,6 +15,13 @@ export default function GaugeStep({ step, submit }) {
   const draggingRef = useRef(false);
   const doneRef = useRef(false);
   const [value, setValue] = useState(START);   // 0~1
+
+  // 눈금이 있으면 백분율 대신 그 단위(기압 등)로 읽어 준다
+  const top = Number(cfg.scale_top), bottom = Number(cfg.scale_bottom);
+  const scaled = Number.isFinite(top) && Number.isFinite(bottom);
+  const reading = scaled
+    ? `${Math.round(bottom + (top - bottom) * value)}${cfg.unit ? ` ${cfg.unit}` : ''}`
+    : `${Math.round(value * 100)}%`;
 
   function move(e) {
     if (!draggingRef.current || doneRef.current) return;
@@ -42,7 +52,21 @@ export default function GaugeStep({ step, submit }) {
         onTouchStart={start} onTouchMove={move} onTouchEnd={end}>
         {cfg.bg_image_url && <img className="vgauge__bg" src={cfg.bg_image_url} alt="" />}
         <div className="vgauge__fill" style={{ height: `${value * 100}%` }} />
-        <div className="vgauge__label">{doneRef.current ? '완료!' : `${Math.round(value * 100)}%`}</div>
+
+        {/* 기압표 눈금 — 위가 scale_top, 아래가 scale_bottom */}
+        {scaled && (
+          <div className="vgauge__scale" aria-hidden="true">
+            {Array.from({ length: TICKS }, (_, i) => (
+              <span key={i} style={{ top: `${(i / (TICKS - 1)) * 100}%` }}>
+                {Math.round(top - (top - bottom) * i / (TICKS - 1))}
+              </span>
+            ))}
+          </div>
+        )}
+        {cfg.top_label && <div className="vgauge__cap vgauge__cap--top">{cfg.top_label}</div>}
+        {cfg.bottom_label && <div className="vgauge__cap vgauge__cap--bottom">{cfg.bottom_label}</div>}
+
+        <div className="vgauge__label">{doneRef.current ? '완료!' : reading}</div>
         <div className="vgauge__arrow">{invert ? '↓' : '↑'}</div>
       </div>
     </div>
