@@ -10,6 +10,7 @@ import Loading from '@/components/Loading';
 import InfoModal from '@/components/InfoModal';
 import Prologue from '@/components/Prologue';
 import Ending from '@/components/Ending';
+import StorySlides from '@/components/StorySlides';
 import Sparkle from '@/components/Sparkle';
 import QuizStep from '@/components/steps/QuizStep';
 import PuzzleStep from '@/components/steps/PuzzleStep';
@@ -43,6 +44,7 @@ function Quest() {
   const [err, setErr] = useState('');
   const [result, setResult] = useState(null);
   const [ending, setEnding] = useState(false);   // 설문대할망의 메시지를 보는 중
+  const [slide, setSlide] = useState(0);        // 좌우로 넘겨 읽는 장에서 보고 있는 문단
   const [narration, setNarration] = useState(false);
   const [locked, setLocked] = useState('');   // 선행 퀘스트를 못 깬 경우의 안내 문구
 
@@ -70,6 +72,8 @@ function Quest() {
     window.addEventListener('keydown', onKey, true);
     return () => window.removeEventListener('keydown', onKey, true);
   }, [id, steps, result]);
+
+  useEffect(() => { setSlide(0); }, [idx]);
 
   const stepId = steps?.[idx]?.id;
   const stepNo = steps?.[idx]?.step_no;   // id가 바뀌어도 장 번호로 찾을 수 있게 함께 보낸다
@@ -134,6 +138,15 @@ function Quest() {
     if (isLast) await submit({ done: true }, true);
     router.push('/scan');
   };
+  // 좌우로 넘겨 읽는 장 — config에 { "slides": ["...", "..."] }
+  const slides = step.type === 'story' && Array.isArray(step.config?.slides) ? step.config.slides : null;
+  // 넘겨 읽는 장은 끝까지 읽어야 마무리 단추가 나온다
+  const readAll = !slides || slide >= slides.length - 1;
+  // 이야기를 끝내고 메인으로 나가는 장 — config에 { "finish": "home" }
+  const finishHome = async () => {
+    await submit({ done: true }, true);
+    router.replace('/');
+  };
 
   // 관리툴에 적어둔 이름 → public/{이름}.mp4
   if (narration) return (
@@ -165,7 +178,9 @@ function Quest() {
       {step.title && <h1 style={{ margin: '4px 0' }}>{step.title}</h1>}
       <StepImage src={step.image_url}
                  fallback={isIntro ? (quest?.cover_image_url || `/quest_intro_${id}.png`) : null} />
-      {step.body_text && <p style={{ whiteSpace: 'pre-wrap' }}>{step.body_text}</p>}
+      {slides
+        ? <StorySlides items={slides} at={slide} onMove={setSlide} />
+        : step.body_text && <p style={{ whiteSpace: 'pre-wrap' }}>{step.body_text}</p>}
       <AudioPlayer src={step.audio_url} />
       {/* 문제 푸는 장은 하단 이동 단추 줄에 힌트를 두므로 여기서는 그리지 않는다 */}
       {!Play && <HintModal hint={step.hint_text} image={step.hint_image_url} />}
@@ -178,14 +193,23 @@ function Quest() {
           현장 코드를 찾아야 이어지는 장은 관리툴 config에 { "next": "scan" }을 넣어 코드 탐색으로 보낸다.
           갈래가 있는 장은 { "choices": [...] }를 넣어 '다음' 대신 고르는 단추를 둔다.
           그냥 넘어가는 장의 단추 글은 { "cta": "..." }로 바꾼다 */}
-      {step.type === 'story' && (<><div className="grow" />
+      {step.type === 'story' && readAll && (<><div className="grow" />
         {step.config?.next === 'scan'
           ? <button className="btn" onClick={goScan}>코드 탐색</button>
           : choices
             ? choices.map(c => (
                 <button key={c.label} className="btn" onClick={() => goStep(c.step)}>{c.label}</button>
               ))
-            : <button className="btn" onClick={isLast ? () => submit({ done: true }) : next}>{step.config?.cta || (isLast ? '퀘스트 완료' : '다음')}</button>}
+            : <button className="btn" onClick={step.config?.finish === 'home' ? finishHome : isLast ? () => submit({ done: true }) : next}>
+                {step.config?.cta || (isLast ? '퀘스트 완료' : '다음')}
+              </button>}
+        {/* 곁들이 단추 — config에 { "extra": { "label": "...", "to": "/map?spot=..." } } */}
+        {step.config?.extra?.to && (
+          <button type="button" className="btn outline outline--bare"
+                  onClick={() => router.push(step.config.extra.to)}>
+            {step.config.extra.label || '바로가기'}
+          </button>
+        )}
       </>)}
       {step.type === 'photo' && (<><PhotoShare /><div className="grow" /><button className="btn" onClick={next}>다음</button></>)}
       {Play && <Play key={step.id} step={step} submit={submit} onPrev={prev} />}

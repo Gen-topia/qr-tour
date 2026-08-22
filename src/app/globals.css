@@ -1299,3 +1299,22 @@ h1 { font-size: 28px; font-weight: 800; margin: 8px 0 6px; letter-spacing: -.03e
   font-size: var(--t-subtitle); font-weight: var(--tw-title);
   color: var(--talisman); letter-spacing: var(--ls-head);
 }
+
+/* 좌우로 넘겨 읽는 이야기 — config.slides */
+.sld {
+  display: grid; grid-template-columns: 30px 1fr 30px; align-items: center; gap: 2px;
+  touch-action: pan-y; user-select: none; -webkit-user-select: none;
+}
+.sld__text {
+  margin: 0; min-height: 9.5em; white-space: pre-line; text-align: center;
+  font-size: var(--t-body); line-height: var(--lh-body);
+  color: var(--c-body); letter-spacing: var(--ls-body);
+}
+.sld__arrow {
+  appearance: none; border: 0; background: none; cursor: pointer;
+  font-size: 26px; line-height: 1; color: var(--lantern); padding: 8px 0;
+}
+.sld__arrow:disabled { opacity: .22; cursor: default; }
+.sld__dots { grid-column: 1 / -1; display: flex; justify-content: center; gap: 6px; margin-top: 6px; }
+.sld__dots i { width: 6px; height: 6px; border-radius: 50%; background: rgba(204,108,152,.28); }
+.sld__dots i.is-on { background: var(--lantern); }
