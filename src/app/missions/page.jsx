@@ -12,17 +12,18 @@ import { QUEST_TABS, QUEST_REQUIRES, groupLabel } from '@/lib/questGroups';
 // 진행 그림이 있는 퀘스트 — 1은 복숭아나무, 2는 측간신. 퀘스트3은 그림이 없다.
 const HERO_GROUPS = [1, 2];
 
-// 퀘스트 진행 이미지 — public/quest_{퀘스트번호}_{완수한 메인 퀘스트 수}.png
-// 하나도 못 깬 0단계 그림부터 보여준다.
+// 퀘스트 진행 이미지 — public/quest_{퀘스트번호}_{단계}.png
+// 하나도 못 깼을 때는 삽화(quest_{번호}.png)만 보이고, 하나를 깬 순간부터
+// 0단계 그림으로 바뀐다(1개 완수 → _0, 2개 → _1 …).
 // 아직 준비되지 않은 단계의 그림은 깨진 이미지 대신 조용히 숨긴다.
 function QuestImage({ group, done, label }) {
   const [broken, setBroken] = useState(false);
   const [loaded, setLoaded] = useState(false);
-  const src = `/quest_${group}_${done}.png`;
+  const src = `/quest_${group}_${done - 1}.png`;
   // 퀘스트를 바꾸면 새 그림이 다 실릴 때까지 아무것도 보이지 않게 한다
   // (안 그러면 브라우저가 이전 그림을 계속 그려서 바뀌는 순간이 어색하다)
   useEffect(() => { setBroken(false); setLoaded(false); }, [src]);
-  if (!HERO_GROUPS.includes(group) || done < 0 || broken) return null;
+  if (!HERO_GROUPS.includes(group) || done < 1 || broken) return null;
   return (
     <img key={src} className={`qhero${loaded ? ' is-on' : ''}`} src={src}
          alt={`${label} 진행 이미지`}
@@ -140,7 +141,9 @@ function Missions() {
           <section className="mq__intro">
             <h2 className="mq__introtitle">{g.title}</h2>
             <p className="mq__introdesc">{g.desc}</p>
-            {(g.value !== 3 || data.skyKey) && <QuestArt group={g.value} label={g.label} />}
+            {/* 삽화는 아직 아무것도 못 깼을 때만 — 하나라도 깨면 진행 그림이 대신 나온다.
+                퀘스트3은 진행 그림이 없어 열쇠를 얻은 뒤 계속 삽화를 보여준다 */}
+            {(g.value === 3 ? data.skyKey : mainsDone === 0) && <QuestArt group={g.value} label={g.label} />}
           </section>
         )}
 

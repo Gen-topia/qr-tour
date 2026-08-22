@@ -22,6 +22,8 @@ export const api = {
   submitAnswer: (id, stepId, answer) => req(`/api/quests/${id}/answer`, { method: 'POST', body: { stepId, answer } }),
   myMissions: () => req('/api/me/missions'),
   claimSkyKey: () => req('/api/me/key', { method: 'POST' }),
+  // 테스트용 — 행사 전에 서버의 /api/me/testclear와 함께 지운다
+  testClear: (questId) => req('/api/me/testclear', { method: 'POST', body: { questId } }),
   adminLogin: (username, password) => req('/api/admin/login', { method: 'POST', body: { username, password } }),
   adminQuests: () => req('/api/admin/quests', { admin: true }),
   adminCreateQuest: (b) => req('/api/admin/quests', { method: 'POST', body: b, admin: true }),

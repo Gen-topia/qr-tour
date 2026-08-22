@@ -5,7 +5,9 @@ export const STEP_TYPES = {
   story: {
     label: '이야기',
     hint: '읽고 넘어가는 페이지. config에 { "modal": true, "cta": "메시지 보기" }를 넣으면 '
-        + '화면 대신 모달로 뜨고, 단추를 누르면 다음 장으로 이어진다',
+        + '화면 대신 모달로 뜨고, 단추를 누르면 다음 장으로 이어진다. '
+        + 'config에 { "choices": [{ "label": "단추 글", "step": 2 }] }를 두면 '
+        + '‘다음’ 대신 갈래 단추가 뜨고 고른 장 번호로 건너뛴다',
     sample: { type: 'story', title: '1장', body_text: '이야기 도입...' },
   },
   quiz: {

@@ -48,17 +48,38 @@ function Quest() {
       .catch(e => setErr(e.message));
   }, [id]);
 
+  // 테스트용 — 미션 화면에서 Ctrl+2를 누르면 이 미션을 곧바로 완수 처리한다.
+  // 키 배열에 따라 key가 달라질 수 있어 code(Digit2)도 함께 본다.
+  // 행사 전에는 이 블록과 /api/me/testclear를 함께 지운다.
+  useEffect(() => {
+    if (!steps || result) return;
+    const onKey = (e) => {
+      if (!e.ctrlKey || e.altKey || e.metaKey) return;
+      if (e.key !== '2' && e.code !== 'Digit2') return;
+      e.preventDefault();
+      e.stopPropagation();
+      api.testClear(id)
+        .then(r => setResult({ awarded: r.awarded, alreadyCleared: r.alreadyCleared,
+                               mainCleared: r.mainCleared, mainNo: r.mainNo }))
+        .catch(e2 => setErr(e2.message));
+    };
+    window.addEventListener('keydown', onKey, true);
+    return () => window.removeEventListener('keydown', onKey, true);
+  }, [id, steps, result]);
+
   const stepId = steps?.[idx]?.id;
   const isLastStep = steps ? idx >= steps.length - 1 : false;
 
   // 모든 유형이 공유하는 제출 — 통과했으면 true를 돌려준다.
-  const submit = useCallback(async (payload) => {
+  // silent를 주면 마지막 장이라도 완료 화면을 띄우지 않는다(바로 다른 곳으로 보낼 때 쓴다)
+  const submit = useCallback(async (payload, silent = false) => {
     try {
       const r = await api.submitAnswer(id, stepId, payload);
       if (!r.correct) return false;
-      if (r.isFinal) setResult({ awarded: r.awarded, alreadyCleared: r.alreadyCleared,
+      if (r.isFinal) {
+        if (!silent) setResult({ awarded: r.awarded, alreadyCleared: r.alreadyCleared,
                                  mainCleared: r.mainCleared, mainNo: r.mainNo });
-      else setIdx(i => i + 1);
+      } else setIdx(i => i + 1);
       return true;
     } catch (e) { setErr(e.message); return false; }
   }, [id, stepId]);
@@ -87,6 +108,21 @@ function Quest() {
   const next = () => { if (!isLast) setIdx(i => i + 1); };
   const prev = () => setIdx(i => Math.max(0, i - 1));
   const Play = PLAY_COMPONENTS[step.type];
+
+  // 갈래가 있는 이야기 장 — 관리툴 config에 적어둔 만큼 단추를 만들고,
+  // 고른 단추의 장 번호(step_no)로 건너뛴다.
+  // { "choices": [{ "label": "이야기를 듣는다", "step": 2 }, ...] }
+  const choices = step.type === 'story' && Array.isArray(step.config?.choices)
+    ? step.config.choices : null;
+  const goStep = (no) => {
+    const at = steps.findIndex(s => s.step_no === Number(no));
+    if (at >= 0) setIdx(at);
+  };
+  // 코드 탐색으로 이어지는 장 — 마지막 장이면 완수 처리부터 하고 넘어간다
+  const goScan = async () => {
+    if (isLast) await submit({ done: true }, true);
+    router.push('/scan');
+  };
 
   // 관리툴에 적어둔 이름 → public/{이름}.mp4
   if (narration) return (
@@ -127,14 +163,24 @@ function Quest() {
         <button className="btn ghost" onClick={() => setNarration(true)}>▶ 나레이션 보기</button>
       )}
 
-      {/* 이야기로 끝나는 미션은 마지막 장에서 바로 완수 처리한다 */}
-      {step.type === 'story' && (<><div className="grow" /><button className="btn" onClick={isLast ? () => submit({ done: true }) : next}>{isLast ? '퀘스트 완료' : '다음'}</button></>)}
+      {/* 이야기로 끝나는 미션은 마지막 장에서 바로 완수 처리한다.
+          현장 코드를 찾아야 이어지는 장은 관리툴 config에 { "next": "scan" }을 넣어 코드 탐색으로 보낸다.
+          갈래가 있는 장은 { "choices": [...] }를 넣어 '다음' 대신 고르는 단추를 둔다 */}
+      {step.type === 'story' && (<><div className="grow" />
+        {step.config?.next === 'scan'
+          ? <button className="btn" onClick={goScan}>코드 탐색</button>
+          : choices
+            ? choices.map(c => (
+                <button key={c.label} className="btn" onClick={() => goStep(c.step)}>{c.label}</button>
+              ))
+            : <button className="btn" onClick={isLast ? () => submit({ done: true }) : next}>{isLast ? '퀘스트 완료' : '다음'}</button>}
+      </>)}
       {step.type === 'photo' && (<><PhotoShare /><div className="grow" /><button className="btn" onClick={next}>다음</button></>)}
       {Play && <Play key={step.id} step={step} submit={submit} />}
 
       {/* 첫 장에서는 '다음' 아래에 메인으로 빠져나갈 길을 둔다 */}
       {isIntro && !Play && (
-        <button type="button" className="btn outline" onClick={() => router.replace('/')}>이전</button>
+        <button type="button" className="btn outline" onClick={() => router.replace('/')}>이전으로</button>
       )}
 
       {/* 문제를 푸는 장에서는 앞 장으로 돌아가거나 그만두고 나갈 수 있어야 한다 */}
@@ -158,20 +204,25 @@ function ClearImage({ src, group }) {
   return <img className="qc__img" src={url} alt="" onError={() => setFailed(true)} />;
 }
 
-// 한 이야기를 모두 완수하면 얻는 정기 그림 — public/quest_spirit_{메인번호}.png
-function SpiritImage({ no }) {
+// 한 이야기를 모두 완수하면 얻는 그림 — 퀘스트1은 정기, 퀘스트2는 고소리술 같은 결과물.
+// 퀘스트1: public/quest_spirit_{메인번호}.png (먼저 만든 규칙 그대로 둔다)
+// 퀘스트2부터: public/quest_spirit_{퀘스트번호}_{메인번호}.png
+function SpiritImage({ group, no }) {
   const [failed, setFailed] = useState(false);
-  useEffect(() => { setFailed(false); }, [no]);
+  const src = group === 1 ? `/quest_spirit_${no}.png` : `/quest_spirit_${group}_${no}.png`;
+  useEffect(() => { setFailed(false); }, [src]);
   if (!no || failed) return null;
-  return <img className="qc__spirit" src={`/quest_spirit_${no}.png`} alt="" onError={() => setFailed(true)} />;
+  return <img className="qc__spirit" src={src} alt="" onError={() => setFailed(true)} />;
 }
 
+// 이야기를 다 끝냈을 때 진행 그림을 보러 가는 버튼 — 퀘스트1은 복숭아나무, 퀘스트2는 측간신
+const HERO_BUTTON = { 1: '복숭아 나무 보기', 2: '측간신 상태보기' };
+
 function ResultView({ result, quest, onHome, onQuestList, onScan }) {
-  // 퀘스트1에서 이야기를 다 끝냈으면 자란 복숭아나무를 보러 가고,
-  // 아직 남았으면 다음 코드를 찾으러 보낸다.
-  const inQuest1 = quest?.quest_group === 1;
-  const toPeach = inQuest1 && result.mainCleared;
-  const toScan = inQuest1 && !result.mainCleared;
+  // 이야기를 다 끝냈으면 진행 그림을 보러 '나의 퀘스트'의 그 탭으로 보낸다.
+  // 퀘스트1은 아직 남았을 때 다음 코드를 찾으러 보낸다.
+  const heroLabel = result.mainCleared ? HERO_BUTTON[quest?.quest_group] : null;
+  const toScan = quest?.quest_group === 1 && !result.mainCleared;
   return (
     <div className="sheet qc">
       <div className="sheet__panel qc__panel">
@@ -181,7 +232,7 @@ function ResultView({ result, quest, onHome, onQuestList, onScan }) {
             <Sparkle className="qc__star" /><i /><Sparkle className="qc__star" />
           </div>
           <h1 className="qc__title">퀘스트 완료</h1>
-          {result.mainCleared && <SpiritImage no={result.mainNo} />}
+          {result.mainCleared && <SpiritImage group={quest?.quest_group} no={result.mainNo} />}
           {/* 관리툴에 적어둔 리워드 문구(대본의 '리워드 획득') */}
           {quest?.clear_text && <p className="qc__reward">{quest.clear_text}</p>}
           {/* 완수했을 때 들려주는 소리 — 파일이 없으면 버튼이 뜨지 않는다 */}
@@ -191,8 +242,8 @@ function ResultView({ result, quest, onHome, onQuestList, onScan }) {
           </p>
         </div>
         <div className="qc__foot">
-          <button className="btn" onClick={toPeach ? onQuestList : toScan ? onScan : onHome}>
-            {toPeach ? '복숭아 나무 보기' : toScan ? '코드 탐색' : '메인으로'}
+          <button className="btn" onClick={heroLabel ? onQuestList : toScan ? onScan : onHome}>
+            {heroLabel || (toScan ? '코드 탐색' : '메인으로')}
           </button>
         </div>
       </div>

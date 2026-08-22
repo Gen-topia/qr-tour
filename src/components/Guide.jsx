@@ -91,6 +91,15 @@ const RULES = [
 const marked = (text) =>
   text.split(/==([\s\S]+?)==/).map((part, i) => (i % 2 ? <mark key={i}>{part}</mark> : part));
 
+// 과업마다 곁들이는 그림 — public/guide/task_{번호}.png
+// 파일이 없으면 그림 없이 글만 보인다.
+function TaskArt({ no }) {
+  const [failed, setFailed] = useState(false);
+  if (failed) return null;
+  return <img className="gd__taskart" src={`/guide/task_${no}.png`} alt=""
+              onError={() => setFailed(true)} />;
+}
+
 // 지침서를 열면 함께 흐르는 안내 음성 — public/guide/guide.mp3
 // 파일이 없거나 재생이 막히면 조용히 사라진다(브라우저가 자동재생을 막으면 버튼으로 켠다).
 function GuideAudio({ src = '/guide/guide.mp3' }) {
@@ -178,9 +187,14 @@ export default function Guide({ onDone }) {
                   )}
 
                   {s.key === 'task' && TASKS.map(([t, d], i) => (
-                    <article key={t} className="gd__task">
-                      <div className="gd__tasknum"><span>{`0${i + 1}`}</span><i /></div>
-                      <h2 className="gd__taskhead">{t}</h2>
+                    <article key={t} className={`gd__task${i % 2 ? ' gd__task--flip' : ''}`}>
+                      <div className="gd__taskhead">
+                        <TaskArt no={i + 1} />
+                        <div className="gd__tasktext">
+                          <span className="gd__tasknum">{i + 1}</span>
+                          <h2>{t}</h2>
+                        </div>
+                      </div>
                       <p className="gd__taskbody">{d}</p>
                     </article>
                   ))}
