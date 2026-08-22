@@ -116,6 +116,11 @@ function Quest() {
       {step.type === 'photo' && (<><PhotoShare /><div className="grow" /><button className="btn" onClick={next}>다음</button></>)}
       {Play && <Play key={step.id} step={step} submit={submit} />}
 
+      {/* 첫 장에서는 '다음' 아래에 메인으로 빠져나갈 길을 둔다 */}
+      {isIntro && !Play && (
+        <button type="button" className="btn outline" onClick={() => router.replace('/')}>이전</button>
+      )}
+
       {/* 문제를 푸는 장에서는 앞 장으로 돌아가거나 그만두고 나갈 수 있어야 한다 */}
       {Play && (
         <div className="qnav">

@@ -101,6 +101,12 @@ a { color: var(--lantern); text-decoration: none; }
   border: 1px solid var(--line); box-shadow: var(--shadow-sm);
 }
 .btn.danger { background: var(--talisman); color: #fff; box-shadow: 0 10px 24px rgba(226,65,95,.24); }
+/* 분홍 테두리만 두른 흰 버튼 — 주 버튼 아래에 놓는 보조 행동 */
+.btn.outline {
+  background: var(--surface); color: var(--lantern-dim);
+  border: 1.5px solid var(--lantern); box-shadow: none;
+}
+.btn.outline:active { background: rgba(204,108,152,.06); box-shadow: none; }
 /* 유리(글래스) 버튼 — 어두운 이미지 배경 위에 얹는다 */
 .btn.glass {
   background: rgba(255,255,255,.12);
