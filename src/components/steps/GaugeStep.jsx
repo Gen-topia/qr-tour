@@ -2,10 +2,12 @@
 import { useRef, useState } from 'react';
 
 // 게이지 올리기 — 아래에서 위로 밀어 끝까지 채우면 성공(휴대폰 잠금 해제 제스처).
-// config에 { "invert": true }를 두면 거꾸로 — 거의 다 찬 상태에서 위에서 아래로 끌어내려 비운다.
+// config에 { "invert": true }를 두면 거꾸로 — 거의 다 찬 상태에서 수위를 잡아 아래로 끌어내려 비운다.
+// 어느 쪽이든 채운 높이는 트랙 아래쪽에서 잰다(눈금과 같은 방향).
 // scale_top·scale_bottom을 적어 두면 기압표처럼 눈금과 수치를 함께 보여준다.
 // 손을 떼면 아직 끝나지 않은 만큼 처음 자리로 되돌아간다.
 const TICKS = 5;
+const GRAB = 0.18;               // 내리는 방식에서 '수위를 잡았다'고 볼 범위(트랙 높이 대비)
 
 export default function GaugeStep({ step, submit }) {
   const cfg = step.config || {};
@@ -27,7 +29,7 @@ export default function GaugeStep({ step, submit }) {
     if (!draggingRef.current || doneRef.current) return;
     const rect = trackRef.current.getBoundingClientRect();
     const t = e.touches?.[0] || e;
-    // 트랙 아래쪽이 0, 위쪽이 1
+    // 트랙 아래쪽이 0, 위쪽이 1 — 손가락 높이가 곧 수위다
     const v = Math.max(0, Math.min(1, (rect.bottom - t.clientY) / rect.height));
     setValue(v);
     if (invert ? v <= 0.01 : v >= 0.99) {
@@ -35,7 +37,17 @@ export default function GaugeStep({ step, submit }) {
     }
   }
 
-  const start = (e) => { draggingRef.current = true; move(e); };
+  const start = (e) => {
+    // 내리는 방식은 지금 수위 근처를 짚어야 잡힌다.
+    // (아무 데나 누르면 그 높이로 값이 튀어 아래쪽을 건드리는 것만으로 끝나 버린다)
+    if (invert) {
+      const rect = trackRef.current.getBoundingClientRect();
+      const t = e.touches?.[0] || e;
+      if (Math.abs((rect.bottom - t.clientY) / rect.height - value) > GRAB) return;
+    }
+    draggingRef.current = true;
+    move(e);
+  };
   const end = () => {
     draggingRef.current = false;
     if (!doneRef.current) setValue(START);   // 끝까지 못 하면 처음 자리로

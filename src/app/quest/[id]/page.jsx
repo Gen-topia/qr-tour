@@ -196,12 +196,13 @@ function Quest() {
 
 // 완료 화면 그림 — 관리툴에 미션별로 적어둔 주소를 먼저 쓰고,
 // 없으면 퀘스트 묶음 공용 그림(public/quest_clear_{그룹번호}.png)을 쓴다.
+// 정기 그림과 같은 자리(제목 바로 아래)에 같은 크기로 놓는다.
 function ClearImage({ src, group }) {
   const url = src || (group ? `/quest_clear_${group}.png` : null);
   const [failed, setFailed] = useState(false);
   useEffect(() => { setFailed(false); }, [url]);
   if (!url || failed) return null;
-  return <img className="qc__img" src={url} alt="" onError={() => setFailed(true)} />;
+  return <img className="qc__spirit" src={url} alt="" onError={() => setFailed(true)} />;
 }
 
 // 한 이야기를 모두 완수하면 얻는 그림 — 퀘스트1은 정기, 퀘스트2는 고소리술 같은 결과물.
@@ -227,12 +228,14 @@ function ResultView({ result, quest, onHome, onQuestList, onScan }) {
     <div className="sheet qc">
       <div className="sheet__panel qc__panel">
         <div className="qc__body">
-          <ClearImage src={quest?.clear_image_url} group={quest?.quest_group} />
           <div className="qc__rule">
             <Sparkle className="qc__star" /><i /><Sparkle className="qc__star" />
           </div>
           <h1 className="qc__title">퀘스트 완료</h1>
-          {result.mainCleared && <SpiritImage group={quest?.quest_group} no={result.mainNo} />}
+          {/* 제목 바로 아래 그림 — 이야기를 다 끝냈으면 정기를, 아니면 그 퀘스트의 완료 그림을 */}
+          {result.mainCleared
+            ? <SpiritImage group={quest?.quest_group} no={result.mainNo} />
+            : <ClearImage src={quest?.clear_image_url} group={quest?.quest_group} />}
           {/* 관리툴에 적어둔 리워드 문구(대본의 '리워드 획득') */}
           {quest?.clear_text && <p className="qc__reward">{quest.clear_text}</p>}
           {/* 완수했을 때 들려주는 소리 — 파일이 없으면 버튼이 뜨지 않는다 */}
