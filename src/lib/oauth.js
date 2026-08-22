@@ -7,7 +7,9 @@ export const PROVIDERS = {
     authUrl: 'https://kauth.kakao.com/oauth/authorize',
     tokenUrl: 'https://kauth.kakao.com/oauth/token',
     profileUrl: 'https://kapi.kakao.com/v2/user/me',
-    scope: 'profile_nickname account_email phone_number',
+    // 전화번호(phone_number)는 비즈 앱 권한 심사가 끝나면 다시 넣는다.
+    // 콘솔 동의항목에 없는 항목을 요청하면 인가 단계에서 바로 막힌다.
+    scope: 'profile_nickname account_email',
     clientId: () => process.env.KAKAO_REST_API_KEY,
     clientSecret: () => process.env.KAKAO_CLIENT_SECRET || '',
     // 응답: { id: 1234567890, kakao_account: { email, phone_number, profile: { nickname } } }
