@@ -143,7 +143,7 @@ function Missions() {
             <p className="mq__introdesc">{g.desc}</p>
             {/* 삽화는 아직 아무것도 못 깼을 때만 — 하나라도 깨면 진행 그림이 대신 나온다.
                 퀘스트3은 진행 그림이 없어 열쇠를 얻은 뒤 계속 삽화를 보여준다 */}
-            {(g.value === 3 ? data.skyKey : mainsDone === 0) && <QuestArt group={g.value} label={g.label} />}
+            {(g.value === 3 || mainsDone === 0) && <QuestArt group={g.value} label={g.label} />}
           </section>
         )}
 
