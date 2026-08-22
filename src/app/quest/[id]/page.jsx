@@ -18,8 +18,9 @@ import DrawStep from '@/components/steps/DrawStep';
 import ScratchStep from '@/components/steps/ScratchStep';
 import GaugeStep from '@/components/steps/GaugeStep';
 import DialStep from '@/components/steps/DialStep';
+import WayStep from '@/components/steps/WayStep';
 
-const PLAY_COMPONENTS = { quiz: QuizStep, puzzle: PuzzleStep, clear: ClearStep, draw: DrawStep, scratch: ScratchStep, gauge: GaugeStep, dial: DialStep };
+const PLAY_COMPONENTS = { quiz: QuizStep, puzzle: PuzzleStep, clear: ClearStep, draw: DrawStep, scratch: ScratchStep, gauge: GaugeStep, dial: DialStep, way: WayStep };
 
 // 장에 붙는 그림 — 그 장에 적어둔 주소를 먼저 쓰고,
 // 없으면 첫 장에 한해 관리툴의 '첫 페이지 이미지 URL'을,
@@ -174,7 +175,8 @@ function Quest() {
 
       {/* 이야기로 끝나는 미션은 마지막 장에서 바로 완수 처리한다.
           현장 코드를 찾아야 이어지는 장은 관리툴 config에 { "next": "scan" }을 넣어 코드 탐색으로 보낸다.
-          갈래가 있는 장은 { "choices": [...] }를 넣어 '다음' 대신 고르는 단추를 둔다 */}
+          갈래가 있는 장은 { "choices": [...] }를 넣어 '다음' 대신 고르는 단추를 둔다.
+          그냥 넘어가는 장의 단추 글은 { "cta": "..." }로 바꾼다 */}
       {step.type === 'story' && (<><div className="grow" />
         {step.config?.next === 'scan'
           ? <button className="btn" onClick={goScan}>코드 탐색</button>
@@ -182,18 +184,19 @@ function Quest() {
             ? choices.map(c => (
                 <button key={c.label} className="btn" onClick={() => goStep(c.step)}>{c.label}</button>
               ))
-            : <button className="btn" onClick={isLast ? () => submit({ done: true }) : next}>{isLast ? '퀘스트 완료' : '다음'}</button>}
+            : <button className="btn" onClick={isLast ? () => submit({ done: true }) : next}>{step.config?.cta || (isLast ? '퀘스트 완료' : '다음')}</button>}
       </>)}
       {step.type === 'photo' && (<><PhotoShare /><div className="grow" /><button className="btn" onClick={next}>다음</button></>)}
-      {Play && <Play key={step.id} step={step} submit={submit} />}
+      {Play && <Play key={step.id} step={step} submit={submit} onPrev={prev} />}
 
       {/* 첫 장에서는 '다음' 아래에 메인으로 빠져나갈 길을 둔다 */}
       {isIntro && !Play && (
         <button type="button" className="btn outline" onClick={() => router.replace('/')}>이전으로</button>
       )}
 
-      {/* 문제를 푸는 장에서는 앞 장으로 돌아가거나 그만두고 나갈 수 있어야 한다 */}
-      {Play && (
+      {/* 문제를 푸는 장에서는 앞 장으로 돌아가거나 그만두고 나갈 수 있어야 한다.
+          길 안내 장은 제 단추를 따로 두므로 여기서는 그리지 않는다. */}
+      {Play && step.type !== 'way' && (
         <div className="qnav">
           <button type="button" className="btn ghost" onClick={prev} disabled={idx === 0}>이전으로</button>
           <HintModal hint={step.hint_text} image={step.hint_image_url} className="btn outline" />

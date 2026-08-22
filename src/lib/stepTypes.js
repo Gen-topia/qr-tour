@@ -72,6 +72,15 @@ export const STEP_TYPES = {
       config: { rings: 3, active_ring: 1, target_angle: 120, tolerance: 12 },
     },
   },
+  way: {
+    label: '가는 길 안내',
+    hint: 'photos에 적어둔 사진을 차례로 보여준다. 아래 ‘코드 탐색’을 누르면 '
+        + '이 미션을 완수하고 코드 탐색 화면으로 넘어간다',
+    sample: {
+      type: 'way', title: '다음으로 가는 길',
+      config: { photos: ['/way/1.png', '/way/2.png'] },
+    },
+  },
   photo: {
     label: '사진 공유',
     hint: '사진을 찍어 공유하는 페이지',

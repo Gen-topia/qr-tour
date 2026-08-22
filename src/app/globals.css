@@ -107,6 +107,14 @@ a { color: var(--lantern); text-decoration: none; }
   border: 1.5px solid var(--lantern); box-shadow: none;
 }
 .btn.outline:active { background: rgba(204,108,152,.06); box-shadow: none; }
+/* 안쪽을 비운 변형 — 바탕이 그대로 비친다 */
+.btn.outline--bare { background: transparent; }
+
+/* 가는 길 안내 — 사진을 위에서 아래로 차례로 놓는다 */
+.way__photo {
+  display: block; width: 100%; height: auto;
+  border-radius: 14px; box-shadow: var(--shadow-sm);
+}
 /* 유리(글래스) 버튼 — 어두운 이미지 배경 위에 얹는다 */
 .btn.glass {
   background: rgba(255,255,255,.12);
