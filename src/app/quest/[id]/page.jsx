@@ -200,7 +200,10 @@ function Quest() {
         <div className="qnav">
           <button type="button" className="btn ghost" onClick={prev} disabled={idx === 0}>이전으로</button>
           <HintModal hint={step.hint_text} image={step.hint_image_url} className="btn outline outline--bare" />
-          <button type="button" className="btn ghost" onClick={() => router.replace('/')}>메인으로</button>
+          {/* 걷어내기는 조각을 판 바깥으로 끌어내므로 아래에 단추를 두지 않는다 */}
+          {step.type !== 'clear' && (
+            <button type="button" className="btn ghost" onClick={() => router.replace('/')}>메인으로</button>
+          )}
         </div>
       )}
     </div>
