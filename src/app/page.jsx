@@ -37,6 +37,7 @@ function MainInner() {
   const [closed, setClosed] = useState(false);   // 오픈 전이라 로그인을 받지 않는 상태
   const [allDone, setAllDone] = useState(false); // 퀘스트3까지 모두 완수해 여정이 끝난 상태
   const [endClosed, setEndClosed] = useState(false); // 여정의 끝 안내를 닫았는지
+  const [doneChecked, setDoneChecked] = useState(false); // 그 확인이 끝났는지
   const params = useSearchParams();
   const next = params.get('next') || '/';
   const err = params.get('error');
@@ -52,15 +53,18 @@ function MainInner() {
     return () => clearTimeout(t);
   }, [ready, isAuthed, uuid, signup]);
 
-  // 퀘스트3을 모두 완수했으면 메인에서 다시 시도할 수 없게 막는다
+  // 퀘스트3을 모두 완수했으면 메인에서 다시 시도할 수 없게 막는다.
+  // 답을 받기 전에 메뉴로 들어가 버리지 않도록, 확인이 끝날 때까지 메뉴를 잠근다.
   useEffect(() => {
-    if (!ready || !isAuthed) return;
+    if (!ready) return;
+    if (!isAuthed) { setDoneChecked(true); return; }
     api.myMissions()
       .then(d => {
         const last = d.quests.filter(q => q.quest_group === 3);
         setAllDone(last.length > 0 && last.every(q => q.cleared));
       })
-      .catch(() => {});
+      .catch(() => {})
+      .finally(() => setDoneChecked(true));
   }, [ready, isAuthed]);
 
   // 지침서를 덮으면 순서의 마지막인 사전 퀘스트가 도착한다
@@ -185,7 +189,8 @@ function MainInner() {
         <div className="screen">
           <div className="grow" />
           {/* <p className="muted center">{user?.nickname ? `${user.nickname} 수호자님, 어서 오세요.` : '수호자님, 어서 오세요.'}</p> */}
-          <nav className="menu">
+          {/* 여정이 끝났는지 확인하기 전에는 눌러도 들어가지 않게 한다 */}
+          <nav className={`menu${!doneChecked || (allDone && !endClosed) ? ' menu--locked' : ''}`}>
             {MENU.map(m => (
               m.to
                 ? <Link key={m.label} href={m.to} className="btn btn--oauth menu__item">{m.label}</Link>
