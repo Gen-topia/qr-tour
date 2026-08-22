@@ -140,8 +140,6 @@ function Quest() {
   };
   // 좌우로 넘겨 읽는 장 — config에 { "slides": ["...", "..."] }
   const slides = step.type === 'story' && Array.isArray(step.config?.slides) ? step.config.slides : null;
-  // 넘겨 읽는 장은 끝까지 읽어야 마무리 단추가 나온다
-  const readAll = !slides || slide >= slides.length - 1;
   // 이야기를 끝내고 메인으로 나가는 장 — config에 { "finish": "home" }
   const finishHome = async () => {
     await submit({ done: true }, true);
@@ -193,7 +191,7 @@ function Quest() {
           현장 코드를 찾아야 이어지는 장은 관리툴 config에 { "next": "scan" }을 넣어 코드 탐색으로 보낸다.
           갈래가 있는 장은 { "choices": [...] }를 넣어 '다음' 대신 고르는 단추를 둔다.
           그냥 넘어가는 장의 단추 글은 { "cta": "..." }로 바꾼다 */}
-      {step.type === 'story' && readAll && (<><div className="grow" />
+      {step.type === 'story' && (<><div className="grow" />
         {step.config?.next === 'scan'
           ? <button className="btn" onClick={goScan}>코드 탐색</button>
           : choices

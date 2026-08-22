@@ -17,15 +17,23 @@ export default function StorySlides({ items, at, onMove }) {
   };
 
   return (
-    <div className="sld"
-         onPointerDown={e => setFrom(e.clientX)}
-         onPointerUp={onUp}
-         onPointerCancel={() => setFrom(null)}>
+    <div className="sld">
       <button type="button" className="sld__arrow" disabled={at === 0}
-              onClick={e => { e.stopPropagation(); go(-1); }} aria-label="이전">‹</button>
-      <p className="sld__text">{items[at]}</p>
+              onClick={() => go(-1)} aria-label="이전">‹</button>
+
+      {/* 글이 실제로 옆으로 미끄러지도록 전부 이어 붙여 두고 통째로 민다 */}
+      <div className="sld__view"
+           onPointerDown={e => setFrom(e.clientX)}
+           onPointerUp={onUp}
+           onPointerCancel={() => setFrom(null)}>
+        <div className="sld__track" style={{ transform: `translateX(-${at * 100}%)` }}>
+          {items.map((t, k) => <p key={k} className="sld__text">{t}</p>)}
+        </div>
+      </div>
+
       <button type="button" className="sld__arrow" disabled={at >= items.length - 1}
-              onClick={e => { e.stopPropagation(); go(1); }} aria-label="다음">›</button>
+              onClick={() => go(1)} aria-label="다음">›</button>
+
       <div className="sld__dots" aria-hidden="true">
         {items.map((_, k) => <i key={k} className={k === at ? 'is-on' : ''} />)}
       </div>
