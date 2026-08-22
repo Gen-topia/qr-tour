@@ -6,7 +6,7 @@ import { STEP_TYPES } from '@/lib/stepTypes';
 import { SPOT_OPTIONS } from '@/lib/spots';
 import { QUEST_GROUPS } from '@/lib/questGroups';
 
-const EMPTY = { title: '', order_no: 1, quest_group: 1, main_no: 1, main_title: '', place: '', cover_image_url: '', narration_video: '', clear_text: '', clear_audio_url: '', reward_points: 100, is_active: 1 };
+const EMPTY = { title: '', order_no: 1, quest_group: 1, main_no: 1, main_title: '', place: '', cover_image_url: '', clear_image_url: '', narration_video: '', clear_text: '', clear_audio_url: '', reward_points: 100, is_active: 1 };
 const SAMPLE = JSON.stringify([STEP_TYPES.story.sample, STEP_TYPES.quiz.sample], null, 2);
 
 function Quests() {
@@ -231,6 +231,15 @@ function Quests() {
                 onChange={e => setEditing({ ...editing, cover_image_url: e.target.value })} />
               <p className="muted" style={{ margin: '6px 0 0', fontSize: 13 }}>
                 public 폴더에 넣은 그림의 주소. 첫 페이지 제목 아래에 나옵니다.
+              </p>
+            </div>
+            <div className="field">
+              <label>완료 화면 이미지 URL</label>
+              <input className="input" placeholder="예: /quest_done_4.png (비우면 퀘스트 공용 그림)"
+                value={editing.clear_image_url || ''}
+                onChange={e => setEditing({ ...editing, clear_image_url: e.target.value })} />
+              <p className="muted" style={{ margin: '6px 0 0', fontSize: 13 }}>
+                퀘스트 완료 화면 맨 위에 나옵니다. 비우면 퀘스트 묶음 공용 그림을 씁니다.
               </p>
             </div>
             <div className="field">

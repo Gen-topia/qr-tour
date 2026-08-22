@@ -78,7 +78,8 @@ function Quest() {
   if (result) return (
     <ResultView result={result} quest={quest}
                 onHome={() => router.replace('/')}
-                onQuestList={() => router.replace(`/missions?quest=${quest?.quest_group}`)} />
+                onQuestList={() => router.replace(`/missions?quest=${quest?.quest_group}`)}
+                onScan={() => router.replace('/scan')} />
   );
 
   const step = steps[idx];
@@ -147,12 +148,14 @@ function Quest() {
   );
 }
 
-// 퀘스트별 클리어 이미지 — public/quest_clear_{퀘스트번호}.png, 없으면 이미지 없이 텍스트만
-function ClearImage({ group }) {
+// 완료 화면 그림 — 관리툴에 미션별로 적어둔 주소를 먼저 쓰고,
+// 없으면 퀘스트 묶음 공용 그림(public/quest_clear_{그룹번호}.png)을 쓴다.
+function ClearImage({ src, group }) {
+  const url = src || (group ? `/quest_clear_${group}.png` : null);
   const [failed, setFailed] = useState(false);
-  useEffect(() => { setFailed(false); }, [group]);
-  if (!group || failed) return null;
-  return <img className="qc__img" src={`/quest_clear_${group}.png`} alt="" onError={() => setFailed(true)} />;
+  useEffect(() => { setFailed(false); }, [url]);
+  if (!url || failed) return null;
+  return <img className="qc__img" src={url} alt="" onError={() => setFailed(true)} />;
 }
 
 // 한 이야기를 모두 완수하면 얻는 정기 그림 — public/quest_spirit_{메인번호}.png
@@ -163,14 +166,17 @@ function SpiritImage({ no }) {
   return <img className="qc__spirit" src={`/quest_spirit_${no}.png`} alt="" onError={() => setFailed(true)} />;
 }
 
-function ResultView({ result, quest, onHome, onQuestList }) {
-  // 퀘스트1은 모은 정기로 복숭아나무가 자라므로 나무를 보러 가게 한다
-  const toPeach = quest?.quest_group === 1;
+function ResultView({ result, quest, onHome, onQuestList, onScan }) {
+  // 퀘스트1에서 이야기를 다 끝냈으면 자란 복숭아나무를 보러 가고,
+  // 아직 남았으면 다음 코드를 찾으러 보낸다.
+  const inQuest1 = quest?.quest_group === 1;
+  const toPeach = inQuest1 && result.mainCleared;
+  const toScan = inQuest1 && !result.mainCleared;
   return (
     <div className="sheet qc">
       <div className="sheet__panel qc__panel">
         <div className="qc__body">
-          <ClearImage group={quest?.quest_group} />
+          <ClearImage src={quest?.clear_image_url} group={quest?.quest_group} />
           <div className="qc__rule">
             <Sparkle className="qc__star" /><i /><Sparkle className="qc__star" />
           </div>
@@ -185,8 +191,8 @@ function ResultView({ result, quest, onHome, onQuestList }) {
           </p>
         </div>
         <div className="qc__foot">
-          <button className="btn" onClick={toPeach ? onQuestList : onHome}>
-            {toPeach ? '복숭아 나무 보기' : '메인으로'}
+          <button className="btn" onClick={toPeach ? onQuestList : toScan ? onScan : onHome}>
+            {toPeach ? '복숭아 나무 보기' : toScan ? '코드 탐색' : '메인으로'}
           </button>
         </div>
       </div>
