@@ -42,7 +42,11 @@ export default function QuizStep({ step, submit }) {
         </>
       )}
 
-      {wrong && <p style={{ color: 'var(--talisman)', margin: 0 }}>정답이 아니에요. 다시 시도해 보세요.</p>}
+      {wrong && (
+        <p style={{ color: 'var(--talisman)', margin: '20px 0 4px', textAlign: 'center', whiteSpace: 'pre-line' }}>
+          {'정답이 아니에요.\n다시 시도해 보세요.'}
+        </p>
+      )}
 
       {/* 정답이 아직 정해지지 않은 문제 — config에 skip이 있을 때만 나온다 */}
       {step.config?.skip && (
