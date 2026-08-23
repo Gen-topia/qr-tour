@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react';
 import AdminShell from '@/components/AdminShell';
 import { api } from '@/lib/apiClient';
 import { STEP_TYPES } from '@/lib/stepTypes';
-import { SPOT_OPTIONS } from '@/lib/spots';
+import { SPOT_OPTIONS, spotOptions } from '@/lib/spots';
 import { QUEST_GROUPS } from '@/lib/questGroups';
 
 const EMPTY = { title: '', header_title: '', screen_title: '', order_no: 1, quest_group: 1, main_no: 1, main_title: '', place: '', cover_image_url: '', clear_image_url: '', narration_video: '', clear_text: '', clear_audio_url: '', reward_points: 100, is_active: 1 };
@@ -19,11 +19,14 @@ function Quests() {
   const [stepsText, setStepsText] = useState('');
   const [stepsErr, setStepsErr] = useState('');
   const [newType, setNewType] = useState('quiz');
+  // 장소 선택지는 코드 지도에서 가져온다(못 불러오면 기본값)
+  const [places, setPlaces] = useState(SPOT_OPTIONS);
 
   async function load() { setQuests((await api.adminQuests()).quests); }
   useEffect(() => { load(); }, []);
   useEffect(() => { api.adminSettings().then(r => setOpen(r.questOpen)).catch(() => {}); }, []);
   useEffect(() => { loadTesters(); }, []);
+  useEffect(() => { api.adminSpots().then(r => setPlaces(spotOptions(r.map))).catch(() => {}); }, []);
   function loadTesters() { api.adminTesters().then(r => setTesters(r.testers)).catch(() => {}); }
 
   async function openEdit(qst) {
@@ -219,7 +222,7 @@ function Quests() {
                 <label>장소 (코드 지도)</label>
                 <select className="input" value={editing.place || ''} onChange={e => setEditing({ ...editing, place: e.target.value })}>
                   <option value="">— 지정 안 함 —</option>
-                  {SPOT_OPTIONS.map(s => <option key={s.code} value={s.code}>{s.name}</option>)}
+                  {places.map(s => <option key={s.code} value={s.code}>{s.name}</option>)}
                 </select>
               </div>
             </div>

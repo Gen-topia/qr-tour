@@ -6,10 +6,11 @@ import Loading from '@/components/Loading';
 import SheetNav from '@/components/SheetNav';
 import Sparkle from '@/components/Sparkle';
 import { api } from '@/lib/apiClient';
-import { SPOT_GROUPS, naverMapUrl } from '@/lib/spots';
+import { DEFAULT_CODE_MAP, naverMapUrl } from '@/lib/spots';
 
 function CodeMap() {
   const [quests, setQuests] = useState(null);
+  const [map, setMap] = useState(null);       // 관리툴에서 고친 지도 내용
   const [err, setErr] = useState('');
   // 다른 화면에서 ?spot=hyangsadang처럼 장소를 지정해 오면 그 장소를 펼쳐 둔다
   const asked = useSearchParams().get('spot');
@@ -23,9 +24,11 @@ function CodeMap() {
   }, [asked, quests]);
 
   useEffect(() => { api.myMissions().then(d => setQuests(d.quests)).catch(e => setErr(e.message)); }, []);
+  // 지도 내용을 못 불러와도 화면은 기본값으로 뜨게 둔다
+  useEffect(() => { api.spots().then(r => setMap(r.map)).catch(() => setMap(DEFAULT_CODE_MAP)); }, []);
 
   if (err) return <div className="screen center"><p className="muted">{err}</p></div>;
-  if (!quests) return <Loading label="코드 지도를 불러오는 중…" />;
+  if (!quests || !map) return <Loading label="코드 지도를 불러오는 중…" />;
 
   // 장소에 연결된 미션이 모두 끝났으면 해결 표시
   const stateOf = (code) => {
@@ -47,15 +50,14 @@ function CodeMap() {
             </button>
           </div>
           <h1 className="gd__title">파수꾼 코드 지도</h1>
-          <p className="gd__lead">
-            활동 장소와 운영 시간을 확인하고
-            {'\n'}가장 가까운 파수꾼 코드부터 찾아보세요.
-          </p>
+          <p className="gd__lead">{map.lead}</p>
         </header>
 
-        <img className="cm__art" src="/map.png" alt="파수꾼 코드가 있는 장소를 표시한 지도" />
+        {map.image && (
+          <img className="cm__art" src={map.image} alt="파수꾼 코드가 있는 장소를 표시한 지도" />
+        )}
 
-        {SPOT_GROUPS.map(g => (
+        {map.groups.map(g => (
           <section key={g.group} className="cm__group">
             <h2 className="cm__grouphead">{g.group}</h2>
             <div className="gd__acc">

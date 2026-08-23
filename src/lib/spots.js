@@ -1,5 +1,6 @@
 // 코드 지도(8. 전체 과업 지도) — 대본 2차 기준 장소 안내
 // quests.place에 아래 code를 넣으면 해당 장소의 해결 상태가 지도에 표시된다.
+// 관리툴에서 고치면 DB(page_content.code_map)에 저장되고, 여기 값은 처음 한 번의 밑그림이 된다.
 export const SPOT_GROUPS = [
   {
     group: '수호 본부',
@@ -56,5 +57,17 @@ export const SPOT_GROUPS = [
 export const naverMapUrl = (spot) =>
   `https://map.naver.com/p/search/${encodeURIComponent(spot.map || spot.name)}`;
 
-// 관리자 미션 편집의 장소 선택용
+// 코드 지도 화면 전체의 기본값 — 관리툴에서 아직 저장한 적이 없을 때 쓰인다
+export const DEFAULT_CODE_MAP = {
+  lead: '활동 장소와 운영 시간을 확인하고\n가장 가까운 파수꾼 코드부터 찾아보세요.',
+  image: '/map.png',
+  groups: SPOT_GROUPS,
+};
+
+// 관리자 미션 편집의 장소 선택용(불러오기 전 기본값)
 export const SPOT_OPTIONS = SPOT_GROUPS.flatMap(g => g.items.map(s => ({ code: s.code, name: s.name })));
+
+// 저장된 지도에서 장소 선택지를 뽑는다
+export const spotOptions = (map) =>
+  (map?.groups || []).flatMap(g => (g.items || []).map(s => ({ code: s.code, name: s.name })))
+    .filter(s => s.code);

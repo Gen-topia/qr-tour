@@ -235,10 +235,10 @@ function Quest() {
           길 안내 장은 제 단추를 따로 두므로 여기서는 그리지 않는다. */}
       {Play && step.type !== 'way' && (
         <div className="qnav">
-          <button type="button" className="btn ghost" onClick={prev} disabled={idx === 0}>이전으로</button>
+          <button type="button" className="btn outline outline--bare" onClick={prev} disabled={idx === 0}>이전으로</button>
           <HintModal hint={step.hint_text} image={step.hint_image_url} className="btn outline outline--bare" />
-          {/* 걷어내기는 조각을 판 바깥으로 끌어내므로 아래에 단추를 두지 않는다 */}
-          {step.type !== 'clear' && (
+          {/* 걷어내기·문지르기·기압 조정은 판 위에서 손을 움직이므로 아래에 나가는 단추를 두지 않는다 */}
+          {step.type !== 'clear' && step.type !== 'scratch' && step.type !== 'gauge' && (
             <button type="button" className="btn ghost" onClick={() => router.replace('/')}>메인으로</button>
           )}
         </div>

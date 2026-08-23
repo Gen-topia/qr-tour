@@ -727,11 +727,11 @@ h1 { font-size: 28px; font-weight: 800; margin: 8px 0 6px; letter-spacing: -.03e
 /* ─────────────────────────────────────────────────────────────
    로그인 · 프롤로그 · 지침서 — 탭바까지 덮는 전체화면 레이어
    ───────────────────────────────────────────────────────────── */
-.login, .prologue, .onboard { position: fixed; inset: 0; z-index: 50; overflow: auto; }
+.login, .oath, .prologue, .onboard { position: fixed; inset: 0; z-index: 50; overflow: auto; }
 
 /* 수호자 서약(로그인)·메인 — intro.png(9:16)가 잘리지 않도록 같은 비율의 무대를 화면 정중앙에 둔다.
    기기 화면과의 비율 차이는 무대 바깥의 어두운 여백으로 남는다 */
-.login, .home {
+.login, .oath, .home {
   display: flex; align-items: center; justify-content: center;
   overflow: hidden; background: #0b0820;
 }
@@ -742,7 +742,7 @@ h1 { font-size: 28px; font-weight: 800; margin: 8px 0 6px; letter-spacing: -.03e
   max-width: calc(100dvh * 9 / 16);
   aspect-ratio: 9 / 16;
 }
-.login .screen, .home .screen { flex: 1; min-height: 0; overflow: auto; }
+.login .screen, .oath .screen, .home .screen { flex: 1; min-height: 0; overflow: auto; }
 
 .login__bg { position: absolute; inset: 0; background: url('/intro.jpg') center / contain no-repeat; }
 .login .screen { position: relative; }
@@ -826,40 +826,47 @@ h1 { font-size: 28px; font-weight: 800; margin: 8px 0 6px; letter-spacing: -.03e
 .menu__logout:active { background: none; opacity: .6; }
 
 /* ── 수호자 서약 ───────────────────────────────────────────
-   시안(성혼선언문)처럼 얇은 테두리를 두른 종이. 글은 가운데로 모으고 크게 둔다 */
-/* 서약을 보는 동안에는 바탕까지 흰색 — 데스크톱 프레임 좌우 여백도 하얗게 이어진다 */
-body.oath-open { background: var(--surface); }
-
-/* 서약은 장식 없이 흰 종이 한 장 — 화면 좌우 끝까지 하얗게 채운다.
-   .sheet의 background:none을 이겨야 해서 두 클래스를 함께 적는다 */
-.oath.sheet { background: var(--surface); }
-.oath .sheet__panel.oath__panel {
+   메인 화면과 같은 배경(main.jpg) 위에 선언문만 얹는다. 종이(흰 바탕)는 쓰지 않는다 */
+.oath__bg { position: absolute; inset: 0; background: url('/main.jpg') center / contain no-repeat; }
+/* 포스터의 분홍 제목과 선언문이 겹쳐 읽기 어려워, 그림은 비치되 글자가 살도록 옅게 덮는다 */
+.oath__bg::after {
+  content: ''; position: absolute; inset: 0;
+  background: linear-gradient(rgba(6,9,26,.62), rgba(6,9,26,.30) 38%, rgba(6,9,26,.30) 70%, rgba(6,9,26,.58));
+}
+.oath .screen.oath__panel {
+  position: relative;                 /* 배경 위로 올린다 */
   display: flex; flex-direction: column;
   padding: 18px var(--gd-pad) calc(24px + env(safe-area-inset-bottom));
-  background: var(--surface);
+  background: none;                   /* 투명 — 배경 그림이 그대로 비친다 */
 }
-/* 그레인(종이 결)도 걷어내 말끔한 흰 바탕으로 둔다 */
-.oath .sheet__panel.oath__panel::before { display: none; }
 .oath__toolbar { height: 24px; margin-bottom: 10px; }
+.oath__back {
+  appearance: none; background: none; border: 0; cursor: pointer;
+  display: block; padding: 0; margin: 0; color: rgba(255,255,255,.72);
+}
+.oath__back svg { display: block; width: 34px; height: 24px; }
 .oath__frame {
   flex: 1; display: flex; flex-direction: column;
   align-items: center; justify-content: center;
   padding: 12px 10px;
 }
+/* 어두운 배경 위라 글자는 밝게, 그림 위에서도 읽히도록 옅은 그림자를 깐다 */
 .oath__title {
   margin: 0 0 30px; font-size: var(--t-head); font-weight: var(--tw-head);
   letter-spacing: .42em; text-indent: .42em;
-  color: var(--c-ink);
+  color: #fff; text-shadow: 0 2px 14px rgba(0,0,0,.55);
 }
 .oath__body {
   margin: 0; white-space: pre-line; text-align: center;
   font-size: var(--t-subtitle); font-weight: var(--tw-body); line-height: 2.05;
-  color: var(--c-ink); letter-spacing: var(--ls-body);
+  color: rgba(255,255,255,.94); letter-spacing: var(--ls-body);
+  text-shadow: 0 2px 12px rgba(0,0,0,.55);
 }
 .oath__ask {
   margin: 34px 0 0; white-space: pre-line; text-align: center;
   font-size: var(--t-body); line-height: var(--lh-body);
-  color: var(--c-body); letter-spacing: var(--ls-body);
+  color: rgba(255,255,255,.74); letter-spacing: var(--ls-body);
+  text-shadow: 0 2px 12px rgba(0,0,0,.55);
 }
 .oath__cta { margin-top: 22px; }
 
@@ -1194,11 +1201,12 @@ body.oath-open { background: var(--surface); }
   font-size: var(--t-body); line-height: var(--lh-body);
   color: var(--c-body); letter-spacing: var(--ls-body);
 }
-/* 퀘스트 삽화 — public/quest_{번호}.png. 원본(768×1376) 높이의 60%만 가운데로 잘라 보여준다 */
+/* 퀘스트 삽화 — public/quest_{번호}.png. 원본(768×1376) 높이의 60%만 가운데로 잘라 보여준다.
+   패널 좌우 여백(--gd-pad)을 음수 마진으로 상쇄해 화면 끝까지 꽉 채운다 */
 .mq__art {
-  display: block; width: 100%; margin: 14px 0 0;
+  display: block;
+  width: calc(100% + var(--gd-pad) * 2); margin: 14px calc(var(--gd-pad) * -1) 0;
   aspect-ratio: 768 / 826; object-fit: cover; object-position: center;
-  border-radius: var(--radius); box-shadow: var(--shadow);
   opacity: 0; transition: opacity .22s ease;
 }
 /* 탭을 바꾸면 새 그림이 다 실린 뒤에 나타난다 */
@@ -1234,11 +1242,11 @@ body.oath-open { background: var(--surface); }
 }
 .qreq--open::before { content: '✓ '; }
 
-/* 퀘스트 진행 이미지 — 퀘스트를 깰수록 public/quest_{번호}_{클리어수}.png 로 바뀐다 */
-/* 진행 그림 — 부모가 flex가 아니어서 align-self가 듣지 않으므로 margin으로 가운데 놓는다 */
+/* 퀘스트 진행 이미지 — 퀘스트를 깰수록 public/quest_{번호}_{클리어수}.png 로 바뀐다.
+   삽화와 같은 자리라 똑같이 좌우 끝까지 채운다 */
 .qhero {
-  display: block; width: 50%; height: auto; margin: 0 auto;
-  border-radius: var(--radius); box-shadow: var(--shadow);
+  display: block; height: auto;
+  width: calc(100% + var(--gd-pad) * 2); margin: 0 calc(var(--gd-pad) * -1);
 }
 
 /* 퀘스트1을 다 깨면 나무의 복숭아를 따서 하늘 문 열쇠를 얻는다 */
@@ -1267,8 +1275,14 @@ body.oath-open { background: var(--surface); }
 }
 .qkey::before { content: '🔑 '; }
 
-/* 열쇠 획득 안내에 얹는 그림 — public/sky_key.png */
-.skykey__img { display: block; width: 56%; height: auto; margin: 0 auto; }
+/* 열쇠 획득 안내에 얹는 그림 — public/sky_key.png
+   --skykey-shift 값을 키우면 오른쪽 여백이 늘어 그림이 그만큼 왼쪽으로 간다.
+   (그림 자기 너비 기준의 비율 — 8%는 그림 폭의 8%만큼 왼쪽으로) */
+.skykey__img {
+  --skykey-shift: 15%;
+  display: block; width: 56%; height: auto; margin: 0 auto;
+  transform: translateX(calc(-1 * var(--skykey-shift)));
+}
 
 /* 설문대할망의 메시지 — 그림이 화면을 채우고 자막을 옆으로 넘겨 읽는 엔딩 */
 .ending {

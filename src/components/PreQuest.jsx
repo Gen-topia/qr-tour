@@ -59,7 +59,8 @@ export default function PreQuest({ onDone }) {
           <>
             <button type="button" className="btn" onClick={toScan}>코드 탐색</button>
             {/* 지운 그림을 다시 크게 들여다볼 수 있게 따로 띄운다 */}
-            <HintModal image={`${DIR}/prequest_hint2.png`} className="btn ghost pq__hintbtn" />
+            <HintModal image={`${DIR}/prequest_hint2.png`} hint="나는 여기에 있어요."
+                       className="btn outline pq__hintbtn" />
             <button type="button" className="btn pq__skip" onClick={onDone}>넘어가기</button>
           </>
         )}

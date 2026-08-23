@@ -35,6 +35,9 @@ export const api = {
 
   // 앱 오픈 여부
   settings: () => req('/api/settings'),
+  spots: () => req('/api/spots'),
+  adminSpots: () => req('/api/admin/spots', { admin: true }),
+  adminSaveSpots: (map) => req('/api/admin/spots', { method: 'PUT', body: { map }, admin: true }),
   adminSettings: () => req('/api/admin/settings', { admin: true }),
   adminSetOpen: (questOpen) => req('/api/admin/settings', { method: 'PUT', body: { questOpen }, admin: true }),
 
