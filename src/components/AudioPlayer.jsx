@@ -9,19 +9,20 @@ export default function AudioPlayer({ src }) {
   const [missing, setMissing] = useState(false);
 
   // 아직 화면을 누른 적이 없으면 브라우저가 자동 재생을 막는다.
-  // 그때는 조용히 멈춰 있다가 사용자가 단추를 누르면 흐른다.
+  // 막혔으면 화면을 건드릴 때마다 다시 시도하고, 한 번 흐르면 그만 듣는다.
+  // (한 번만 시도하면 그 시도까지 막혔을 때 영영 소리가 나지 않는다)
+  const EVENTS = ['pointerdown', 'touchstart', 'click'];
   useEffect(() => {
     setMissing(false);
     const a = ref.current;
     if (!a) return;
-    let onFirstTouch = null;
+
+    function onGesture() { a.play().then(off).catch(() => {}); }
+    function off() { EVENTS.forEach(e => document.removeEventListener(e, onGesture, true)); }
+
     a.currentTime = 0;
-    a.play().catch(() => {
-      // 막혔으면 화면을 처음 건드리는 순간 흐르게 한다(단추를 누를 필요가 없다)
-      onFirstTouch = () => a.play().catch(() => {});
-      document.addEventListener('pointerdown', onFirstTouch, { once: true });
-    });
-    return () => { if (onFirstTouch) document.removeEventListener('pointerdown', onFirstTouch); };
+    a.play().catch(() => EVENTS.forEach(e => document.addEventListener(e, onGesture, true)));
+    return off;
   }, [src]);
 
   if (!src || missing) return null;

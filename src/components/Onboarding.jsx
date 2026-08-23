@@ -14,7 +14,7 @@ export default function Onboarding({ onStart, onClose }) {
       <div className="ob__card" onClick={e => e.stopPropagation()}>
         <button type="button" className="ob__x" onClick={onClose} aria-label="닫기">✕</button>
 
-        <div className="ob__eyebrow">수호자님, 어서 오세요</div>
+        <div className="ob__eyebrow">수호자님, 어서 오세요.</div>
         <p className="ob__msg">아래 순서대로 따라오시면 됩니다.</p>
 
         <ol className="ob__steps">

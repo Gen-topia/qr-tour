@@ -2,6 +2,7 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Scratch from '@/components/Scratch';
+import HintModal from '@/components/HintModal';
 
 // 7-1. 사전 퀘스트 — 대본 2차 기준
 //   알림음과 함께 메시지가 화면 한가운데 바로 열린다 → 가려진 힌트 → 코드 탐색
@@ -57,6 +58,8 @@ export default function PreQuest({ onDone }) {
         {hint && (
           <>
             <button type="button" className="btn" onClick={toScan}>코드 탐색</button>
+            {/* 지운 그림을 다시 크게 들여다볼 수 있게 따로 띄운다 */}
+            <HintModal image={`${DIR}/prequest_hint2.png`} className="btn ghost pq__hintbtn" />
             <button type="button" className="btn pq__skip" onClick={onDone}>넘어가기</button>
           </>
         )}

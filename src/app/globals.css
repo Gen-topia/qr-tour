@@ -249,7 +249,7 @@ h1 { font-size: 28px; font-weight: 800; margin: 8px 0 6px; letter-spacing: -.03e
   border-radius: 10px; cursor: zoom-in;
 }
 .hint__img.is-zoom {
-  position: fixed; inset: 0; z-index: 60;
+  position: fixed; inset: 0; z-index: 75;
   width: 100vw; height: 100vh; max-height: none;
   padding: 12px; border-radius: 0; cursor: zoom-out;
   background: rgba(20,26,46,.92);
@@ -283,6 +283,7 @@ h1 { font-size: 28px; font-weight: 800; margin: 8px 0 6px; letter-spacing: -.03e
 }
 .pq__hint.is-open .pq__hintimg { max-height: 220px; }
 /* 넘어가기 — 테두리만 핑크, 속은 모달 배경이 비친다 */
+.pq__hintbtn { margin-top: 10px; }
 .pq__skip {
   margin-top: 10px;
   background: none; color: var(--lantern);

@@ -13,7 +13,7 @@ export default function HintModal({ hint, image, className = 'btn ghost' }) {
     <>
       <button type="button" className={className} onClick={() => setOpen(true)}>힌트 보기</button>
       {open && (
-        <div onClick={close} style={{ position: 'fixed', inset: 0, background: 'rgba(20,26,46,.35)', display: 'grid', placeItems: 'center', padding: 12, zIndex: 50 }}>
+        <div onClick={close} style={{ position: 'fixed', inset: 0, background: 'rgba(20,26,46,.35)', display: 'grid', placeItems: 'center', padding: 12, zIndex: 70 }}>
           <div className="card stack" style={{ maxWidth: image ? 'min(94vw, 520px)' : 340, width: '100%' }} onClick={e => e.stopPropagation()}>
             <div className="eyebrow">힌트</div>
             {image && (
