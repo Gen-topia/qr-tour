@@ -139,7 +139,8 @@ function Quest() {
                 onHome={() => router.replace('/')}
                 onQuestList={() => router.replace(`/missions?quest=${quest?.quest_group}`)}
                 onScan={() => router.replace('/scan')}
-                onEnding={() => setEnding(true)} />
+                onEnding={() => setEnding(true)}
+                onGo={(to) => router.replace(to)} />
   );
 
   const step = steps[idx];
@@ -305,7 +306,12 @@ const big = (text) =>
 // 이야기를 다 끝냈을 때 진행 그림을 보러 가는 버튼 — 퀘스트1은 복숭아나무, 퀘스트2는 측간신
 const HERO_BUTTON = { 1: '복숭아 나무 보기', 2: '측간신 상태보기' };
 
-function ResultView({ result, quest, onHome, onQuestList, onScan, onEnding }) {
+// 완수하자마자 다음 미션으로 곧장 이어지는 미션 — 측간신을 잠재운 뒤 바로 정화로 넘어간다.
+// 여기 적힌 미션은 완료 화면의 주 단추가 '여기서 마무리하기'(퀘스트 보기)로 바뀌고,
+// 그 아래에 다음 미션으로 가는 단추가 하나 더 붙는다.
+const CLEAR_NEXT = { 8: { label: '측간신 정화하기', to: '/quest/9' } };
+
+function ResultView({ result, quest, onHome, onQuestList, onScan, onEnding, onGo }) {
   // 퀘스트3까지 모두 끝내면 최종 완료 — 설문대할망의 메시지로 이어진다
   const isFinal = quest?.quest_group === 3 && result.groupCleared;
   // 이야기를 다 끝냈으면 진행 그림을 보러 '나의 퀘스트'의 그 탭으로 보낸다.
@@ -314,6 +320,8 @@ function ResultView({ result, quest, onHome, onQuestList, onScan, onEnding }) {
   const heroLabel = result.mainCleared || quest?.quest_group === 2
     ? HERO_BUTTON[quest?.quest_group] : null;
   const toScan = quest?.quest_group === 1 && !result.mainCleared;
+  // 다음 미션으로 곧장 잇는 미션이면 단추가 셋이 된다
+  const nextQuest = CLEAR_NEXT[quest?.id];
   return (
     <div className="sheet qc">
       <div className="sheet__panel qc__panel">
@@ -338,11 +346,18 @@ function ResultView({ result, quest, onHome, onQuestList, onScan, onEnding }) {
           </p>
         </div>
         <div className="qc__foot">
-          <button className="btn" onClick={isFinal ? onEnding : heroLabel ? onQuestList : toScan ? onScan : onHome}>
-            {isFinal ? '메시지 듣기' : heroLabel || (toScan ? '코드 탐색' : '메인으로')}
-          </button>
+          {nextQuest ? (
+            <>
+              <button className="btn" onClick={onQuestList}>여기서 마무리하기</button>
+              <button className="btn" onClick={() => onGo(nextQuest.to)}>{nextQuest.label}</button>
+            </>
+          ) : (
+            <button className="btn" onClick={isFinal ? onEnding : heroLabel ? onQuestList : toScan ? onScan : onHome}>
+              {isFinal ? '메시지 듣기' : heroLabel || (toScan ? '코드 탐색' : '메인으로')}
+            </button>
+          )}
           {/* 주 단추가 메인으로가 아닐 때만 빠져나갈 길을 하나 더 둔다 */}
-          {(isFinal || heroLabel || toScan) && (
+          {(isFinal || heroLabel || toScan || nextQuest) && (
             <button type="button" className="btn outline" onClick={onHome}>이전으로</button>
           )}
         </div>
