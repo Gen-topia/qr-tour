@@ -833,13 +833,16 @@ h1 { font-size: 28px; font-weight: 800; margin: 8px 0 6px; letter-spacing: -.03e
   content: ''; position: absolute; inset: 0;
   background: linear-gradient(rgba(6,9,26,.62), rgba(6,9,26,.30) 38%, rgba(6,9,26,.30) 70%, rgba(6,9,26,.58));
 }
+/* 글은 9:16 무대에 갇히지 않고 화면 전체를 쓴다(무대 높이에 맞추면 버튼이 잘린다) */
 .oath .screen.oath__panel {
-  position: relative;                 /* 배경 위로 올린다 */
-  display: flex; flex-direction: column;
-  padding: 18px var(--gd-pad) calc(24px + env(safe-area-inset-bottom));
+  position: absolute; inset: 0;
+  width: 100%; max-width: var(--maxw); margin: 0 auto;
+  display: flex; flex-direction: column; overflow: auto;
+  /* --gd-pad는 .sheet에만 있는 값이라 여기선 쓸 수 없다(쓰면 padding이 통째로 무효가 된다) */
+  padding: 30px 21px calc(40px + env(safe-area-inset-bottom));
   background: none;                   /* 투명 — 배경 그림이 그대로 비친다 */
 }
-.oath__toolbar { height: 24px; margin-bottom: 10px; }
+.oath__toolbar { height: 24px; margin: 0 0 10px 4px; }
 .oath__back {
   appearance: none; background: none; border: 0; cursor: pointer;
   display: block; padding: 0; margin: 0; color: rgba(255,255,255,.72);
@@ -868,7 +871,9 @@ h1 { font-size: 28px; font-weight: 800; margin: 8px 0 6px; letter-spacing: -.03e
   color: rgba(255,255,255,.74); letter-spacing: var(--ls-body);
   text-shadow: 0 2px 12px rgba(0,0,0,.55);
 }
-.oath__cta { margin-top: 22px; }
+/* 주 동작 버튼은 화면을 꽉 채우지 않고 가운데로 — 화면 폭의 80%.
+   기준이 되는 부모가 좌우 21px씩 들어가 있어, 그만큼(42px의 80% = 34px)을 되돌려 준다 */
+.oath__cta { width: calc(80% + 34px); margin: 22px auto 0; }
 
 @media (max-height: 700px) {
   .oath__body { font-size: var(--t-body); line-height: 1.9; }

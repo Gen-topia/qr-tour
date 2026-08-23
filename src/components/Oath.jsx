@@ -19,26 +19,26 @@ const ASK = `설문대할망의 사자,
 export default function Oath({ onAgree, onBack }) {
   return (
     <div className="oath fade-in">
-      <div className="stage">
-        <div className="oath__bg" />
-        <div className="screen oath__panel">
-          <div className="oath__toolbar">
-            <button type="button" className="oath__back" onClick={onBack} aria-label="뒤로">
-              <svg viewBox="0 0 34 20" aria-hidden="true">
-                <path d="M10.5 2 2 10l8.5 8M2 10h31" fill="none" stroke="currentColor"
-                      strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />
-              </svg>
-            </button>
-          </div>
+      {/* 배경은 포스터가 잘리지 않게 9:16 무대에 담고, 글은 그 위에 화면 전체로 얹는다 */}
+      <div className="stage"><div className="oath__bg" /></div>
 
-          <div className="oath__frame">
-            <h1 className="oath__title">수호자 서약</h1>
-            <p className="oath__body">{OATH}</p>
-            <p className="oath__ask">{ASK}</p>
-          </div>
-
-          <button type="button" className="btn oath__cta" onClick={onAgree}>서약하기</button>
+      <div className="screen oath__panel">
+        <div className="oath__toolbar">
+          <button type="button" className="oath__back" onClick={onBack} aria-label="뒤로">
+            <svg viewBox="0 0 34 20" aria-hidden="true">
+              <path d="M10.5 2 2 10l8.5 8M2 10h31" fill="none" stroke="currentColor"
+                    strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+          </button>
         </div>
+
+        <div className="oath__frame">
+          <h1 className="oath__title">수호자 서약</h1>
+          <p className="oath__body">{OATH}</p>
+          <p className="oath__ask">{ASK}</p>
+        </div>
+
+        <button type="button" className="btn oath__cta" onClick={onAgree}>서약하기</button>
       </div>
     </div>
   );
