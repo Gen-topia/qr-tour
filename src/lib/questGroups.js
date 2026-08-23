@@ -15,8 +15,11 @@ export const QUEST_GROUPS = [
 // 퀘스트 보기에서 좌우로 넘기는 탭(프롤로그는 홈에서 따로 진입한다)
 export const QUEST_TABS = QUEST_GROUPS.filter(g => g.value > 0);
 
-// 진행 조건 — { 잠긴 퀘스트: 먼저 모두 완수해야 하는 퀘스트 }
-export const QUEST_REQUIRES = { 3: 1 };
+// 진행 조건 — { 잠긴 퀘스트: 먼저 모두 완수해야 하는 퀘스트들 }
+export const QUEST_REQUIRES = { 3: [1, 2] };
+
+// 선행 퀘스트를 사람이 읽는 이름으로 — '퀘스트1·퀘스트2'
+export const requireLabel = (groups) => groups.map(groupLabel).join('·');
 
 // 이야기가 이어지는 퀘스트 — 앞 순서(order_no)를 모두 완수해야 다음 미션이 열린다.
 // 퀘스트1은 네 장소를 자유롭게 돌 수 있어 넣지 않는다.

@@ -7,10 +7,12 @@ import Loading from '@/components/Loading';
 import SheetNav from '@/components/SheetNav';
 import InfoModal from '@/components/InfoModal';
 import Sparkle from '@/components/Sparkle';
-import { QUEST_TABS, QUEST_REQUIRES, groupLabel } from '@/lib/questGroups';
+import { QUEST_TABS, QUEST_REQUIRES, requireLabel } from '@/lib/questGroups';
 
 // 진행 그림이 있는 퀘스트 — 1은 복숭아나무, 2는 측간신. 퀘스트3은 그림이 없다.
-const HERO_GROUPS = [1, 2];
+// 값은 '몇 개 깼는지'를 그림 번호로 옮기는 몫 — 퀘스트1은 1개 깨면 _0부터,
+// 퀘스트2는 1개 깨면 _1부터 쓴다(_0은 아직 아무것도 안 깬 측간신이라 건너뛴다).
+const HERO_OFFSET = { 1: -1, 2: 0 };
 
 // 퀘스트 그림 한 장 — 다 실리면 is-on이 붙는다.
 // '실렸다·깨졌다'를 참/거짓으로 두면 그림이 바뀔 때 되돌려야 하는데, 그 사이에
@@ -37,11 +39,12 @@ const HERO_CROP = { '/quest_1_0.png': { aspectRatio: '731 / 420', objectFit: 'co
 
 // 퀘스트 진행 이미지 — public/quest_{퀘스트번호}_{단계}.png
 // 하나도 못 깼을 때는 삽화(quest_{번호}.png)만 보이고, 하나를 깬 순간부터
-// 0단계 그림으로 바뀐다(1개 완수 → _0, 2개 → _1 …).
+// 진행 그림으로 바뀐다. 그림 번호는 HERO_OFFSET이 정한다.
 // 아직 준비되지 않은 단계의 그림은 깨진 이미지 대신 조용히 숨긴다.
 function QuestImage({ group, done, label }) {
-  const src = `/quest_${group}_${done - 1}.png`;
-  if (!HERO_GROUPS.includes(group) || done < 1) return null;
+  const offset = HERO_OFFSET[group];
+  const src = `/quest_${group}_${done + offset}.png`;
+  if (offset === undefined || done < 1) return null;
   return <QuestPic className="qhero" src={src} style={HERO_CROP[src]}
                    alt={`${label} 진행 이미지`} />;
 }
@@ -108,10 +111,15 @@ function Missions() {
   const mainsDone = mains.filter(m => m.items.every(q => q.cleared)).length;
 
   // 선행 퀘스트를 모두 완수해야 열리는 퀘스트라면 조건을 함께 알려준다
-  const needGroup = QUEST_REQUIRES[g.value];
-  const need = needGroup ? data.quests.filter(q => q.quest_group === needGroup) : [];
+  const needGroups = QUEST_REQUIRES[g.value] || [];
+  const need = data.quests.filter(q => needGroups.includes(q.quest_group));
   const needDone = need.filter(q => q.cleared).length;
   const openable = need.length === 0 || needDone >= need.length;
+
+  // 열쇠를 얻어도 퀘스트2가 남았으면 퀘스트3은 아직 잠겨 있다 — '열렸습니다' 안내를 띄우지 않는다
+  const quest3Open = data.quests
+    .filter(q => (QUEST_REQUIRES[3] || []).includes(q.quest_group))
+    .every(q => q.cleared);
 
   // 퀘스트1을 모두 완수했는데 아직 열쇠를 얻지 않았다면, 나무의 복숭아를 딸 수 있다
   const canPick = g.value === 1 && mains.length > 0 && mainsDone === mains.length && !data.skyKey;
@@ -186,8 +194,8 @@ function Missions() {
         {need.length > 0 && (
           <p className={`qreq${openable ? ' qreq--open' : ''}`}>
             {openable
-              ? `${groupLabel(needGroup)}을 모두 완수했어요. ${g.label}에 도전할 수 있습니다.`
-              : `${groupLabel(needGroup)}의 모든 퀘스트를 완수해야 ${g.label}에 도전할 수 있어요. (${needDone}/${need.length} 완수)`}
+              ? `${requireLabel(needGroups)}를 모두 완수했어요. ${g.label}에 도전할 수 있습니다.`
+              : `${requireLabel(needGroups)}의 모든 퀘스트를 완수해야 ${g.label}에 도전할 수 있어요. (${needDone}/${need.length} 완수)`}
           </p>
         )}
 
@@ -237,7 +245,7 @@ function Missions() {
 
       {phase === 'key' && (
         <InfoModal eyebrow="퀘스트1 완수" title="하늘 문 열쇠를 얻었습니다"
-                   confirmLabel="확인" onClose={() => setPhase('quest3')}>
+                   confirmLabel="확인" onClose={() => setPhase(quest3Open ? 'quest3' : '')}>
           <KeyImage />
           <p style={{ margin: '10px 0 0' }}>
             유산의 정기로 열린 복숭아가 하늘 문 열쇠가 되었습니다.
