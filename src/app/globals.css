@@ -1289,8 +1289,15 @@ h1 { font-size: 28px; font-weight: 800; margin: 8px 0 6px; letter-spacing: -.03e
   transform: translateX(calc(-1 * var(--skykey-shift)));
 }
 
-/* 퀘스트1 자리에 놓는 하늘 문 열쇠 — 나무보다 옆으로 퍼져 있어 조금 크게 둔다 */
-.qhero--key { width: 68%; box-shadow: none; border-radius: 0; }
+/* 퀘스트1 자리에 놓는 하늘 문 열쇠 — 나무 삽화와 같이 좌우 끝까지 꽉 채운다.
+   오른쪽 여백은 --skykey-gap 으로 조절한다(0이면 여백 없이 최대, 값을 키우면
+   오른쪽에 그만큼 여백이 생기고 그림은 그만큼 작아진다) */
+.qhero--key {
+  --skykey-gap: 0%;
+  width: calc(100% + var(--gd-pad) * 2 - var(--skykey-gap));
+  margin: 0 0 0 calc(var(--gd-pad) * -1);
+  box-shadow: none; border-radius: 0;
+}
 
 /* 설문대할망의 메시지 — 그림이 화면을 채우고 자막을 옆으로 넘겨 읽는 엔딩 */
 .ending {
