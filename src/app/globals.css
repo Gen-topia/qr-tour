@@ -243,12 +243,17 @@ h1 { font-size: 28px; font-weight: 800; margin: 8px 0 6px; letter-spacing: -.03e
 .qnav { display: flex; gap: 10px; margin-top: 16px; }
 .qnav .btn { font-size: 14px; padding: 12px 14px; }
 
-/* 힌트 그림 — 기본은 작게, 누르면 크게 본다 */
+/* 힌트 그림 — 처음부터 크게 띄우고, 누르면 화면을 꽉 채워 본다 */
 .hint__img {
-  display: block; width: 100%; max-height: 120px; object-fit: contain;
+  display: block; width: 100%; max-height: 68vh; object-fit: contain;
   border-radius: 10px; cursor: zoom-in;
 }
-.hint__img.is-zoom { max-height: 60vh; cursor: zoom-out; }
+.hint__img.is-zoom {
+  position: fixed; inset: 0; z-index: 60;
+  width: 100vw; height: 100vh; max-height: none;
+  padding: 12px; border-radius: 0; cursor: zoom-out;
+  background: rgba(20,26,46,.92);
+}
 
 .pq__hint { margin: 18px 0; }
 .pq__scratch {

@@ -269,8 +269,10 @@ function ResultView({ result, quest, onHome, onQuestList, onScan, onEnding }) {
   // 퀘스트3까지 모두 끝내면 최종 완료 — 설문대할망의 메시지로 이어진다
   const isFinal = quest?.quest_group === 3 && result.groupCleared;
   // 이야기를 다 끝냈으면 진행 그림을 보러 '나의 퀘스트'의 그 탭으로 보낸다.
+  // 퀘스트2는 이야기가 아직 남았어도 측간신의 상태를 보러 갈 수 있게 한다.
   // 퀘스트1은 아직 남았을 때 다음 코드를 찾으러 보낸다.
-  const heroLabel = result.mainCleared ? HERO_BUTTON[quest?.quest_group] : null;
+  const heroLabel = result.mainCleared || quest?.quest_group === 2
+    ? HERO_BUTTON[quest?.quest_group] : null;
   const toScan = quest?.quest_group === 1 && !result.mainCleared;
   return (
     <div className="sheet qc">
