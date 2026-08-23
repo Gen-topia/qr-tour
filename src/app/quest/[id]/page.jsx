@@ -138,11 +138,16 @@ function Quest() {
     <ResultView result={result} quest={quest}
                 onHome={() => router.replace('/')}
                 onBack={() => setResult(null)}
-                onQuestList={() => router.replace(`/missions?quest=${quest?.quest_group}`)}
+                onQuestList={(main) => router.replace(
+                  `/missions?quest=${quest?.quest_group}${main ? `&main=${main}` : ''}`)}
                 onScan={() => router.replace('/scan')}
                 onEnding={() => setEnding(true)}
                 onGo={(to) => router.replace(to)} />
   );
+
+  // 코드를 비추는 것만으로 끝나는 미션(autoclear)은 완수 처리가 끝날 때까지 장을 그리지 않는다.
+  // 안 그러면 첫 장이 잠깐 떴다가 완료 화면으로 바뀌어 두 화면이 스쳐 지나간다.
+  if (steps[0]?.config?.autoclear) return <Loading label="퀘스트를 여는 중…" />;
 
   const step = steps[idx];
   // 진행 화면 윗줄(핑크) — 관리툴에 따로 적어두면 그것을, 없으면 미션 이름을 쓴다
@@ -321,10 +326,13 @@ function ResultView({ result, quest, onHome, onBack, onQuestList, onScan, onEndi
   // 퀘스트3까지 모두 끝내면 최종 완료 — 설문대할망의 메시지로 이어진다
   const isFinal = quest?.quest_group === 3 && result.groupCleared;
   // 이야기를 다 끝냈으면 진행 그림을 보러 '나의 퀘스트'의 그 탭으로 보낸다.
-  // 퀘스트2는 이야기가 아직 남았어도 측간신의 상태를 보러 갈 수 있게 한다.
+  // 퀘스트2는 이야기가 아직 남았어도 같은 곳으로 보내되, 볼 것이 진행 그림이 아니라
+  // 남은 미션이므로 단추 글을 '다음으로'로 두고 그 이야기를 펼쳐서 보여준다.
   // 퀘스트1은 아직 남았을 때 다음 코드를 찾으러 보낸다.
-  const heroLabel = result.mainCleared || quest?.quest_group === 2
-    ? HERO_BUTTON[quest?.quest_group] : null;
+  const heroLabel = result.mainCleared
+    ? HERO_BUTTON[quest?.quest_group]
+    : (quest?.quest_group === 2 ? '다음으로' : null);
+  const openMain = result.mainCleared ? null : result.mainNo;
   const toScan = quest?.quest_group === 1 && !result.mainCleared;
   // 다음 미션으로 곧장 잇는 미션이면 단추가 셋이 된다
   const nextQuest = CLEAR_NEXT[quest?.id];
@@ -354,11 +362,13 @@ function ResultView({ result, quest, onHome, onBack, onQuestList, onScan, onEndi
         <div className="qc__foot">
           {nextQuest ? (
             <>
-              <button className="btn" onClick={onQuestList}>여기서 마무리하기</button>
+              <button className="btn" onClick={() => onQuestList()}>여기서 마무리하기</button>
               <button className="btn" onClick={() => onGo(nextQuest.to)}>{nextQuest.label}</button>
             </>
           ) : (
-            <button className="btn" onClick={isFinal ? onEnding : heroLabel ? onQuestList : toScan ? onScan : onHome}>
+            <button className="btn"
+                    onClick={isFinal ? onEnding : heroLabel ? () => onQuestList(openMain)
+                           : toScan ? onScan : onHome}>
               {isFinal ? '메시지 듣기' : heroLabel || (toScan ? '코드 탐색' : '메인으로')}
             </button>
           )}

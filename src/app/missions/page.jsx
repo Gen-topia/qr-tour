@@ -1,5 +1,5 @@
 'use client';
-import { Suspense, useEffect, useState } from 'react';
+import { Suspense, useEffect, useRef, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Protected from '@/components/Protected';
 import { api } from '@/lib/apiClient';
@@ -72,15 +72,27 @@ function toMains(list) {
 function Missions() {
   const [data, setData] = useState(null);
   const [err, setErr] = useState('');
-  // 퀘스트를 완수하고 넘어올 때는 ?quest=1처럼 볼 탭을 지정해 온다
-  const asked = useSearchParams().get('quest');
+  // 퀘스트를 완수하고 넘어올 때는 ?quest=1처럼 볼 탭을 지정해 온다.
+  // 이야기가 남아 다음 미션을 찾아야 하면 ?main=1처럼 펼쳐 둘 이야기까지 함께 온다.
+  const params = useSearchParams();
+  const asked = params.get('quest');
+  const askedMain = params.get('main');
   const wanted = QUEST_TABS.findIndex(t => String(t.value) === asked);
   const [tab, setTab] = useState(wanted < 0 ? 0 : wanted);   // QUEST_TABS의 인덱스
-  const [open, setOpen] = useState(null);     // 펼쳐 둔 메인 퀘스트 키
+  const [open, setOpen] = useState(askedMain ? `${asked}-${askedMain}` : null);   // 펼쳐 둔 메인 퀘스트 키
   // 복숭아 따기 연출 — '' → picking(나무가 스러진다) → key(열쇠) → quest3(열림 안내)
   const [phase, setPhase] = useState('');
   const router = useRouter();
   useEffect(() => { api.myMissions().then(setData).catch(e => setErr(e.message)); }, []);
+
+  // 펼쳐 둘 이야기를 지정해 왔으면, 그 안의 미션이 바로 보이도록 맨 아래까지 내려준다
+  // (이 화면은 창이 아니라 바깥 상자가 구르므로 그 상자를 움직인다)
+  const boxRef = useRef(null);
+  useEffect(() => {
+    if (!data || !askedMain) return;
+    const box = boxRef.current;
+    if (box) box.scrollTo({ top: box.scrollHeight, behavior: 'smooth' });
+  }, [data, askedMain]);
 
   if (err) return <div className="screen center"><p className="muted">{err}</p></div>;
   if (!data) return <Loading label="퀘스트를 불러오는 중…" />;
@@ -112,7 +124,7 @@ function Missions() {
   };
 
   return (
-    <div className="onboard sheet gd mq">
+    <div className="onboard sheet gd mq" ref={boxRef}>
       <div className="sheet__panel">
         <header className="gd__hero">
           <div className="gd__toolbar">
