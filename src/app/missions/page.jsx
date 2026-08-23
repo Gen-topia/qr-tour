@@ -18,7 +18,7 @@ const HERO_GROUPS = [1, 2];
 // 흰 자리만 보인다). 그래서 '어느 주소가' 실렸는지·몇 번 실패했는지를 기억한다.
 // 실패는 한 번 더 불러본 뒤에야 포기한다 — 이동 통신에서 요청이 한 번 끊겼다고
 // 그림이 영영 빈 자리로 굳지 않게(주소를 바꿔야 브라우저가 다시 받아온다).
-function QuestPic({ className, src, alt }) {
+function QuestPic({ className, src, alt, style }) {
   const [shown, setShown] = useState('');
   const [fails, setFails] = useState({});
   const tried = fails[src] || 0;
@@ -31,13 +31,18 @@ function QuestPic({ className, src, alt }) {
   );
 }
 
+// 위쪽이 크게 비어 있어 흰 칸으로만 보이는 그림은 그 빈 자리를 잘라 아래쪽만 보여준다.
+// (새싹 그림은 731×1024 중 아래 388px에만 그림이 있다 — 그림을 다시 그리면 여기도 함께 손본다)
+const HERO_CROP = { '/quest_1_0.png': { aspectRatio: '731 / 420', objectFit: 'cover', objectPosition: 'bottom' } };
+
 // 퀘스트 진행 이미지 — public/quest_{퀘스트번호}_{단계}.png
 // 하나도 못 깼을 때는 삽화(quest_{번호}.png)만 보이고, 하나를 깬 순간부터
 // 0단계 그림으로 바뀐다(1개 완수 → _0, 2개 → _1 …).
 // 아직 준비되지 않은 단계의 그림은 깨진 이미지 대신 조용히 숨긴다.
 function QuestImage({ group, done, label }) {
+  const src = `/quest_${group}_${done - 1}.png`;
   if (!HERO_GROUPS.includes(group) || done < 1) return null;
-  return <QuestPic className="qhero" src={`/quest_${group}_${done - 1}.png`}
+  return <QuestPic className="qhero" src={src} style={HERO_CROP[src]}
                    alt={`${label} 진행 이미지`} />;
 }
 

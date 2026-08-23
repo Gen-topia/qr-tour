@@ -173,6 +173,11 @@ function Quest() {
     if (isLast) await submit({ done: true }, true);
     router.push('/scan');
   };
+  // 곁들이 단추로 다른 화면에 나가는 장 — 마지막 장이면 완수 처리부터 하고 넘어간다
+  const goExtra = async (to) => {
+    if (isLast) await submit({ done: true }, true);
+    router.push(to);
+  };
   // 좌우로 넘겨 읽는 장 — config에 { "slides": ["...", "..."] }
   const slides = step.type === 'story' && Array.isArray(step.config?.slides) ? step.config.slides : null;
   // 이야기를 끝내고 메인으로 나가는 장 — config에 { "finish": "home" }
@@ -253,7 +258,7 @@ function Quest() {
         {/* 곁들이 단추 — config에 { "extra": { "label": "...", "to": "/map?spot=..." } } */}
         {step.config?.extra?.to && (
           <button type="button" className="btn outline outline--bare"
-                  onClick={() => router.push(step.config.extra.to)}>
+                  onClick={() => goExtra(step.config.extra.to)}>
             {step.config.extra.label || '바로가기'}
           </button>
         )}

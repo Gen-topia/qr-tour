@@ -1208,10 +1208,10 @@ h1 { font-size: 28px; font-weight: 800; margin: 8px 0 6px; letter-spacing: -.03e
   color: var(--c-body); letter-spacing: var(--ls-body);
 }
 /* 퀘스트 삽화 — public/quest_{번호}.png. 원본(768×1376) 높이의 60%만 가운데로 잘라 보여준다.
-   패널 좌우 여백(--gd-pad)을 음수 마진으로 상쇄해 화면 끝까지 꽉 채운다 */
+   패널 안쪽 여백만큼 좌우를 띄우고 모서리를 둥글린다 */
 .mq__art {
   display: block;
-  width: calc(100% + var(--gd-pad) * 2); margin: 14px calc(var(--gd-pad) * -1) 0;
+  width: 100%; margin: 14px 0 0; border-radius: 16px;
   aspect-ratio: 768 / 826; object-fit: cover; object-position: center;
   opacity: 0; transition: opacity .22s ease;
 }
@@ -1249,10 +1249,10 @@ h1 { font-size: 28px; font-weight: 800; margin: 8px 0 6px; letter-spacing: -.03e
 .qreq--open::before { content: '✓ '; }
 
 /* 퀘스트 진행 이미지 — 퀘스트를 깰수록 public/quest_{번호}_{클리어수}.png 로 바뀐다.
-   삽화와 같은 자리라 똑같이 좌우 끝까지 채운다 */
+   삽화와 같은 자리라 여백·둥근 모서리도 똑같이 맞춘다 */
 .qhero {
   display: block; height: auto;
-  width: calc(100% + var(--gd-pad) * 2); margin: 0 calc(var(--gd-pad) * -1);
+  width: 100%; margin: 0; border-radius: 16px;
 }
 
 /* 퀘스트1을 다 깨면 나무의 복숭아를 따서 하늘 문 열쇠를 얻는다 */
