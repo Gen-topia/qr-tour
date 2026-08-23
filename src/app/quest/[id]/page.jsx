@@ -3,6 +3,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Protected from '@/components/Protected';
 import { api } from '@/lib/apiClient';
+import { naverMapUrl } from '@/lib/spots';
 import AudioPlayer from '@/components/AudioPlayer';
 import HintModal from '@/components/HintModal';
 import PhotoShare from '@/components/PhotoShare';
@@ -35,11 +36,24 @@ function StepImage({ src, fallback }) {
   return <img src={url} alt="" style={{ width: '100%', borderRadius: 12 }} onError={() => setFailed(true)} />;
 }
 
+// 장소 안내 — 코드 지도에 적어둔 주소와 지도 링크를 그대로 보여준다(관리툴 config에 { "spot": true })
+function SpotInfo({ spot }) {
+  return (
+    <div className="card stack">
+      <div className="eyebrow">{spot.name}</div>
+      <dl className="cm__info"><dt>주소</dt><dd>{spot.address}</dd></dl>
+      <a className="btn sm outline cm__link" href={naverMapUrl(spot)}
+         target="_blank" rel="noreferrer">네이버 지도로 보기</a>
+    </div>
+  );
+}
+
 function Quest() {
   const { id } = useParams();
   const router = useRouter();
   const [quest, setQuest] = useState(null);
   const [steps, setSteps] = useState(null);
+  const [spot, setSpot] = useState(null);   // 장소 안내를 보여주는 장에서 쓸 주소
   const [idx, setIdx] = useState(0);
   const [err, setErr] = useState('');
   const [result, setResult] = useState(null);
@@ -50,7 +64,7 @@ function Quest() {
 
   useEffect(() => {
     api.questSteps(id)
-      .then(r => { setQuest(r.quest); setLocked(r.locked || ''); setSteps(r.steps); })
+      .then(r => { setQuest(r.quest); setLocked(r.locked || ''); setSteps(r.steps); setSpot(r.spot || null); })
       .catch(e => setErr(e.message));
   }, [id]);
 
@@ -159,6 +173,12 @@ function Quest() {
     await submit({ done: true }, true);
     router.replace('/');
   };
+  // 이야기를 끝내고 '나의 퀘스트'의 그 탭으로 가는 장 — config에 { "finish": "quests" }.
+  // 완료 화면을 거치지 않으므로 진행 그림을 바로 보러 갈 수 있다.
+  const finishQuests = async () => {
+    await submit({ done: true }, true);
+    router.replace(`/missions?quest=${quest?.quest_group}`);
+  };
 
   // 관리툴에 적어둔 이름 → public/{이름}.mp4
   if (narration) return (
@@ -193,6 +213,7 @@ function Quest() {
       {slides
         ? <StorySlides items={slides} at={slide} onMove={setSlide} />
         : step.body_text && <p style={{ whiteSpace: 'pre-wrap' }}>{step.body_text}</p>}
+      {step.config?.spot && spot && <SpotInfo spot={spot} />}
       <AudioPlayer src={step.audio_url} />
       {/* 문제 푸는 장은 하단 이동 단추 줄에 힌트를 두므로 여기서는 그리지 않는다 */}
       {!Play && <HintModal hint={step.hint_text} image={step.hint_image_url} />}
@@ -212,9 +233,16 @@ function Quest() {
             ? choices.map(c => (
                 <button key={c.label} className="btn" onClick={() => goStep(c.step)}>{c.label}</button>
               ))
-            : <button className="btn" onClick={step.config?.finish === 'home' ? finishHome : isLast ? () => submit({ done: true }) : next}>
+            : <button className="btn"
+                      onClick={step.config?.finish === 'home' ? finishHome
+                             : step.config?.finish === 'quests' ? finishQuests
+                             : isLast ? () => submit({ done: true }) : next}>
                 {step.config?.cta || (isLast ? '퀘스트 완료' : '다음')}
               </button>}
+        {/* 앞 장으로 돌아가는 단추 — config에 { "prev": true } */}
+        {step.config?.prev && (
+          <button type="button" className="btn outline outline--bare" onClick={prev}>이전으로</button>
+        )}
         {/* 곁들이 단추 — config에 { "extra": { "label": "...", "to": "/map?spot=..." } } */}
         {step.config?.extra?.to && (
           <button type="button" className="btn outline outline--bare"

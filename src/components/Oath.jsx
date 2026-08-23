@@ -1,7 +1,8 @@
 'use client';
+import AudioPlayer from '@/components/AudioPlayer';
 
 // 수호자 서약 — 소셜 로그인 전에 한 번만 거치는 선언문.
-// 메인 화면과 같은 배경(main.jpg) 위에 선언문만 얹는다. 소리는 넣지 않는다.
+// 메인 화면과 같은 배경(main.jpg) 위에 선언문을 얹고, 선언문 낭독을 함께 들려준다.
 
 const OATH = `본인은 비밀 파수꾼
 ‘동자석’의 령을 대리하고,
@@ -21,6 +22,8 @@ export default function Oath({ onAgree, onBack }) {
     <div className="oath fade-in">
       {/* 배경은 포스터가 잘리지 않게 9:16 무대에 담고, 글은 그 위에 화면 전체로 얹는다 */}
       <div className="stage"><div className="oath__bg" /></div>
+
+      <AudioPlayer src="/oath/oath.mp3" />
 
       <div className="screen oath__panel">
         <div className="oath__toolbar">
