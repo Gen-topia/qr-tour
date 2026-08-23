@@ -147,7 +147,10 @@ function Missions() {
           </section>
         )}
 
-        {canPick ? (
+        {/* 열쇠를 얻은 뒤로 퀘스트1 자리는 복숭아나무 대신 하늘 문 열쇠를 보여준다 */}
+        {g.value === 1 && data.skyKey ? (
+          <img className="qhero is-on qhero--key" src="/sky_key.png" alt="하늘 문 열쇠" />
+        ) : canPick ? (
           <button type="button" className={`peach${phase === 'picking' ? ' is-picking' : ''}`}
                   onClick={pickPeach} disabled={!!phase}>
             <QuestImage group={g.value} done={mainsDone} label={g.label} />
