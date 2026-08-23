@@ -1,5 +1,5 @@
 'use client';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Protected from '@/components/Protected';
 import { api } from '@/lib/apiClient';
@@ -92,6 +92,16 @@ function Quest() {
       return true;
     } catch (e) { setErr(e.message); return false; }
   }, [id, stepId, stepNo]);
+
+  // 읽을 것 없이 코드를 비추는 것만으로 끝나는 미션 — 관리툴 config에 { "autoclear": true }.
+  // 열자마자 완수 처리해서 곧바로 완료 화면을 보여준다.
+  const autoRef = useRef(false);
+  useEffect(() => {
+    if (!steps?.length || locked || result || autoRef.current) return;
+    if (!steps[0].config?.autoclear) return;
+    autoRef.current = true;
+    submit({ done: true });
+  }, [steps, locked, result, submit]);
 
   if (err) return <div className="screen center"><p className="muted">{err}</p></div>;
   if (!steps) return <Loading label="퀘스트를 여는 중…" />;
