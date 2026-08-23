@@ -137,7 +137,7 @@ function Quest() {
   if (result) return (
     <ResultView result={result} quest={quest}
                 onHome={() => router.replace('/')}
-                onBack={() => setResult(null)}
+                onBack={steps[0]?.config?.autoclear ? null : () => setResult(null)}
                 onQuestList={(main) => router.replace(
                   `/missions?quest=${quest?.quest_group}${main ? `&main=${main}` : ''}`)}
                 onScan={() => router.replace('/scan')}
@@ -377,9 +377,12 @@ function ResultView({ result, quest, onHome, onBack, onQuestList, onScan, onEndi
               {isFinal ? '메시지 듣기' : heroLabel || (toScan ? '코드 탐색' : '메인으로')}
             </button>
           )}
-          {/* 앞 화면(미션의 마지막 장)으로 돌아갈 길은 언제나 둔다 — 완료 화면에서
-              빠져나갈 곳이 메인밖에 없으면 읽던 이야기로 되돌아갈 수 없다 */}
-          <button type="button" className="btn outline" onClick={onBack}>이전으로</button>
+          {/* 앞 화면(미션의 마지막 장)으로 돌아갈 길을 둔다 — 완료 화면에서 빠져나갈 곳이
+              메인밖에 없으면 읽던 이야기로 되돌아갈 수 없다.
+              코드를 비추자마자 끝나는 미션(autoclear)은 돌아갈 장이 없어 onBack이 없다 */}
+          {onBack && (
+            <button type="button" className="btn outline" onClick={onBack}>이전으로</button>
+          )}
         </div>
       </div>
     </div>
