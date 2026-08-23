@@ -6,6 +6,7 @@ import { api } from '@/lib/apiClient';
 import Loading from '@/components/Loading';
 import SheetNav from '@/components/SheetNav';
 import InfoModal from '@/components/InfoModal';
+import Sparkle from '@/components/Sparkle';
 import { QUEST_TABS, QUEST_REQUIRES, groupLabel } from '@/lib/questGroups';
 
 // 진행 그림이 있는 퀘스트 — 1은 복숭아나무, 2는 측간신. 퀘스트3은 그림이 없다.
@@ -171,11 +172,15 @@ function Missions() {
           {mains.map(m => {
             const key = `${g.value}-${m.no}`;
             const done = m.items.filter(q => q.cleared).length;
+            const all = m.items.length > 0 && done === m.items.length;
             return (
               <section key={key} className="gd__sec">
                 <button type="button" className="gd__row" aria-expanded={open === key}
                         onClick={() => setOpen(o => (o === key ? null : key))}>
-                  <span className="gd__rowlabel">{m.title}</span>
+                  <span className="gd__rowlabel">
+                    {all && <Sparkle className="gd__rowstar" />}
+                    {m.title}
+                  </span>
                   <span className="mq__count">{done}/{m.items.length}</span>
                   <i className={`gd__sign${open === key ? ' is-open' : ''}`} aria-hidden="true" />
                 </button>

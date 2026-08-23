@@ -129,8 +129,10 @@ function Quest() {
   );
 
   const step = steps[idx];
-  // 진행 화면 윗줄 — 관리툴에 따로 적어두면 그것을, 없으면 미션 이름을 쓴다
+  // 진행 화면 윗줄(핑크) — 관리툴에 따로 적어두면 그것을, 없으면 미션 이름을 쓴다
   const header = quest?.header_title || quest?.title || '미션';
+  // 진행 화면 제목(검정) — 미션에 하나로 적어두면 모든 장에 그것을, 없으면 장마다 적은 제목을 쓴다
+  const heading = quest?.screen_title || step.title;
   const isLast = isLastStep;
   const next = () => { if (!isLast) setIdx(i => i + 1); };
   const prev = () => setIdx(i => Math.max(0, i - 1));
@@ -169,7 +171,7 @@ function Quest() {
   if (step.type === 'story' && step.config?.modal) return (
     <>
       <AudioPlayer src={step.audio_url} />
-      <InfoModal eyebrow={header} title={step.title}
+      <InfoModal eyebrow={header} title={quest?.screen_title || step.title}
                  confirmLabel={step.config.cta || '확인'}
                  onClose={isLast ? () => submit({ done: true }) : next}>
         {step.body_text}
@@ -185,7 +187,7 @@ function Quest() {
         <div className="eyebrow">{header}</div>
         <span className="badge">{idx + 1} / {steps.length}</span>
       </div>
-      {step.title && <h1 style={{ margin: '4px 0' }}>{step.title}</h1>}
+      {heading && <h1 style={{ margin: '4px 0' }}>{heading}</h1>}
       <StepImage src={step.image_url}
                  fallback={isIntro ? (quest?.cover_image_url || `/quest_intro_${id}.png`) : null} />
       {slides
