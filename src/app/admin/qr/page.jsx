@@ -32,7 +32,7 @@ function QrCodes() {
             {imgs[q.id]
               ? <img src={imgs[q.id]} alt={q.code} />
               : <div className="qr-card__ph" />}
-            <div className="qr-card__title">미션 {q.order_no} · {q.title}</div>
+            <div className="qr-card__title">미션 {q.order_no} · {q.order_no === 16 ? '홈페이지로 연결' : q.title}</div>
             <div className="muted qr-card__url">{urlOf(q, origin)}</div>
             <button className="btn sm" onClick={() => download(q)}>PNG 다운로드</button>
           </div>
