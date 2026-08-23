@@ -224,21 +224,17 @@ function Quest() {
       {step.type === 'photo' && (<><PhotoShare /><div className="grow" /><button className="btn" onClick={next}>다음</button></>)}
       {Play && <Play key={step.id} step={step} submit={submit} onPrev={prev} />}
 
-      {/* 첫 장에서는 '다음' 아래에 메인으로 빠져나갈 길을 둔다 */}
-      {isIntro && !Play && (
-        <button type="button" className="btn outline" onClick={() => router.replace('/')}>이전으로</button>
+      {/* 읽고 넘어가는 장에서도 앞 장으로 돌아갈 수 있게 한다(첫 장에는 돌아갈 곳이 없다) */}
+      {!isIntro && !Play && (
+        <button type="button" className="btn outline outline--bare" onClick={prev}>이전으로</button>
       )}
 
-      {/* 문제를 푸는 장에서는 앞 장으로 돌아가거나 그만두고 나갈 수 있어야 한다.
+      {/* 문제를 푸는 장에서는 앞 장으로 돌아갈 수 있어야 한다.
           길 안내 장은 제 단추를 따로 두므로 여기서는 그리지 않는다. */}
       {Play && step.type !== 'way' && (
         <div className="qnav">
-          <button type="button" className="btn ghost" onClick={prev} disabled={idx === 0}>이전으로</button>
+          <button type="button" className="btn outline outline--bare" onClick={prev} disabled={idx === 0}>이전으로</button>
           <HintModal hint={step.hint_text} image={step.hint_image_url} className="btn outline outline--bare" />
-          {/* 걷어내기는 조각을 판 바깥으로 끌어내므로 아래에 단추를 두지 않는다 */}
-          {step.type !== 'clear' && (
-            <button type="button" className="btn ghost" onClick={() => router.replace('/')}>메인으로</button>
-          )}
         </div>
       )}
     </div>
@@ -311,10 +307,6 @@ function ResultView({ result, quest, onHome, onQuestList, onScan, onEnding }) {
           <button className="btn" onClick={isFinal ? onEnding : heroLabel ? onQuestList : toScan ? onScan : onHome}>
             {isFinal ? '메시지 듣기' : heroLabel || (toScan ? '코드 탐색' : '메인으로')}
           </button>
-          {/* 주 단추가 메인으로가 아닐 때만 빠져나갈 길을 하나 더 둔다 */}
-          {(isFinal || heroLabel || toScan) && (
-            <button type="button" className="btn outline" onClick={onHome}>이전으로</button>
-          )}
         </div>
       </div>
     </div>
