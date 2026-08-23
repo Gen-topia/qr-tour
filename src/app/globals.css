@@ -322,6 +322,8 @@ h1 { font-size: 28px; font-weight: 800; margin: 8px 0 6px; letter-spacing: -.03e
   font-size: 12px; font-weight: 700;
 }
 .tj__title { flex: 1; min-width: 0; font-size: 14px; letter-spacing: -.01em; }
+/* 번호 대신 글자가 들어가는 줄(수호자 서약)은 칸을 넓혀 준다 */
+.tj__row .tj__no:not(:empty) { width: auto; min-width: 26px; padding: 0 6px; }
 
 /* 로그인 직후 순서 안내 */
 .ob {

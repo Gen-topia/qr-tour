@@ -5,7 +5,7 @@ import { api } from '@/lib/apiClient';
 
 // 테스트용 — 퀘스트로 바로 건너뛰는 패널.
 // 번호는 관리툴의 '순서'(order_no)와 같다. 0은 사전 퀘스트.
-export default function TestJump({ onClose }) {
+export default function TestJump({ onClose, onOath }) {
   const [quests, setQuests] = useState(null);
   const [err, setErr] = useState('');
   const [no, setNo] = useState('');
@@ -53,6 +53,12 @@ export default function TestJump({ onClose }) {
         {err && <p className="tj__err">{err}</p>}
 
         <div className="tj__list">
+          {onOath && (
+            <button type="button" className="tj__row" onClick={() => { onClose(); onOath(); }}>
+              <span className="tj__no">서약</span>
+              <span className="tj__title">수호자 서약</span>
+            </button>
+          )}
           {!quests && !err && <p className="muted" style={{ margin: 0 }}>불러오는 중…</p>}
           {quests?.map(q => (
             <button key={q.id} type="button" className="tj__row" onClick={() => go(q.id)}>

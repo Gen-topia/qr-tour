@@ -24,8 +24,6 @@ const MENU = [
 
 // 사전 퀘스트 안내는 계정마다 한 번만 띄운다
 const PREQ_KEY = (uuid) => `preq_seen:${uuid || 'guest'}`;
-// 수호자 서약은 이 기기에서 한 번만 받는다
-const OATH_KEY = 'oath_done';
 
 function MainInner() {
   const { isAuthed, ready, user, uuid, reset } = useAuth();
@@ -34,6 +32,7 @@ function MainInner() {
   const [preq, setPreq] = useState(false);  // 사전 퀘스트 안내 표시 여부
   const [oath, setOath] = useState(null);   // 서약을 받는 중인 로그인 수단
   const [jump, setJump] = useState(false);  // 테스트용 퀘스트 바로가기 패널
+  const [oathView, setOathView] = useState(false); // 테스트용 수호자 서약 다시 보기
   const [onboard, setOnboard] = useState(false); // 로그인 직후 순서 안내
   const [closed, setClosed] = useState(false);   // 오픈 전이라 로그인을 받지 않는 상태
   const [allDone, setAllDone] = useState(false); // 퀘스트3까지 모두 완수해 여정이 끝난 상태
@@ -117,12 +116,10 @@ function MainInner() {
         const r = await api.settings();
         if (!r.questOpen) { setClosed(true); return; }
       } catch { /* 확인에 실패하면 막지 않는다 */ }
-      if (localStorage.getItem(OATH_KEY)) go(provider);
-      else setOath(provider);
+      setOath(provider);
     };
     if (oath) return (
-      <Oath onBack={() => setOath(null)}
-            onAgree={() => { localStorage.setItem(OATH_KEY, '1'); go(oath); }} />
+      <Oath onBack={() => setOath(null)} onAgree={() => go(oath)} />
     );
 
     return (
@@ -172,6 +169,11 @@ function MainInner() {
   );
   if (view === 'guide') return <Guide onDone={onGuideDone} />;
 
+  // 테스트용 — Ctrl+1 패널에서 연 수호자 서약. 이미 로그인한 뒤라 읽고 덮기만 한다.
+  if (oathView) return (
+    <Oath onBack={() => setOathView(false)} onAgree={() => setOathView(false)} />
+  );
+
   // 저장된 계정 정보를 지우고 로그인 화면으로(next 쿼리도 제거)
   const onLogout = () => { reset(); router.replace('/'); };
 
@@ -201,7 +203,7 @@ function MainInner() {
         )}
         {preq && !allDone && <PreQuest onDone={closePreq} />}
         {/* 테스트용 — Ctrl+1로 연다 */}
-        {jump && <TestJump onClose={() => setJump(false)} />}
+        {jump && <TestJump onClose={() => setJump(false)} onOath={() => setOathView(true)} />}
         {/* 여정의 끝 — 닫을 수 없다. 여기서부터는 다시 도전할 수 없다 */}
         {allDone && (
           <InfoModal eyebrow="여정의 끝" title="모든 퀘스트를 완수했습니다">
