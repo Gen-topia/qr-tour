@@ -293,11 +293,12 @@ function ResultView({ result, quest, onHome, onQuestList, onScan, onEnding }) {
           </div>
           <h1 className="qc__title">퀘스트 완료</h1>
           {isFinal && <p className="qc__final">최종 퀘스트 완료</p>}
-          {/* 제목 바로 아래 그림 — 이야기를 다 끝냈으면 정기를, 아니면 그 퀘스트의 완료 그림을.
+          {/* 제목 바로 아래 그림 — 관리툴에 적어둔 그림이 있으면 그것을 쓰고,
+              없을 때만 이야기를 다 끝낸 경우의 정기 그림을 쓴다.
               최종 완료는 열린 하늘 문 그림을 쓴다 */}
-          {result.mainCleared && !isFinal
-            ? <SpiritImage group={quest?.quest_group} no={result.mainNo} />
-            : <ClearImage src={quest?.clear_image_url} group={quest?.quest_group} />}
+          {quest?.clear_image_url || isFinal || !result.mainCleared
+            ? <ClearImage src={quest?.clear_image_url} group={quest?.quest_group} />
+            : <SpiritImage group={quest?.quest_group} no={result.mainNo} />}
           {/* 관리툴에 적어둔 리워드 문구(대본의 '리워드 획득') */}
           {quest?.clear_text && <p className="qc__reward">{big(quest.clear_text)}</p>}
           {/* 완수했을 때 들려주는 소리 — 파일이 없으면 버튼이 뜨지 않는다 */}
