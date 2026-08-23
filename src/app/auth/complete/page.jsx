@@ -2,7 +2,17 @@
 import { Suspense, useEffect, useRef, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuth } from '@/lib/authClient';
-import Loading from '@/components/Loading';
+
+// 로그인만 마치고 곧장 넘어가는 경유 화면이라 등불 없이 글만 둔다
+function Waiting() {
+  return (
+    <div className="screen center">
+      <div className="grow" />
+      <p className="muted">로그인 중…</p>
+      <div className="grow" />
+    </div>
+  );
+}
 
 function CompleteInner() {
   const { completeSocialLogin } = useAuth();
@@ -33,9 +43,9 @@ function CompleteInner() {
       <button className="btn" onClick={() => router.replace('/')}>처음으로</button>
     </div>
   );
-  return <Loading label="로그인 중…" />;
+  return <Waiting />;
 }
 
 export default function AuthCompletePage() {
-  return <Suspense fallback={<Loading label="로그인 중…" />}><CompleteInner /></Suspense>;
+  return <Suspense fallback={<Waiting />}><CompleteInner /></Suspense>;
 }

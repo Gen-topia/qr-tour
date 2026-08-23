@@ -266,8 +266,10 @@ function Quest() {
         <div className="qnav">
           <button type="button" className="btn outline outline--bare" onClick={prev} disabled={idx === 0}>이전으로</button>
           <HintModal hint={step.hint_text} image={step.hint_image_url} className="btn outline outline--bare" />
-          {/* 걷어내기·문지르기·기압 조정은 판 위에서 손을 움직이므로 아래에 나가는 단추를 두지 않는다 */}
-          {step.type !== 'clear' && step.type !== 'scratch' && step.type !== 'gauge' && (
+          {/* 걷어내기·문지르기·기압 조정은 판 위에서 손을 움직이므로 아래에 나가는 단추를 두지 않는다.
+              장별로 빼고 싶으면 관리툴 config에 { "nohome": true } */}
+          {step.type !== 'clear' && step.type !== 'scratch' && step.type !== 'gauge'
+            && !step.config?.nohome && (
             <button type="button" className="btn ghost" onClick={() => router.replace('/')}>메인으로</button>
           )}
         </div>

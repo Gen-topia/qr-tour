@@ -12,35 +12,39 @@ import { QUEST_TABS, QUEST_REQUIRES, groupLabel } from '@/lib/questGroups';
 // 진행 그림이 있는 퀘스트 — 1은 복숭아나무, 2는 측간신. 퀘스트3은 그림이 없다.
 const HERO_GROUPS = [1, 2];
 
+// 퀘스트 그림 한 장 — 다 실리면 is-on이 붙는다.
+// '실렸다·깨졌다'를 참/거짓으로 두면 그림이 바뀔 때 되돌려야 하는데, 그 사이에
+// 캐시에 있던 그림이 먼저 onLoad를 쏴서 표시가 지워진다(그림이 투명한 채로 남아
+// 흰 자리만 보인다). 그래서 '어느 주소가' 실렸는지·몇 번 실패했는지를 기억한다.
+// 실패는 한 번 더 불러본 뒤에야 포기한다 — 이동 통신에서 요청이 한 번 끊겼다고
+// 그림이 영영 빈 자리로 굳지 않게(주소를 바꿔야 브라우저가 다시 받아온다).
+function QuestPic({ className, src, alt }) {
+  const [shown, setShown] = useState('');
+  const [fails, setFails] = useState({});
+  const tried = fails[src] || 0;
+  if (tried > 1) return null;
+  return (
+    <img key={`${src}#${tried}`} className={`${className}${shown === src ? ' is-on' : ''}`}
+         src={tried ? `${src}?retry=${tried}` : src} alt={alt}
+         onLoad={() => setShown(src)}
+         onError={() => setFails(f => ({ ...f, [src]: (f[src] || 0) + 1 }))} />
+  );
+}
+
 // 퀘스트 진행 이미지 — public/quest_{퀘스트번호}_{단계}.png
 // 하나도 못 깼을 때는 삽화(quest_{번호}.png)만 보이고, 하나를 깬 순간부터
 // 0단계 그림으로 바뀐다(1개 완수 → _0, 2개 → _1 …).
 // 아직 준비되지 않은 단계의 그림은 깨진 이미지 대신 조용히 숨긴다.
 function QuestImage({ group, done, label }) {
-  const [broken, setBroken] = useState(false);
-  const [loaded, setLoaded] = useState(false);
-  const src = `/quest_${group}_${done - 1}.png`;
-  // 퀘스트를 바꾸면 새 그림이 다 실릴 때까지 아무것도 보이지 않게 한다
-  // (안 그러면 브라우저가 이전 그림을 계속 그려서 바뀌는 순간이 어색하다)
-  useEffect(() => { setBroken(false); setLoaded(false); }, [src]);
-  if (!HERO_GROUPS.includes(group) || done < 1 || broken) return null;
-  return (
-    <img key={src} className={`qhero${loaded ? ' is-on' : ''}`} src={src}
-         alt={`${label} 진행 이미지`}
-         onLoad={() => setLoaded(true)} onError={() => setBroken(true)} />
-  );
+  if (!HERO_GROUPS.includes(group) || done < 1) return null;
+  return <QuestPic className="qhero" src={`/quest_${group}_${done - 1}.png`}
+                   alt={`${label} 진행 이미지`} />;
 }
 
 // 퀘스트 삽화 — public/quest_{퀘스트번호}.png
 // 탭을 바꾸면 새 그림이 다 실릴 때까지 이전 그림이 남지 않게 감춰 둔다.
 function QuestArt({ group, label }) {
-  const [loaded, setLoaded] = useState(false);
-  const src = `/quest_${group}.png`;
-  useEffect(() => { setLoaded(false); }, [src]);
-  return (
-    <img key={src} className={`mq__art${loaded ? ' is-on' : ''}`} src={src}
-         alt={`${label} 삽화`} onLoad={() => setLoaded(true)} />
-  );
+  return <QuestPic className="mq__art" src={`/quest_${group}.png`} alt={`${label} 삽화`} />;
 }
 
 // 하늘 문 열쇠 — public/sky_key.png. 파일이 없으면 글만 남는다.
