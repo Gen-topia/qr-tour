@@ -390,6 +390,8 @@ h1 { font-size: 28px; font-weight: 800; margin: 8px 0 6px; letter-spacing: -.03e
 .audiobtn svg { width: 15px; height: 15px; }
 /* 머리줄(제목 · n/총)이 음성 단추와 겹치지 않게 오른쪽을 비운다 */
 .qpage > .spread:first-child { padding-right: 46px; }
+/* 미션 화면의 카드는 흰 판을 두지 않고 바탕 그러데이션이 그대로 비치게 한다 */
+.qpage .card { background: none; border: 0; box-shadow: none; padding-left: 0; padding-right: 0; }
 .audiobtn:active { background: rgba(255,255,255,.9); }
 
 /* 보기에서 고르는 퀴즈 */
