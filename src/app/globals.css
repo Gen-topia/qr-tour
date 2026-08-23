@@ -817,25 +817,24 @@ h1 { font-size: 28px; font-weight: 800; margin: 8px 0 6px; letter-spacing: -.03e
 
 /* ── 수호자 서약 ───────────────────────────────────────────
    시안(성혼선언문)처럼 얇은 테두리를 두른 종이. 글은 가운데로 모으고 크게 둔다 */
+/* 서약을 보는 동안에는 바탕까지 흰색 — 데스크톱 프레임 좌우 여백도 하얗게 이어진다 */
+body.oath-open { background: var(--surface); }
+
+/* 서약은 장식 없이 흰 종이 한 장 — 화면 좌우 끝까지 하얗게 채운다.
+   .sheet의 background:none을 이겨야 해서 두 클래스를 함께 적는다 */
+.oath.sheet { background: var(--surface); }
 .oath .sheet__panel.oath__panel {
   display: flex; flex-direction: column;
   padding: 18px var(--gd-pad) calc(24px + env(safe-area-inset-bottom));
-  /* 메인 화면과 같은 배경 그림 */
-  background: url('/main.jpg') center / cover no-repeat;
+  background: var(--surface);
 }
+/* 그레인(종이 결)도 걷어내 말끔한 흰 바탕으로 둔다 */
+.oath .sheet__panel.oath__panel::before { display: none; }
 .oath__toolbar { height: 24px; margin-bottom: 10px; }
-/* 선언문 종이 — public/border.png 를 테두리로 두른다.
-   모서리 꽃은 원본 비율 그대로 두고 위아래·좌우 변만 늘려 화면에 꼭 맞춘다
-   (원본 1213×1296에서 모서리 장식이 차지하는 250px을 잘라 쓴다) */
 .oath__frame {
   flex: 1; display: flex; flex-direction: column;
   align-items: center; justify-content: center;
   padding: 12px 10px;
-  border: 42px solid transparent;
-  border-image: url('/border.png') 250 stretch;
-  /* 배경 그림 위에서도 글이 읽히도록 종이면을 깐다(테두리 안쪽만) */
-  background: rgba(255,255,255,.90);
-  background-clip: padding-box;
 }
 .oath__title {
   margin: 0 0 30px; font-size: var(--t-head); font-weight: var(--tw-head);

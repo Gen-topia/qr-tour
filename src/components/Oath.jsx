@@ -1,4 +1,5 @@
 'use client';
+import { useEffect } from 'react';
 import AudioPlayer from '@/components/AudioPlayer';
 
 // 수호자 서약 — 소셜 로그인 전에 한 번만 거치는 선언문.
@@ -18,6 +19,12 @@ const ASK = `설문대할망의 사자,
 수호자 서약을 진행하시겠습니까?`;
 
 export default function Oath({ onAgree, onBack }) {
+  // 서약을 보는 동안에는 바탕도 흰색으로 — 넓은 화면의 좌우 여백까지 이어진다
+  useEffect(() => {
+    document.body.classList.add('oath-open');
+    return () => document.body.classList.remove('oath-open');
+  }, []);
+
   return (
     <div className="onboard sheet oath">
       <div className="sheet__panel oath__panel">

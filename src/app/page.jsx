@@ -36,6 +36,7 @@ function MainInner() {
   const [onboard, setOnboard] = useState(false); // 로그인 직후 순서 안내
   const [closed, setClosed] = useState(false);   // 오픈 전이라 로그인을 받지 않는 상태
   const [allDone, setAllDone] = useState(false); // 퀘스트3까지 모두 완수해 여정이 끝난 상태
+  const [endClosed, setEndClosed] = useState(false); // 여정의 끝 안내를 닫았는지
   const params = useSearchParams();
   const next = params.get('next') || '/';
   const err = params.get('error');
@@ -204,9 +205,10 @@ function MainInner() {
         {preq && !allDone && <PreQuest onDone={closePreq} />}
         {/* 테스트용 — Ctrl+1로 연다 */}
         {jump && <TestJump onClose={() => setJump(false)} onOath={() => setOathView(true)} />}
-        {/* 여정의 끝 — 닫을 수 없다. 여기서부터는 다시 도전할 수 없다 */}
-        {allDone && (
-          <InfoModal eyebrow="여정의 끝" title="모든 퀘스트를 완수했습니다">
+        {/* 여정의 끝 — 닫으면 메인 화면이 그대로 남는다(다시 도전할 수는 없다) */}
+        {allDone && !endClosed && (
+          <InfoModal eyebrow="여정의 끝" title="모든 퀘스트를 완수했습니다"
+                     confirmLabel="닫기" onClose={() => setEndClosed(true)}>
             수호자님의 거룩한 여정이 모두 끝났습니다.{'\n'}
             수호 본부(향사당)로 돌아가 발걸음을 증명하고{'\n'}
             명예의 전당에 이름을 새겨 주세요.

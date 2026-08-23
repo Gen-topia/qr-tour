@@ -6,7 +6,7 @@ import { STEP_TYPES } from '@/lib/stepTypes';
 import { SPOT_OPTIONS } from '@/lib/spots';
 import { QUEST_GROUPS } from '@/lib/questGroups';
 
-const EMPTY = { title: '', order_no: 1, quest_group: 1, main_no: 1, main_title: '', place: '', cover_image_url: '', clear_image_url: '', narration_video: '', clear_text: '', clear_audio_url: '', reward_points: 100, is_active: 1 };
+const EMPTY = { title: '', header_title: '', order_no: 1, quest_group: 1, main_no: 1, main_title: '', place: '', cover_image_url: '', clear_image_url: '', narration_video: '', clear_text: '', clear_audio_url: '', reward_points: 100, is_active: 1 };
 const SAMPLE = JSON.stringify([STEP_TYPES.story.sample, STEP_TYPES.quiz.sample], null, 2);
 
 function Quests() {
@@ -198,7 +198,8 @@ function Quests() {
               </p>
             </div>
             <div className="grid2">
-              <div className="field"><label>제목</label><input className="input" value={editing.title} onChange={e => setEditing({ ...editing, title: e.target.value })} /></div>
+              <div className="field"><label>제목</label><input className="input" value={editing.title} onChange={e => setEditing({ ...editing, title: e.target.value })} placeholder="'나의 퀘스트' 목록에 보이는 이름" /></div>
+              <div className="field"><label>진행 화면 윗줄</label><input className="input" value={editing.header_title || ''} onChange={e => setEditing({ ...editing, header_title: e.target.value })} placeholder="비우면 제목을 그대로 쓴다" /></div>
               <div className="field"><label>순서</label><input className="input" type="number" value={editing.order_no} onChange={e => setEditing({ ...editing, order_no: +e.target.value })} /></div>
             </div>
             {/* 이 미션(QR)이 어느 메인 퀘스트에 속하는지 — 같은 번호끼리 모두 깨야 한 퀘스트가 완수된다 */}
