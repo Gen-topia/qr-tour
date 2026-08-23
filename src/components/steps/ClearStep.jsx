@@ -62,7 +62,7 @@ export default function ClearStep({ step, submit }) {
   return (
     <div className="card stack">
       <div className="eyebrow">미션 · 걷어내기</div>
-      <p className="muted" style={{ margin: 0 }}>덮인 조각을 판 바깥으로 끌어내 주세요.</p>
+      <p className="muted" style={{ margin: 0 }}>측간신의 찌꺼기를 사진 밖으로 끌어내 주세요.</p>
       <div className="clr" ref={areaRef}>
         {background && <img className="clr__bg" src={background} alt="" />}
         {HOME.map((home, i) => gone[i] ? null : (

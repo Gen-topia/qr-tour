@@ -137,6 +137,7 @@ function Quest() {
   if (result) return (
     <ResultView result={result} quest={quest}
                 onHome={() => router.replace('/')}
+                onBack={() => setResult(null)}
                 onQuestList={() => router.replace(`/missions?quest=${quest?.quest_group}`)}
                 onScan={() => router.replace('/scan')}
                 onEnding={() => setEnding(true)}
@@ -316,7 +317,7 @@ const HERO_BUTTON = { 1: '복숭아 나무 보기', 2: '측간신 상태보기' 
 // 그 아래에 다음 미션으로 가는 단추가 하나 더 붙는다.
 const CLEAR_NEXT = { 8: { label: '측간신 정화하기', to: '/quest/9' } };
 
-function ResultView({ result, quest, onHome, onQuestList, onScan, onEnding, onGo }) {
+function ResultView({ result, quest, onHome, onBack, onQuestList, onScan, onEnding, onGo }) {
   // 퀘스트3까지 모두 끝내면 최종 완료 — 설문대할망의 메시지로 이어진다
   const isFinal = quest?.quest_group === 3 && result.groupCleared;
   // 이야기를 다 끝냈으면 진행 그림을 보러 '나의 퀘스트'의 그 탭으로 보낸다.
@@ -361,10 +362,9 @@ function ResultView({ result, quest, onHome, onQuestList, onScan, onEnding, onGo
               {isFinal ? '메시지 듣기' : heroLabel || (toScan ? '코드 탐색' : '메인으로')}
             </button>
           )}
-          {/* 주 단추가 메인으로가 아닐 때만 빠져나갈 길을 하나 더 둔다 */}
-          {(isFinal || heroLabel || toScan || nextQuest) && (
-            <button type="button" className="btn outline" onClick={onHome}>이전으로</button>
-          )}
+          {/* 앞 화면(미션의 마지막 장)으로 돌아갈 길은 언제나 둔다 — 완료 화면에서
+              빠져나갈 곳이 메인밖에 없으면 읽던 이야기로 되돌아갈 수 없다 */}
+          <button type="button" className="btn outline" onClick={onBack}>이전으로</button>
         </div>
       </div>
     </div>

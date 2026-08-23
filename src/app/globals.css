@@ -226,13 +226,13 @@ h1 { font-size: 28px; font-weight: 800; margin: 8px 0 6px; letter-spacing: -.03e
 
 /* 가려진 힌트 — 하얀 입김을 문질러 지우면 그림과 글이 함께 드러난다 */
 /* 미션 첫 장 — 수호자 지침서와 같은 톤. 제목은 가볍게, 본문은 옅고 넉넉하게 */
-/* 제목 크기는 어느 장에서나 같게 둔다(장마다 커졌다 작아지지 않도록) */
+/* 제목·본문 크기는 어느 장에서나 같게 둔다(장마다 커졌다 작아지지 않도록) */
 .qpage h1 {
   margin: 18px 0 14px;
   font-size: 20px; font-weight: var(--tw-head);
   letter-spacing: var(--ls-head); color: var(--c-ink);
 }
-.qintro > p {
+.qpage > p {
   margin: 0; font-size: var(--t-body); line-height: var(--lh-body);
   letter-spacing: var(--ls-body); color: var(--c-body);
 }
@@ -1285,7 +1285,7 @@ h1 { font-size: 28px; font-weight: 800; margin: 8px 0 6px; letter-spacing: -.03e
    --skykey-shift 값을 키우면 오른쪽 여백이 늘어 그림이 그만큼 왼쪽으로 간다.
    (그림 자기 너비 기준의 비율 — 8%는 그림 폭의 8%만큼 왼쪽으로) */
 .skykey__img {
-  --skykey-shift: 15%;
+  --skykey-shift: 7%;
   display: block; width: 84%; height: auto; margin: 0 auto;
   transform: translateX(calc(-1 * var(--skykey-shift)));
 }
