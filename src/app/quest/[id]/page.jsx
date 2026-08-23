@@ -261,10 +261,13 @@ function Quest() {
       )}
 
       {/* 문제를 푸는 장에서는 앞 장으로 돌아가거나 그만두고 나갈 수 있어야 한다.
-          길 안내 장은 제 단추를 따로 두므로 여기서는 그리지 않는다. */}
+          길 안내 장은 제 단추를 따로 두므로 여기서는 그리지 않는다.
+          돌아갈 앞 장이 없는 장은 관리툴 config에 { "prevhome": true }를 넣어 메인으로 내보낸다. */}
       {Play && step.type !== 'way' && (
         <div className="qnav">
-          <button type="button" className="btn outline outline--bare" onClick={prev} disabled={idx === 0}>이전으로</button>
+          <button type="button" className="btn outline outline--bare"
+                  onClick={step.config?.prevhome ? () => router.replace('/') : prev}
+                  disabled={idx === 0 && !step.config?.prevhome}>이전으로</button>
           <HintModal hint={step.hint_text} image={step.hint_image_url} className="btn outline outline--bare" />
           {/* 걷어내기·문지르기·기압 조정은 판 위에서 손을 움직이므로 아래에 나가는 단추를 두지 않는다.
               장별로 빼고 싶으면 관리툴 config에 { "nohome": true } */}

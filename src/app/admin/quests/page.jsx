@@ -30,9 +30,13 @@ function Quests() {
   function loadTesters() { api.adminTesters().then(r => setTesters(r.testers)).catch(() => {}); }
 
   async function openEdit(qst) {
-    setEditing(qst); setStepsErr('');
+    // 먼저 비운다 — 안 비우면 스텝을 받아오는 동안 앞서 열어본 미션의 내용이 그대로 보이고,
+    // 못 받아오면 그대로 남아 다른 미션의 스텝을 덮어쓰게 된다
+    setEditing(qst); setStepsErr(''); setStepsText('');
     if (qst.id) {
-      const { steps } = await api.adminGetSteps(qst.id);
+      let steps;
+      try { ({ steps } = await api.adminGetSteps(qst.id)); }
+      catch (e) { setStepsErr(`스텝을 불러오지 못했습니다 — ${e.message}`); return; }
       // 값이 없는 필드는 빼서 JSON을 읽기 쉽게 유지한다
       setStepsText(JSON.stringify(steps.map(s => {
         const out = { type: s.type };
@@ -275,7 +279,8 @@ function Quests() {
                 <button type="button" className="btn sm ghost" onClick={addStep}>+ 스텝 추가</button>
               </div>
               <p className="muted" style={{ fontSize: 12, margin: '0 0 8px' }}>{STEP_TYPES[newType].hint}</p>
-              <textarea style={{ minHeight: 220, fontFamily: 'monospace', fontSize: 13 }} value={stepsText} onChange={e => setStepsText(e.target.value)} />
+              <textarea style={{ minHeight: 220, fontFamily: 'monospace', fontSize: 13 }} placeholder="불러오는 중…"
+                        value={stepsText} onChange={e => setStepsText(e.target.value)} />
               {stepsErr && <p style={{ color: 'var(--talisman)', fontSize: 13 }}>{stepsErr}</p>}
             </div>
             <div className="row-actions" style={{ justifyContent: 'flex-end' }}>
