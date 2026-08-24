@@ -9,6 +9,7 @@ async function req(path, { method = 'GET', body, admin = false } = {}) {
       method,
       headers: { 'Content-Type': 'application/json', ...(token ? { Authorization: `Bearer ${token}` } : {}) },
       body: body ? JSON.stringify(body) : undefined,
+      cache: 'no-store',   // 진행 상황은 늘 새로 받아 온다(브라우저가 옛 응답을 쓰지 않게)
     });
   } catch {
     // 신호가 끊겼거나 서버에 닿지 못한 경우 — 다시 눌러 보라고 알려준다

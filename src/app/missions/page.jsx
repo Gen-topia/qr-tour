@@ -91,7 +91,21 @@ function Missions() {
   // 복숭아 따기 연출 — '' → picking(나무가 스러진다) → key(열쇠) → quest3(열림 안내)
   const [phase, setPhase] = useState('');
   const router = useRouter();
-  useEffect(() => { api.myMissions().then(setData).catch(e => setErr(e.message)); }, []);
+  useEffect(() => {
+    const load = () => api.myMissions().then(setData).catch(e => setErr(e.message));
+    load();
+    // 미션을 완수하고 돌아오면 목록이 바뀌어 있어야 한다.
+    // 모바일 브라우저는 뒤로 가기로 돌아올 때 화면을 통째로 되살려(bfcache) 처음 받아둔
+    // 목록을 그대로 보여주므로, 되살아나거나 다시 화면에 들어올 때 새로 받아 온다.
+    const back = (e) => { if (e.persisted) load(); };
+    const shown = () => { if (document.visibilityState === 'visible') load(); };
+    window.addEventListener('pageshow', back);
+    document.addEventListener('visibilitychange', shown);
+    return () => {
+      window.removeEventListener('pageshow', back);
+      document.removeEventListener('visibilitychange', shown);
+    };
+  }, []);
 
   // 펼쳐 둘 이야기를 지정해 왔으면, 그 안의 미션이 바로 보이도록 맨 아래까지 내려준다
   // (이 화면은 창이 아니라 바깥 상자가 구르므로 그 상자를 움직인다)
