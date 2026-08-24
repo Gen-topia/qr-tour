@@ -3,13 +3,20 @@
 async function req(path, { method = 'GET', body, admin = false } = {}) {
   const token = typeof window !== 'undefined'
     ? localStorage.getItem(admin ? 'admin_token' : 'token') : null;
-  const res = await fetch(path, {
-    method,
-    headers: { 'Content-Type': 'application/json', ...(token ? { Authorization: `Bearer ${token}` } : {}) },
-    body: body ? JSON.stringify(body) : undefined,
-  });
+  let res;
+  try {
+    res = await fetch(path, {
+      method,
+      headers: { 'Content-Type': 'application/json', ...(token ? { Authorization: `Bearer ${token}` } : {}) },
+      body: body ? JSON.stringify(body) : undefined,
+    });
+  } catch {
+    // 신호가 끊겼거나 서버에 닿지 못한 경우 — 다시 눌러 보라고 알려준다
+    throw new Error('연결이 끊겼어요. 잠시 후 다시 시도해 주세요.');
+  }
   const data = await res.json().catch(() => ({}));
-  if (!res.ok) throw new Error(data.error || '요청 실패');
+  // 서버가 오류를 HTML로 뱉으면 error가 비어 원인을 알 수 없다. 적어도 상태 번호는 남긴다.
+  if (!res.ok) throw new Error(data.error || `요청 실패 (${res.status})`);
   return data;
 }
 

@@ -33,6 +33,17 @@ function judge(step, answer) {
 }
 
 export async function POST(request, { params }) {
+  // 뜻밖의 오류가 나도 HTML 오류 화면 대신 까닭을 담은 JSON을 돌려준다.
+  // (HTML이 오면 화면에는 '요청 실패'만 남아 무엇이 잘못됐는지 알 수 없다)
+  try {
+    return await handle(request, params);
+  } catch (e) {
+    console.error('[answer]', e);
+    return bad(`완료 처리 중 문제가 생겼어요. (${e.code || e.message})`, 500);
+  }
+}
+
+async function handle(request, params) {
   const user = verifyFrom(request, 'user');
   if (!user) return unauthorized();
   const { id } = await params;
