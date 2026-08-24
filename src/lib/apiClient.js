@@ -13,6 +13,14 @@ async function req(path, { method = 'GET', body, admin = false } = {}) {
   return data;
 }
 
+// 파일을 내려받는 요청 — 응답이 JSON이 아니므로 그대로 Blob으로 받는다
+async function fileReq(path) {
+  const token = typeof window !== 'undefined' ? localStorage.getItem('admin_token') : null;
+  const res = await fetch(path, { headers: token ? { Authorization: `Bearer ${token}` } : {} });
+  if (!res.ok) throw new Error('요청 실패');
+  return res.blob();
+}
+
 export const api = {
   session: () => req('/api/auth/session', { method: 'POST' }),
   resume: (uuid) => req('/api/auth/resume', { method: 'POST', body: { uuid } }),
@@ -32,6 +40,7 @@ export const api = {
   adminGetSteps: (id) => req(`/api/admin/quests/${id}/steps`, { admin: true }),
   adminPutSteps: (id, steps) => req(`/api/admin/quests/${id}/steps`, { method: 'PUT', body: { steps }, admin: true }),
   adminUsers: () => req('/api/admin/users', { admin: true }),
+  adminUsersXlsx: () => fileReq('/api/admin/users/export'),
 
   // 앱 오픈 여부
   settings: () => req('/api/settings'),
