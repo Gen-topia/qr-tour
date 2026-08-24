@@ -16,6 +16,12 @@ async function req(path, { method = 'GET', body, admin = false } = {}) {
     throw new Error('연결이 끊겼어요. 잠시 후 다시 시도해 주세요.');
   }
   const data = await res.json().catch(() => ({}));
+  // 로그인이 더는 쓸 수 없는 상태(참가자 줄이 사라졌거나 토큰 만료)면
+  // 저장해 둔 로그인을 지우고 로그인 화면으로 돌려보낸다 — 그래야 다시 이어서 할 수 있다.
+  if (res.status === 401 && !admin && typeof window !== 'undefined') {
+    ['tour_uuid', 'token', 'user'].forEach(k => localStorage.removeItem(k));
+    if (window.location.pathname !== '/') window.location.replace('/');
+  }
   // 서버가 오류를 HTML로 뱉으면 error가 비어 원인을 알 수 없다. 적어도 상태 번호는 남긴다.
   if (!res.ok) throw new Error(data.error || `요청 실패 (${res.status})`);
   return data;

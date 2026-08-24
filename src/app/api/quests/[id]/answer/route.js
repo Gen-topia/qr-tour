@@ -39,6 +39,10 @@ export async function POST(request, { params }) {
     return await handle(request, params);
   } catch (e) {
     console.error('[answer]', e);
+    // 토큰은 살아 있는데 그 참가자 줄이 사라진 경우(외래키 위반) — 다시 로그인하면 이어진다
+    if (e.code === 'ER_NO_REFERENCED_ROW_2' || e.code === 'ER_NO_REFERENCED_ROW') {
+      return unauthorized('로그인이 만료되었어요. 다시 로그인해 주세요.');
+    }
     return bad(`완료 처리 중 문제가 생겼어요. (${e.code || e.message})`, 500);
   }
 }
