@@ -168,28 +168,23 @@ function Quest() {
     const at = steps.findIndex(s => s.step_no === Number(no));
     if (at >= 0) setIdx(at);
   };
-  // 코드 탐색으로 이어지는 장 — 마지막 장이면 완수 처리부터 하고 넘어간다
-  const goScan = async () => {
-    if (isLast) await submit({ done: true }, true);
-    router.push('/scan');
-  };
-  // 곁들이 단추로 다른 화면에 나가는 장 — 마지막 장이면 완수 처리부터 하고 넘어간다
-  const goExtra = async (to) => {
-    if (isLast) await submit({ done: true }, true);
-    router.push(to);
-  };
+  // 마지막 장에서 다른 화면으로 나가는 단추들 — 완수 처리가 끝난 뒤에만 넘어간다.
+  // 실패했는데도 넘어가면 완수된 줄 알고 나가 버려 기록이 남지 않는다.
+  const cleared = async () => !isLast || await submit({ done: true }, true);
+  // 코드 탐색으로 이어지는 장
+  const goScan = async () => { if (await cleared()) router.push('/scan'); };
+  // 곁들이 단추로 다른 화면에 나가는 장
+  const goExtra = async (to) => { if (await cleared()) router.push(to); };
   // 좌우로 넘겨 읽는 장 — config에 { "slides": ["...", "..."] }
   const slides = step.type === 'story' && Array.isArray(step.config?.slides) ? step.config.slides : null;
   // 이야기를 끝내고 메인으로 나가는 장 — config에 { "finish": "home" }
   const finishHome = async () => {
-    await submit({ done: true }, true);
-    router.replace('/');
+    if (await submit({ done: true }, true)) router.replace('/');
   };
   // 이야기를 끝내고 '나의 퀘스트'의 그 탭으로 가는 장 — config에 { "finish": "quests" }.
   // 완료 화면을 거치지 않으므로 진행 그림을 바로 보러 갈 수 있다.
   const finishQuests = async () => {
-    await submit({ done: true }, true);
-    router.replace(`/missions?quest=${quest?.quest_group}`);
+    if (await submit({ done: true }, true)) router.replace(`/missions?quest=${quest?.quest_group}`);
   };
 
   // 관리툴에 적어둔 이름 → public/{이름}.mp4

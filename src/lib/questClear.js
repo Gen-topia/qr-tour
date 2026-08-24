@@ -16,16 +16,29 @@ export async function isMainCleared(userId, quest) {
 
 export async function clearQuest(userId, questId) {
   // 트랜잭션으로 커넥션을 붙잡고 있으면 서버리스에서 커넥션이 모자라 요청이 통째로 실패한다.
-  // 그래서 짧은 문장 둘로 나눈다.
-  //  1) 진행 줄이 없으면 만든다(이미 있으면 그대로 둔다)
-  //  2) '아직 안 깼을 때만' 완수로 바꾼다 — 이 한 문장이 실제로 바꾼 경우에만 점수를 준다.
-  //     같은 요청이 두 번 오거나 두 창에서 동시에 눌러도 점수는 한 번만 쌓인다.
-  await q(`INSERT IGNORE INTO quest_progress (user_id, quest_id, status) VALUES (?, ?, 'unlocked')`,
-          [userId, questId]);
+  // 그래서 짧은 문장으로 나누되, 쓰기가 정말 들어갔는지는 반드시 확인한다.
+  //  1) 진행 줄이 있으면 '아직 안 깼을 때만' 완수로 바꾼다 — 이때만 점수를 준다.
   const upd = await q(
     `UPDATE quest_progress SET status='cleared', cleared_at=NOW()
       WHERE user_id=? AND quest_id=? AND status<>'cleared'`, [userId, questId]);
-  if (!upd.affectedRows) return { awarded: 0, alreadyCleared: true };
+  let awardNow = upd.affectedRows > 0;
+
+  //  2) 바뀐 것이 없으면 이미 깼거나 줄이 아예 없는 것이다.
+  if (!awardNow) {
+    const [row] = await q('SELECT status FROM quest_progress WHERE user_id=? AND quest_id=?', [userId, questId]);
+    if (row) return { awarded: 0, alreadyCleared: true };
+    try {
+      // 줄이 없으면 새로 만든다. INSERT IGNORE를 쓰면 사용자가 없는 것 같은 진짜 문제까지
+      // 조용히 넘어가 '완료했는데 기록이 없는' 일이 생기므로 절대 쓰지 않는다.
+      await q(`INSERT INTO quest_progress (user_id, quest_id, status, cleared_at)
+               VALUES (?, ?, 'cleared', NOW())`, [userId, questId]);
+      awardNow = true;
+    } catch (e) {
+      // 같은 순간 다른 요청이 먼저 넣은 경우만 넘어간다
+      if (e.code !== 'ER_DUP_ENTRY') throw e;
+      return { awarded: 0, alreadyCleared: true };
+    }
+  }
 
   const [quest] = await q('SELECT reward_points FROM quests WHERE id=?', [questId]);
   const points = Number(quest?.reward_points || 0);
