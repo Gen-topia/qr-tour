@@ -3,7 +3,7 @@ import { q } from '@/lib/db';
 import { verifyFrom, unauthorized } from '@/lib/auth';
 
 // 참가자 목록을 엑셀 파일(.xlsx)로 내려준다 — 화면의 표와 같은 열에,
-// 뒤로 미션마다 한 칸씩 붙여 수행 여부를 O·X로 적는다.
+// 뒤로 미션마다 두 칸씩 붙여 수행 여부(O·X)와 완료 시각을 적는다.
 // 전화번호처럼 0으로 시작하는 값은 xlsx가 글자 유형을 함께 담으므로 앞자리가 떨어지지 않는다.
 const COLUMNS = [
   { header: 'ID', key: 'id', width: 6 },
@@ -25,13 +25,19 @@ export async function GET(request) {
      FROM users u ORDER BY u.id DESC`);
   const quests = await q(
     'SELECT id, title FROM quests WHERE is_active=1 ORDER BY order_no ASC');
-  const done = await q("SELECT user_id, quest_id FROM quest_progress WHERE status='cleared'");
-  const doneSet = new Set(done.map(r => `${r.user_id}:${r.quest_id}`));
+  // 완료 시각은 DB에서 바로 글자로 만든다 — DB 시간대가 Asia/Seoul이라 그대로 우리 시각이다
+  const done = await q(
+    `SELECT user_id, quest_id, DATE_FORMAT(cleared_at, '%Y-%m-%d %H:%i') AS at
+       FROM quest_progress WHERE status='cleared'`);
+  const doneAt = new Map(done.map(r => [`${r.user_id}:${r.quest_id}`, r.at || '']));
 
   const wb = new ExcelJS.Workbook();
   const ws = wb.addWorksheet('참가자');
-  // 미션 이름을 열로 붙인다. 같은 이름이 있어도 열쇠(key)는 미션 번호라 섞이지 않는다.
-  ws.columns = [...COLUMNS, ...quests.map(qz => ({ header: qz.title, key: `q${qz.id}`, width: 14 }))];
+  // 미션마다 '수행 여부'와 '완료 시각' 두 칸. 같은 이름이 있어도 열쇠(key)는 미션 번호라 섞이지 않는다.
+  ws.columns = [...COLUMNS, ...quests.flatMap(qz => [
+    { header: qz.title, key: `q${qz.id}`, width: 14 },
+    { header: `${qz.title} 완료시각`, key: `t${qz.id}`, width: 17 },
+  ])];
   ws.getRow(1).font = { bold: true };
   ws.getRow(1).alignment = { wrapText: true, vertical: 'middle' };
   ws.views = [{ state: 'frozen', xSplit: 1, ySplit: 1 }];   // 머리글과 ID 칸을 고정해 둔다
@@ -42,11 +48,15 @@ export async function GET(request) {
       email: u.email || '',
       phone: u.phone || '',
     };
-    for (const qz of quests) row[`q${qz.id}`] = doneSet.has(`${u.id}:${qz.id}`) ? 'O' : 'X';
+    for (const qz of quests) {
+      const at = doneAt.get(`${u.id}:${qz.id}`);
+      row[`q${qz.id}`] = at === undefined ? 'X' : 'O';
+      row[`t${qz.id}`] = at ?? '';
+    }
     const added = ws.addRow(row);
-    // O·X 칸은 가운데로 모아 한눈에 보이게 한다
+    // O·X 칸은 가운데로 모아 한눈에 보이게 한다(그 옆 시각 칸은 그대로 왼쪽)
     for (let i = 0; i < quests.length; i++) {
-      added.getCell(COLUMNS.length + 1 + i).alignment = { horizontal: 'center' };
+      added.getCell(COLUMNS.length + 1 + i * 2).alignment = { horizontal: 'center' };
     }
   }
 
