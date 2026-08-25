@@ -2,7 +2,8 @@ import ExcelJS from 'exceljs';
 import { q } from '@/lib/db';
 import { verifyFrom, unauthorized } from '@/lib/auth';
 
-// 참가자 목록을 엑셀 파일(.xlsx)로 내려준다 — 화면의 표와 같은 열·같은 순서.
+// 참가자 목록을 엑셀 파일(.xlsx)로 내려준다 — 화면의 표와 같은 열에,
+// 뒤로 미션마다 한 칸씩 붙여 수행 여부를 O·X로 적는다.
 // 전화번호처럼 0으로 시작하는 값은 xlsx가 글자 유형을 함께 담으므로 앞자리가 떨어지지 않는다.
 const COLUMNS = [
   { header: 'ID', key: 'id', width: 6 },
@@ -22,19 +23,31 @@ export async function GET(request) {
             DATE_FORMAT(u.created_at, '%Y-%m-%d') AS created_at,
             (SELECT COUNT(*) FROM quest_progress p WHERE p.user_id=u.id AND p.status='cleared') AS cleared_count
      FROM users u ORDER BY u.id DESC`);
+  const quests = await q(
+    'SELECT id, title FROM quests WHERE is_active=1 ORDER BY order_no ASC');
+  const done = await q("SELECT user_id, quest_id FROM quest_progress WHERE status='cleared'");
+  const doneSet = new Set(done.map(r => `${r.user_id}:${r.quest_id}`));
 
   const wb = new ExcelJS.Workbook();
   const ws = wb.addWorksheet('참가자');
-  ws.columns = COLUMNS;
+  // 미션 이름을 열로 붙인다. 같은 이름이 있어도 열쇠(key)는 미션 번호라 섞이지 않는다.
+  ws.columns = [...COLUMNS, ...quests.map(qz => ({ header: qz.title, key: `q${qz.id}`, width: 14 }))];
   ws.getRow(1).font = { bold: true };
-  ws.views = [{ state: 'frozen', ySplit: 1 }];   // 첫 줄(머리글)을 고정해 둔다
+  ws.getRow(1).alignment = { wrapText: true, vertical: 'middle' };
+  ws.views = [{ state: 'frozen', xSplit: 1, ySplit: 1 }];   // 머리글과 ID 칸을 고정해 둔다
   for (const u of users) {
-    ws.addRow({
+    const row = {
       ...u,
       nickname: u.nickname || '',
       email: u.email || '',
       phone: u.phone || '',
-    });
+    };
+    for (const qz of quests) row[`q${qz.id}`] = doneSet.has(`${u.id}:${qz.id}`) ? 'O' : 'X';
+    const added = ws.addRow(row);
+    // O·X 칸은 가운데로 모아 한눈에 보이게 한다
+    for (let i = 0; i < quests.length; i++) {
+      added.getCell(COLUMNS.length + 1 + i).alignment = { horizontal: 'center' };
+    }
   }
 
   const buf = await wb.xlsx.writeBuffer();
