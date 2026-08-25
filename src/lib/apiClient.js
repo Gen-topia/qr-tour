@@ -55,6 +55,7 @@ export const api = {
   adminPutSteps: (id, steps) => req(`/api/admin/quests/${id}/steps`, { method: 'PUT', body: { steps }, admin: true }),
   adminUsers: () => req('/api/admin/users', { admin: true }),
   adminUsersXlsx: () => fileReq('/api/admin/users/export'),
+  adminDeleteUser: (id) => req(`/api/admin/users/${id}`, { method: 'DELETE', admin: true }),
 
   // 앱 오픈 여부
   settings: () => req('/api/settings'),

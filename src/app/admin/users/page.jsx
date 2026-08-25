@@ -3,14 +3,22 @@ import { useEffect, useState } from 'react';
 import AdminShell from '@/components/AdminShell';
 import { api } from '@/lib/apiClient';
 
+// 검색은 닉네임·이메일·전화번호·UUID를 한꺼번에 본다
+const matches = (u, word) =>
+  [u.nickname, u.email, u.phone, u.uuid, String(u.no)].some(v => (v || '').toLowerCase().includes(word));
+
 function Users() {
   const [users, setUsers] = useState([]);
   const [quests, setQuests] = useState([]);
   const [busy, setBusy] = useState(false);
+  const [word, setWord] = useState('');
   const [seeing, setSeeing] = useState(null);   // 정보 보기로 펼쳐 둔 참가자
-  useEffect(() => {
-    api.adminUsers().then(d => { setUsers(d.users); setQuests(d.quests || []); }).catch(() => {});
-  }, []);
+
+  // 번호는 목록에 실린 차례대로 1번부터 매긴다(DB 번호와 별개 — 검색해도 번호는 그대로다)
+  const load = () => api.adminUsers()
+    .then(d => { setUsers(d.users.map((u, i) => ({ ...u, no: i + 1 }))); setQuests(d.quests || []); })
+    .catch(() => {});
+  useEffect(() => { load(); }, []);
 
   // 엑셀 파일은 서버가 만들어 보내준다(/api/admin/users/export)
   async function download() {
@@ -27,6 +35,19 @@ function Users() {
     setBusy(false);
   }
 
+  // 계정을 지우면 진행 기록도 함께 사라진다. 그 사람은 앱에서 다시 로그인(=새 가입)하게 된다.
+  async function remove(u) {
+    const who = u.nickname || u.email || `번호 ${u.no}`;
+    if (!confirm(`${who} 계정을 지울까요?\n진행 기록도 함께 사라지고 되돌릴 수 없습니다.`)) return;
+    try {
+      await api.adminDeleteUser(u.id);
+      setSeeing(s => (s?.id === u.id ? null : s));
+      await load();
+    } catch (e) { alert(e.message); }
+  }
+
+  const shown = word.trim() ? users.filter(u => matches(u, word.trim().toLowerCase())) : users;
+
   return (
     <div>
       <div className="spread" style={{ marginBottom: 18 }}>
@@ -35,19 +56,34 @@ function Users() {
           {busy ? '만드는 중…' : `엑셀 내려받기 (${users.length}명)`}
         </button>
       </div>
+
+      <div className="spread" style={{ marginBottom: 14 }}>
+        <input className="input" style={{ maxWidth: 360 }} value={word}
+               onChange={e => setWord(e.target.value)}
+               placeholder="닉네임 · 이메일 · 전화번호 · UUID로 검색" />
+        <span className="muted" style={{ fontSize: 13 }}>
+          {word.trim() ? `${shown.length}명 찾음 / 전체 ${users.length}명` : `전체 ${users.length}명`}
+        </span>
+      </div>
+
       <table className="table">
-        <thead><tr><th>ID</th><th>UUID</th><th>닉네임</th><th>이메일</th><th>전화번호</th><th>누적점수</th><th>완료 미션</th><th>가입일</th><th></th></tr></thead>
+        <thead><tr><th>번호</th><th>UUID</th><th>닉네임</th><th>이메일</th><th>전화번호</th><th>누적점수</th><th>완료 미션</th><th>가입일</th><th></th></tr></thead>
         <tbody>
-          {users.map(u => (
-            <tr key={u.id}><td>{u.id}</td><td><code style={{ fontSize: 12 }}>{u.uuid}</code></td>
+          {shown.map(u => (
+            <tr key={u.id}><td>{u.no}</td><td><code style={{ fontSize: 12 }}>{u.uuid}</code></td>
               <td>{u.nickname || '-'}</td><td>{u.email || '-'}</td><td>{u.phone || '-'}</td>
               <td>{u.total_points}</td><td>{u.cleared_count}/{quests.length}</td>
               <td className="muted">{String(u.created_at).slice(0, 10)}</td>
               <td className="row-actions">
                 <button className="btn sm ghost" onClick={() => setSeeing(u)}>정보 보기</button>
+                <button className="btn sm danger" onClick={() => remove(u)}>삭제</button>
               </td></tr>
           ))}
-          {users.length === 0 && <tr><td colSpan="9" className="muted">참가자가 없습니다.</td></tr>}
+          {shown.length === 0 && (
+            <tr><td colSpan="9" className="muted">
+              {users.length === 0 ? '참가자가 없습니다.' : '검색 결과가 없습니다.'}
+            </td></tr>
+          )}
         </tbody>
       </table>
 
@@ -57,7 +93,7 @@ function Users() {
           <div className="card" style={{ width: 600, maxHeight: '88vh', overflow: 'auto' }} onClick={e => e.stopPropagation()}>
             <h1 style={{ marginTop: 0, fontSize: 20 }}>{seeing.nickname || '(닉네임 없음)'}</h1>
             <p className="muted" style={{ margin: '0 0 14px', fontSize: 13 }}>
-              ID {seeing.id} · {seeing.email || '이메일 없음'} · {seeing.phone || '전화번호 없음'}
+              번호 {seeing.no} · {seeing.email || '이메일 없음'} · {seeing.phone || '전화번호 없음'}
               <br />누적 {seeing.total_points}점 · {Object.keys(seeing.cleared).length}/{quests.length} 완수
             </p>
             <table className="table">
@@ -79,7 +115,10 @@ function Users() {
                 {quests.length === 0 && <tr><td colSpan="3" className="muted">미션이 없습니다.</td></tr>}
               </tbody>
             </table>
-            <button className="btn sm ghost" style={{ marginTop: 14 }} onClick={() => setSeeing(null)}>닫기</button>
+            <div className="spread" style={{ marginTop: 14 }}>
+              <button className="btn sm ghost" onClick={() => setSeeing(null)}>닫기</button>
+              <button className="btn sm danger" onClick={() => remove(seeing)}>계정 삭제</button>
+            </div>
           </div>
         </div>
       )}

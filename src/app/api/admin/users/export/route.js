@@ -6,7 +6,7 @@ import { verifyFrom, unauthorized } from '@/lib/auth';
 // 뒤로 미션마다 두 칸씩 붙여 수행 여부(O·X)와 완료 시각을 적는다.
 // 전화번호처럼 0으로 시작하는 값은 xlsx가 글자 유형을 함께 담으므로 앞자리가 떨어지지 않는다.
 const COLUMNS = [
-  { header: 'ID', key: 'id', width: 6 },
+  { header: '번호', key: 'no', width: 6 },
   { header: 'UUID', key: 'uuid', width: 38 },
   { header: '닉네임', key: 'nickname', width: 14 },
   { header: '이메일', key: 'email', width: 26 },
@@ -41,9 +41,10 @@ export async function GET(request) {
   ws.getRow(1).font = { bold: true };
   ws.getRow(1).alignment = { wrapText: true, vertical: 'middle' };
   ws.views = [{ state: 'frozen', xSplit: 1, ySplit: 1 }];   // 머리글과 ID 칸을 고정해 둔다
-  for (const u of users) {
+  users.forEach((u, i) => {
     const row = {
       ...u,
+      no: i + 1,               // 화면 목록과 같은 차례 번호(위에서부터 1번)
       nickname: u.nickname || '',
       email: u.email || '',
       phone: u.phone || '',
@@ -55,10 +56,10 @@ export async function GET(request) {
     }
     const added = ws.addRow(row);
     // O·X 칸은 가운데로 모아 한눈에 보이게 한다(그 옆 시각 칸은 그대로 왼쪽)
-    for (let i = 0; i < quests.length; i++) {
-      added.getCell(COLUMNS.length + 1 + i * 2).alignment = { horizontal: 'center' };
+    for (let k = 0; k < quests.length; k++) {
+      added.getCell(COLUMNS.length + 1 + k * 2).alignment = { horizontal: 'center' };
     }
-  }
+  });
 
   const buf = await wb.xlsx.writeBuffer();
   return new Response(buf, {
