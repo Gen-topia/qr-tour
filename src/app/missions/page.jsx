@@ -205,6 +205,9 @@ function Missions() {
 
         {g.value === 1 && data.skyKey && <p className="qkey">하늘 문 열쇠를 얻었습니다.</p>}
 
+        {g.value === 1 && <p className="qreq">퀘스트1은 순서에 상관없이 진행해주세요.</p>}
+        {g.value === 2 && <p className="qreq">퀘스트2는 순서에 따라 진행해주세요.</p>}
+
         {need.length > 0 && (
           <p className={`qreq${openable ? ' qreq--open' : ''}`}>
             {openable
